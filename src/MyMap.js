@@ -16,6 +16,7 @@ const MyMap = () => {
     const [lines, setLines] = useState([]); // Array of arrays of polyline positions
     const [polygons, setPolygons] = useState([]); // Array of arrays of polygon positions
 
+
     const position = [51.505, -0.09]; // Change to your preferred initial position
     const zoom = 13; // Initial zoom level
 
@@ -52,6 +53,7 @@ const MyMap = () => {
             setPolygons((prevPolygons) => [...prevPolygons, layer.getLatLngs()]);
         }
         // Handle other types as necessary
+        
     };
 
     const onEdited = (e) => {
@@ -125,25 +127,37 @@ const MyMap = () => {
         const file = event.target.files[0];
         if (file) {
             const reader = new FileReader();
-            reader.onload = (e) => {
+            reader.onload = async (e) => {
                 try {
-                    const text = e.target.result;
-                    const data = JSON.parse(text); // Ensure text is parsed as JSON
-                    if (data) { // Check that data is not null
-                        setGeoJsonData(data);
+                    const data = JSON.parse(e.target.result);
+                    if (data && data.features) {
+                        if (featureGroupRef.current) {
+                            // Clear any existing layers
+                            const featureGroup = featureGroupRef.current;
+                            featureGroup.clearLayers();
+    
+                            // Create layers from GeoJSON and add them to the feature group
+                            const geoJsonLayer = L.geoJSON(data, {
+                                onEachFeature: function (feature, layer) {
+                                    // Attach any necessary events or properties to layer here if needed
+                                    featureGroup.addLayer(layer); // Add each layer to the feature group
+                                }
+                            });
+    
+                            // Now featureGroup contains all the layers from GeoJSON
+                            updateGeoJson();  // Update the geoJSON state
+                        }
                     } else {
-                        console.error("Parsed GeoJSON is null.");
+                        console.error("Parsed GeoJSON is null or not properly formatted.");
                     }
                 } catch (error) {
                     console.error("Error reading GeoJSON: ", error);
                 }
             };
-            reader.onerror = (error) => console.error('Error reading file: ', error);
             reader.readAsText(file);
-        } else {
-            console.log("No file selected");
         }
     };
+        
 
 
 
@@ -171,6 +185,7 @@ const MyMap = () => {
 
             {/* Save Button */}
             <button onClick={() => downloadGeoJson(geoJsonData)}>Save Drawings</button>
+
 
             <MapContainer center={position} zoom={zoom} style={{ height: '100vh', width: '100%' }}>
                 <LayersControl position="topright">
