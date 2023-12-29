@@ -7,7 +7,7 @@ import 'leaflet-draw/dist/leaflet.draw.css';
 
 const { BaseLayer } = LayersControl;
 
-const MyMap = () => {
+const Map = () => {
     const [geoJsonData, setGeoJsonData] = useState(null);
     const featureGroupRef = useRef(null); // Using useRef to access the FeatureGroup
 
@@ -95,4 +95,4 @@ const MyMap = () => {
     );
 };
 
-export default MyMap;
+export default Map;

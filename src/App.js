@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Layout from './components/Layout';
 import RegistrationView from './views/RegistrationView';
 import LoginView from './views/LoginView';
@@ -14,18 +14,18 @@ function App() {
   return (
     <Router>
       <Layout>
-        <Switch>
-          <Route path="/register" component={RegistrationView} />
-          <Route path="/login" component={LoginView} />
-          <Route path="/dashboard" component={DashboardView} />
-          <Route path="/news" component={NewsView} />
-          <Route path="/settings" component={SettingsView} />
-          <Route path="/project" component={ProjectView} />
-          <Route path="/report" component={ReportView} />
+        <Routes> {/* Switch is replaced with Routes */}
+          <Route path="/register" element={<RegistrationView />} />
+          <Route path="/login" element={<LoginView />} />
+          <Route path="/dashboard" element={<DashboardView />} />
+          <Route path="/news" element={<NewsView />} />
+          <Route path="/settings" element={<SettingsView />} />
+          <Route path="/project" element={<ProjectView />} />
+          <Route path="/report" element={<ReportView />} />
           {/* Default path or 404 Not Found View */}
-          <Route path="/" exact component={DashboardView} />
+          <Route path="/" element={<DashboardView />} />
           {/* Add other routes as needed */}
-        </Switch>
+        </Routes>
       </Layout>
     </Router>
   );
