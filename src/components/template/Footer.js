@@ -17,6 +17,7 @@ const Footer = () => {
           <Link to="/dashboard">Panel</Link><br/>
           <Link to="/project">Projekt</Link><br/>
           <Link to="/report">Rapport</Link><br/>
+          <Link to="/data">Data</Link><br/>
           <Link to="/news">Nyheter</Link><br/>
           <Link to="/settings">Inställningar</Link><br/>
           {/* Add other links as needed */}

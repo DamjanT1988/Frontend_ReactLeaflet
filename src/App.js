@@ -8,6 +8,7 @@ import NewsView from './views/NewsView';
 import SettingsView from './views/SettingsView';
 import ProjectView from './views/ProjectView';
 import ReportView from './views/ReportView';
+import DataView from './views/DataView';
 // ... any other imports you might need
 
 function App() {
@@ -21,6 +22,7 @@ function App() {
           <Route path="/news" element={<NewsView />} />
           <Route path="/settings" element={<SettingsView />} />
           <Route path="/project" element={<ProjectView />} />
+          <Route path="/data" element={<DataView />} />
           <Route path="/report" element={<ReportView />} />
           {/* Default path or 404 Not Found View */}
           <Route path="/" element={<DashboardView />} />

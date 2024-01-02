@@ -11,6 +11,7 @@
     padding: 10px 20px;
     display: flex;
     align-items: center;
+    justify-content: space-between; /* Space between logo and navigation */
     border-bottom: 10px solid #30A875; /* Thick green line at the bottom */
 }
 
@@ -20,13 +21,62 @@
 }
 
 .logo {
-    width: 300px; /* Adjust size accordingly */
-    margin-right: 15px;
+    width: 275px; /* Adjust size accordingly */
+    margin-right: -175px;
+}
+
+.main-nav a {
+    text-decoration: none; /* Remove link underlines */
+    color: #666; /* Initial color for links */
+    margin: 0 20px; /* Spacing between links */
+    padding: 5px 10px; /* Padding for clickable area */
+    font-size: 275%;
+    font-weight: bolder;
+}
+
+.main-nav a:hover {
+    color: white; /* White text on hover */
+    background-color: #666; /* Dark grey background on hover */
+}
+
+.main-nav .active {
+    background-color: #30A875; /* Active link background color */
+    color: white; /* Active link text color */
+}
+
+.user-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-weight: bold;
+    font-size: 115%;
+}
+
+.user-actions a,
+.user-actions button {
+    text-decoration: none;
+    background: none;
+    border: none;
+    color: #666;
+    cursor: pointer;
+    margin: 5px 0;
+}
+
+.user-actions button {
+    padding: 5px 15px;
+    align-self: center;
+}
+
+.user-actions a:hover,
+.user-actions button:hover {
+    color: white;
+    background-color: #30A875;
 }
 
 .footer {
     background: #d3d3d3; /* Medium grey background */
-    color: #333; /* Dark grey text */
+    color: #666; /* Dark grey text */
+    font-weight: bold;
     padding: 20px 10px;
     margin-top: auto; /* Pushes footer to bottom */
     display: flex; /* Use flexbox to layout children horizontally */
@@ -47,4 +97,12 @@
     font-size: 150%;
     margin-top: 1px;
     margin-bottom: 5px;
+}
+
+/* Additional vertical line style for the logo */
+.logo-divider {
+    height: 75%; /* 75% of the parent's height */
+    width: 2px; /* Thin line width */
+    background-color: #30A875; /* Black color */
+    margin-left: 20px; /* Spacing from the logo */
 }
