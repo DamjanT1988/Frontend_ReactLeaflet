@@ -3,35 +3,48 @@
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-  }
-  
-  .header {
-    background: #333;
-    color: white;
+}
+
+.header {
+    background: #d3d3d3; /* Medium grey background */
+    color: #333; /* Dark grey text */
     padding: 10px 20px;
     display: flex;
     align-items: center;
-  }
-  
-  .logo-container {
+    border-bottom: 10px solid #30A875; /* Thick green line at the bottom */
+}
+
+.logo-container {
     display: flex;
     align-items: center;
-  }
-  
-  .logo {
-    width: 50px; /* Adjust size accordingly */
+}
+
+.logo {
+    width: 300px; /* Adjust size accordingly */
     margin-right: 15px;
-  }
-  
-  .footer {
-    background: #333;
-    color: white;
-    text-align: center;
+}
+
+.footer {
+    background: #d3d3d3; /* Medium grey background */
+    color: #333; /* Dark grey text */
     padding: 20px 10px;
     margin-top: auto; /* Pushes footer to bottom */
-  }
-  
-  .footer-section {
-    margin: 10px 0;
-  }
-  
+    display: flex; /* Use flexbox to layout children horizontally */
+    justify-content: space-around; /* Distribute space around items */
+    align-items: flex-start; /* Align items vertically */
+    border-top: 5px solid #30A875; /* Thin green line at the top */
+}
+
+.footer-section {
+    flex: 1; /* Each section takes equal width */
+    padding: 0 10px; /* Add some padding around sections */
+    text-align: center; /* Center text for each section */
+}
+
+.footer h4 {
+    text-transform: uppercase; /* Make all text in h4 uppercase */
+    color: #30A875; /* Green text color */
+    font-size: 150%;
+    margin-top: 1px;
+    margin-bottom: 5px;
+}
