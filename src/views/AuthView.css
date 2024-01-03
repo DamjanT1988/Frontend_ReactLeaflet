@@ -1,0 +1,88 @@
+/* AuthView.css */
+body {
+    background-color: #d3d3d3;
+}
+
+.auth-container {
+    background-color: #d3d3d3;
+    color: #666;
+    width: 768px;
+    margin: 100px auto; /* Center the box */
+    padding: 20px;
+    box-sizing: border-box;
+  }
+  
+  .auth-header {
+    color: #30A875;
+    text-align: left;
+    padding-bottom: 30px;
+    }
+  
+  .auth-logo {
+    width: 100%;
+    display: block; /* Adjust if you have a specific logo format */
+    margin-bottom: 30px; /* Space between logo and form */
+  }
+  
+  .auth-form {
+    width: 450px;
+    margin: 0 auto; /* Centering form in the container */
+    padding-left: 145px;
+  }
+  
+  .auth-form h1 {
+    color: #30A875;
+    margin-bottom: 20px;
+  }
+  
+  .auth-form input {
+    width: 300px;
+    padding: 10px;
+    margin-bottom: 20px; /* Space between inputs */
+    border: 1px solid #ccc;
+  }
+  
+  .auth-form label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 135%;
+    font-weight: bold;
+  }
+  
+  .auth-remember {
+    display: flex;
+    margin-bottom: 20px;
+    margin-top: 10px;
+    font-size: 80%;
+    width: 60px;
+    height: 40px;
+  }
+
+  .auth-remember input[type="checkbox"] {
+    margin-right: -50px;
+}
+  
+  .auth-login-button {
+    background-color: #30A875;
+    color: white;
+    padding: 15px 30px;
+    font-size: 150%;
+    border: none;
+    cursor: pointer;
+    float: right; /* Aligns the button to the right */
+  }
+  
+  .auth-forgot-link {
+    display: block;
+    color: #30A875;
+    text-align: right;
+    margin-top: 75px;
+  }
+  
+  /* Clearing floats */
+  .auth-form::after {
+    content: "";
+    display: table;
+    clear: both;
+  }
+  
