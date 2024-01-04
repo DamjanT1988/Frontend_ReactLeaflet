@@ -49,7 +49,7 @@ const RegistrationView = () => {
         }
         // Proceed with API call if passwords match
         try {
-            const response = await fetch('http://localhost:8000/api/users/create', {
+            const response = await fetch('http://localhost:8000/api/user/create/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -83,7 +83,7 @@ const RegistrationView = () => {
 
                 {/* Organization Number */}
                 <label htmlFor="organization_number">Organisationsnummer:</label>
-                <p>Endast nummer.</p>
+                <p>Endast siffror.</p>
                 <input type="text" id="organization_number" name="user_additional.organization_name" onChange={handleInputChange} />
 
                 {/* Password */}
@@ -100,6 +100,10 @@ const RegistrationView = () => {
                 <br />
 
                 {/* User Additional Information */}
+                {/* Username */}
+                <label htmlFor="username">ÖnskatAnvändarnamn:</label>
+                <input type="text" id="username" name="username" onChange={handleInputChange} />
+                
                 {/* First Name */}
                 <label htmlFor="first_name">Ansvarig förnamn:</label>
                 <input type="text" id="first_name" name="first_name" onChange={handleInputChange} />
@@ -108,7 +112,6 @@ const RegistrationView = () => {
                 <label htmlFor="last_name">Ansvarig efternamn:</label>
                 <input type="text" id="last_name" name="last_name" onChange={handleInputChange} />
   
-
                 {/* Role */}
                 <label htmlFor="role">Roll:</label>
                 <input type="text" id="role" name="user_additional.role" onChange={handleInputChange} />
@@ -121,12 +124,18 @@ const RegistrationView = () => {
                 <label htmlFor="department">Avdelning:</label>
                 <input type="text" id="department" name="user_additional.department" onChange={handleInputChange} />
 
+                {/* Email */}
+                <label htmlFor="email">Kontakt e-mejl:</label>
+                <p>Kolla inbox efter registration for bekräftelsemejl.</p>
+                <input type="email" id="email" name="email" onChange={handleInputChange} />
+
                 {/* Phone Number */}
-                <label htmlFor="phone_number">Telefonnummer:</label>
+                <label htmlFor="phone_number">Kontakt telefonnummer:</label>
+                <p>Endast siffror. Inga bindestreck.</p>
                 <input type="text" id="phone_number" name="user_additional.phone_number" onChange={handleInputChange} />
 
                 {/* Submit button */}
-                <br />
+                <br /><br /><br />
                 <button type="submit" className="auth-login-button">Registrera</button>
             </form>
         </div>
