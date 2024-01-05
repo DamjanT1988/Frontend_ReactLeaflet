@@ -1,7 +1,8 @@
 // RegistrationView.js
-import React, { useState } from 'react';
-import './AuthView.css'; // Reusing the same style sheet as LoginView for consistency
-import Logo from '../media/vagmiljo_logotyp_grey.png'; // Make sure the path is correct
+import React, { useState, useEffect } from 'react';
+import './AuthView.css';
+import Logo from '../media/vagmiljo_logotyp_grey.png'; 
+import { API_URLS } from '../constants/APIURLS';
 
 const RegistrationView = () => {
     const [formData, setFormData] = useState({
@@ -20,6 +21,16 @@ const RegistrationView = () => {
             phone_number: ''
         }
     });
+
+    useEffect(() => {
+      // When the component mounts
+      document.body.style.backgroundColor = '#d3d3d3';
+
+              // When the component unmounts
+              return () => {
+                document.body.style.backgroundColor = null; // or set to a default color
+              };
+    }, []); 
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -49,7 +60,7 @@ const RegistrationView = () => {
         }
         // Proceed with API call if passwords match
         try {
-            const response = await fetch('http://localhost:8000/api/user/create/', {
+            const response = await fetch(API_URLS.USER_CREATE, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

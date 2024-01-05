@@ -1,33 +1,52 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './AuthView.css';
 import Logo from '../media/vagmiljo_logotyp_grey.png';
+import { useNavigate } from 'react-router-dom';
+import { API_URLS } from '../constants/APIURLS';
 
 const LoginView = () => {
   const [userNumber, setUserNumber] = useState('');
   const [userPassword, setUserPassword] = useState('');
-  
+  const navigate = useNavigate();
+
+  useEffect(() => {
+     // When the component mounts
+     document.body.style.backgroundColor = '#d3d3d3';
+   
+
+    // Check if the access token exists
+    const accessToken = localStorage.getItem('accessToken');
+    if (accessToken) {
+      navigate('/dashboard'); // If the access token exists in localStorage, navigate to Dashboard
+    }
+    // Dependency array is empty, meaning it will run once on mount
+            // When the component unmounts
+            return () => {
+              document.body.style.backgroundColor = null; // or set to a default color
+            };
+  }, []); // Empty dependency array means it only runs on the first render
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch('http://localhost:8000/api/user/login/', {
+      const response = await fetch(API_URLS.LOGIN, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          username: userNumber, // assuming userNumber is the username
+          username: userNumber,
           password: userPassword,
         }),
       });
 
       const data = await response.json();
-      
+
       if (response.ok) {
         console.log('Login successful!');
-        // Store the token, for example in localStorage (Consider security implications depending on your application needs)
         localStorage.setItem('refreshToken', data.refresh);
         localStorage.setItem('accessToken', data.access);
-        // Redirect or update UI
+        navigate('/dashboard');
       } else {
         console.error('Failed to login:', data.error);
         // Handle errors, such as displaying a message to the user
