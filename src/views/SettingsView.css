@@ -1,63 +1,61 @@
+/* SettingsView.css - Assuming you're adding these styles to a separate CSS file for your settings */
+
 .settings-container {
-    max-width: 768px;
-    margin: 50px auto;
-    padding: 20px;
-    background-color: #fff;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
-
-.settings-form {
-    display: flex;
-    flex-direction: column;
-}
-
-.settings-form h1 {
-    margin-bottom: 20px;
-    color: #333;
-}
-
-.settings-form label {
-    margin-top: 10px;
-    color: #666;
-}
-
-.settings-form input[type="text"],
-.settings-form input[type="email"],
-.settings-form input[type="password"] {
-    width: calc(100% - 20px); /* Full width minus padding */
-    padding: 10px;
-    margin-top: 5px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-}
-
-.submit-button {
-    margin-top: 20px;
-    padding: 10px 15px;
-    color: white;
-    background-color: #30A875;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-.submit-button:hover {
-    background-color: #259067;
-}
-
-/* Additional styles */
-.settings-form input:focus {
-    outline: none;
-    border-color: #30A875;
-}
-
-.settings-form input[type="text"]:invalid,
-.settings-form input[type="email"]:invalid,
-.settings-form input[type="password"]:invalid {
-    border-color: red;
-}
-
-.status-message {
-    color: #d9534f; /* Change as needed */
-    margin-top: 10px;
+    background-color: #d3d3d3; /* Medium grey background */
+    color: #666; /* Dark grey text */
+    width: 768px; /* Match the auth-container width */
+    margin: 100px auto; /* Center the container */
+    padding: 20px; /* Consistent padding */
+    padding-bottom: 100px;
+    box-sizing: border-box;
   }
+  
+  .settings-form {
+    margin-bottom: 40px; /* Spacing between different forms */
+  }
+  
+  .settings-form h2 {
+    color: #30A875; /* Green color for sub-headings */
+    margin-bottom: 20px; /* Spacing after headings */
+  }
+  
+  .settings-form input[type="text"],
+  .settings-form input[type="email"],
+  .settings-form input[type="date"],
+  .settings-form input[type="number"],
+  .settings-form textarea {
+    width: 97%; /* Make input take full width of form */
+    padding: 10px;
+    margin-bottom: 15px; /* Spacing between inputs */
+    border: 1px solid #ccc;
+  }
+  
+  .settings-form label {
+    display: block; /* Ensure the label goes on a new line */
+    margin-bottom: 5px; /* Small space between label and input */
+  }
+  
+  .settings-form textarea {
+    height: auto; /* Override default height */
+    resize: vertical; /* Allow only vertical resizing */
+  }
+  
+  .auth-login-button {
+    background-color: #30A875; /* Consistent button color with auth view */
+    color: white;
+    padding: 10px 20px; /* Slightly smaller buttons */
+    border: none;
+    cursor: pointer;
+    display: block; /* Make the button a block to fill width */
+    width: 100%;
+    margin-top: 20px; /* Space before the button */
+  }
+  
+  .status-message {
+    color: red; /* Consistent color for messages */
+    font-weight: bold;
+    font-size: larger;
+    margin-top: 50px; /* Space after button or last input */
+    margin-bottom: -90px;
+  }
+  

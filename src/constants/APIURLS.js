@@ -9,7 +9,8 @@ export const API_URLS = {
     USER_INFO: `${BASE_URL}/user/info/`,
     USER_CREATE: `${BASE_URL}/user/create/`,
     USER_DELETE: `${BASE_URL}/user/delete/`, // Specify a user ID when using this endpoint
-    USER_PAYMENT: `${BASE_URL}/user/payment/`,
+    USER_PAYMENT_CREATE: `${BASE_URL}/user/payment/create/`,
+    USER_PAYMENT_INFO: `${BASE_URL}/user/payment/info/`,
 
     SPECIES_LIST: `${BASE_URL}/species/`,
     USER_SPECIES_LIST: `${BASE_URL}/species/user/`,

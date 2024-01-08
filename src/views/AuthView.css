@@ -1,5 +1,11 @@
 /* AuthView.css */
 
+h1 {
+    color: #30A875;
+    text-transform: uppercase;
+    font-weight: 900;
+}
+
 .auth-container {
     background-color: #d3d3d3;
     color: #666;
@@ -44,6 +50,17 @@
     margin-bottom: 5px;
     font-size: 135%;
     font-weight: bold;
+  }
+
+
+  .auth-form textarea {
+    width: 300px; /* same as input width */
+    padding: 10px; /* same as input padding */
+    margin-bottom: 20px; /* same as input margin */
+    border: 1px solid #ccc; /* same as input border */
+    resize: vertical; /* Allow only vertical resizing */
+    height: auto; /* Override default height */
+    display: block; /* Ensure it is block level like other inputs */
   }
   
   .auth-remember {

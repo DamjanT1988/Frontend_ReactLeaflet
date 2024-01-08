@@ -27,7 +27,7 @@ const Header = () => {
       </nav>
       <div className="user-actions">
         <NavLink to="/news" activeClassName="active">NYHETER</NavLink>
-        <NavLink to="/settings" activeClassName="active">INSTÄLLNINGAR</NavLink>
+        <NavLink to="/settings" activeClassName="active">ANVÄNDARKONTO</NavLink>
         <button onClick={handleLogout}>LOGGA UT</button>
       </div>
     </header>
