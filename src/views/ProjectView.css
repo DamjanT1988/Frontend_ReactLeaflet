@@ -13,7 +13,6 @@
 /* Style for the main title */
 .project-container > h1 {
     color: #30A875; /* Green color for main heading */
-    text-align: center; /* Center the main title */
     margin-bottom: 30px; /* Space after the main title */
 }
 

@@ -4,6 +4,7 @@ h1 {
     color: #30A875;
     text-transform: uppercase;
     font-weight: 900;
+    text-align: center; /* Center the main title */
 }
 
 .auth-container {
