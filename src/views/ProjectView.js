@@ -73,21 +73,21 @@ const ProjectView = () => {
 
   return (
     <div className="project-container">
-      <h1>My Projects</h1>
+      <h1>Mina projekt</h1>
       <button className="toggle-form-button" onClick={toggleFormVisibility}>
         {showForm ? "Dölj formulär" : "Lägg till nytt projekt"}
       </button>
 
       {showForm && (
         <form className={`form-container ${showForm ? "visible" : ""}`} onSubmit={handleProjectCreate}>
-          <h2>Create New Project</h2>
-          <label htmlFor="project_name">Project Name:</label>
+          <h2>Skapa nytt projekt</h2>
+          <label htmlFor="project_name">Projektnamn:</label>
           <input type="text" id="project_name" name="project_name" required />
 
-          <label htmlFor="description">Description:</label>
+          <label htmlFor="description">Beskrivning:</label>
           <textarea id="description" name="description" required></textarea>
 
-          <button type="submit">Create Project</button>
+          <button type="submit">Skapa projekt!</button> <br /><br />
         </form>
       )}
 
@@ -95,7 +95,7 @@ const ProjectView = () => {
         <div key={project.id} className='project'>
           <h2>{project.project_name}</h2>
           <p>{project.description}</p>
-          <button onClick={() => viewProjectDetails(project.id)}>View Details</button>
+          <button onClick={() => viewProjectDetails(project.id)}>Välj projekt!</button>
         </div>
       ))}
     </div>
