@@ -171,7 +171,8 @@ const RegistrationView = () => {
         <label htmlFor="billing_details.payment_telephone">Kontakttelefonnummer:</label>
         <input type="text" id="billing_details.payment_telephone" name="billing_details.payment_telephone" onChange={handleInputChange} />
 
-        <label htmlFor="billing_details.payment_reference">Er referens:</label>
+        <label htmlFor="billing_details.payment_reference">Referens:</label>
+        <p>Personens namn som har hand om ekonomin.</p>
         <input type="text" id="billing_details.payment_reference" name="billing_details.payment_reference" onChange={handleInputChange} />
 
         {/* Submit button */}
