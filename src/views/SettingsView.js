@@ -262,7 +262,7 @@ const SettingsView = () => {
         <input type="password" id="confirmPassword" name="confirmPassword" value={userDetails.confirmPassword} onChange={handleInputChange} />
 
         {/* Submit button */}
-        <button type="submit" className="auth-login-button">Spara ändringar</button>
+        <button type="submit" className="auth-login-button">Spara användarändringar</button>
 
         {/* Status Message */}
         {statusMessageUser && <p className="status-message">{statusMessageUser}</p>}
