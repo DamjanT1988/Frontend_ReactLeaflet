@@ -92,8 +92,6 @@ const ProjectView = () => {
   // State for storing GeoJSON data
   const [geoJsonData, setGeoJsonData] = useState(null);
 
-
-
   const viewProjectDetails = (projectId) => {
     // Fetch the details of the selected project along with its GIS data
     fetch(`${API_URLS.PROJECT_DETAIL}${projectId}/`, {
@@ -105,12 +103,13 @@ const ProjectView = () => {
       .then(response => response.json())
       .then(data => {
           console.log('Project details:', data);
-        // Check if polygon_data, line_data, and point_data have the 'features' property
+          setSelectedProject(data); // Has to be on top
+
+        /*
         const polygonFeatures = data.polygon_data && data.polygon_data.features ? data.polygon_data.features : [];
         const lineFeatures = data.line_data && data.line_data.features ? data.line_data.features : [];
         const pointFeatures = data.point_data && data.point_data.features ? data.point_data.features : [];
 
-        // Update the data object with the features property
         const updatedData = {
           ...data,
           polygon_data: polygonFeatures,
@@ -118,6 +117,7 @@ const ProjectView = () => {
           point_data: pointFeatures,
       };
         setSelectedProject(updatedData);
+        */
 
         // Assuming your project data includes fields for polygon_data, line_data, and point_data
         const processedGeoJsonData = {
@@ -142,6 +142,8 @@ const ProjectView = () => {
         };
         // Set the geoJsonData in the Map component
         setGeoJsonData(processedGeoJsonData);
+            // Hide the form   
+            setShowForm(true);  // This line will hide the form
       })
       .catch(error => console.error('Error fetching project details:', error));
   };
