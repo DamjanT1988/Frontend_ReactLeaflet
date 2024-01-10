@@ -1,27 +1,32 @@
+// Import necessary modules and components
 import React, { useState, useRef, useEffect } from 'react';
-import { MapContainer, TileLayer, LayersControl, FeatureGroup, GeoJSON, useMap } from 'react-leaflet';
+import { MapContainer, TileLayer, LayersControl, FeatureGroup, GeoJSON } from 'react-leaflet';
 import { EditControl } from "react-leaflet-draw";
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-draw/dist/leaflet.draw.css';
 
+// Destructure BaseLayer from LayersControl
 const { BaseLayer } = LayersControl;
 
+// Define the Map component
 const Map = ({ selectedProjectId, onSave, geoJsonData }) => {
-    const [currentGeoJsonData, setCurrentGeoJsonData] = useState(null); // Corrected state declaration
-    //const [localGeoJsonData, setLocalGeoJsonData] = useState(null); // Changed line
-    const featureGroupRef = useRef(null); // Reference to the FeatureGroup
-    const [saveStatus, setSaveStatus] = useState(''); // New state for status message
+    // State for current GeoJSON data
+    const [currentGeoJsonData, setCurrentGeoJsonData] = useState(null);
+    // Reference to the FeatureGroup
+    const featureGroupRef = useRef(null);
+    // State for save status message
+    const [saveStatus, setSaveStatus] = useState('');
 
+    // Initial map position and zoom level
     const position = [51.505, -0.09];
     const zoom = 13;
 
+    // Effect hook to handle received GeoJSON data
     useEffect(() => {
-        console.log("GeoJSON Data Received in Map:", geoJsonData); // Debugging log
         if (geoJsonData && featureGroupRef.current) {
             const featureGroup = featureGroupRef.current;
-            featureGroupRef.current.clearLayers();
-//            L.geoJSON(geoJsonData).addTo(featureGroupRef.current);
+            featureGroup.clearLayers();
             // Convert GeoJSON data to Leaflet layers and add them to the FeatureGroup
             L.geoJSON(geoJsonData, {
                 onEachFeature: (feature, layer) => featureGroup.addLayer(layer)
@@ -29,54 +34,36 @@ const Map = ({ selectedProjectId, onSave, geoJsonData }) => {
         }
     }, [geoJsonData]);
 
+    // Function to handle save operation
     const handleSave = () => {
         if (currentGeoJsonData && selectedProjectId) {
-            setSaveStatus('Saving...'); // Update status message
+            setSaveStatus('Saving...');
             onSave(currentGeoJsonData)
-              .then(() => setSaveStatus('Data saved successfully!')) // Update status on successful save
-              .catch(() => setSaveStatus('Error saving data')); // Update status on error
+              .then(() => setSaveStatus('Data saved successfully!'))
+              .catch(() => setSaveStatus('Error saving data'));
         } else {
-            console.error("No GeoJSON data or selected project ID.");
-            setSaveStatus('No data to save'); // Update status if no data
+            setSaveStatus('No data to save');
         }
     }
 
-
+    // Function to update GeoJSON data
     const updateGeoJson = () => {
         if (featureGroupRef.current) {
             const drawnItems = featureGroupRef.current.toGeoJSON();
-            console.log("Updated GeoJSON Data:", drawnItems);
-
-            setCurrentGeoJsonData(drawnItems); // Update state with the new GeoJSON data
+            setCurrentGeoJsonData(drawnItems);
         }
     };
 
-    /*
-        const updateGeoJson = () => {
-            if (featureGroupRef.current) {
-                const drawnItems = featureGroupRef.current.toGeoJSON();
-                console.log("Updated GeoJSON Data:", drawnItems);
-                setLocalGeoJsonData(drawnItems); // Changed line
-            }
-        };
-    */
+    // Functions to handle create, edit, and delete events
+    const onCreate = () => updateGeoJson();
+    const onEdited = () => updateGeoJson();
+    const onDeleted = () => updateGeoJson();
 
-    const onCreate = (e) => {
-        updateGeoJson();
-    };
-
-    const onEdited = (e) => {
-        updateGeoJson();
-    };
-
-    const onDeleted = (e) => {
-        updateGeoJson();
-    };
-
+    // Render the Map component
     return (
         <div>
             <button className="toggle-form-button" onClick={handleSave}>Spara ritning</button>
-            <span className="save-status">{saveStatus}</span> {/* Display status message */}
+            <span className="save-status">{saveStatus}</span>
             <MapContainer center={position} zoom={zoom} style={{ height: '100vh', width: '100%' }}>
                 <LayersControl position="topright">
                     <BaseLayer checked name="OpenStreetMap">
@@ -101,4 +88,5 @@ const Map = ({ selectedProjectId, onSave, geoJsonData }) => {
     );
 };
 
+// Export the Map component
 export default Map;

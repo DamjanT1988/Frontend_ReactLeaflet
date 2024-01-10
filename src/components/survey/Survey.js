@@ -38,7 +38,6 @@ const Survey = () => {
     return (
         <div className="survey-container">
             <form onSubmit={handleSurveySubmit}>
-                <h2>Survey Form</h2>
                 <label htmlFor="species">Art:</label>
                 <select
                     name="species"
