@@ -155,3 +155,59 @@ h3 {
 .form-container button:hover {
     background-color: #26724d; /* Slightly darker green on hover */
 }
+
+/* Survey form */
+.survey-container {
+    margin-top: 40px; /* Space before the form */
+}
+
+.survey-container > h2 {
+    color: #30A875; /* Green color for form heading */
+    margin-bottom: 20px; /* Space after the form title */
+}
+
+.survey-container label {
+    display: block; /* Ensure the label goes on a new line */
+    margin-bottom: 5px; /* Small space between label and input */
+    font-weight: bold; /* Make labels bold for clarity */
+}
+
+.survey-container input[type="text"],
+.survey-container textarea {
+    width: 95%; /* Make input take full width of form - accounting for padding */
+    padding: 10px;
+    margin-bottom: 15px; /* Space between each form field */
+    border: 1px solid #ccc;
+}
+
+/* Style specifically for text area to input descriptions */
+.survey-container textarea {
+    height: 100px; /* Default height for the textarea */
+    resize: vertical; /* Allow only vertical resizing */
+}
+
+/* Submit button for submitting the survey */
+.survey-container button {
+    background-color: #30A875; /* Green background like other buttons */
+    color: white; /* Text color */
+    padding: 10px 20px; /* Padding for button */
+    border: none; /* No border */
+    cursor: pointer; /* Cursor pointer */
+    display: block; /* Make the button a block to fill width if needed */
+    width: 100%; /* Full width */
+    margin-top: 10px; /* Space from the last input field */
+}
+
+/* Responsive adjustments for smaller screens */
+@media (max-width: 768px) {
+    .survey-container,
+    .survey-container input[type="text"],
+    .survey-container textarea {
+        width: 95%; /* Make container and input fields slightly narrower on smaller screens */
+    }
+}
+
+/* Add any additional styles for hover, focus, or active states as desired */
+.survey-container button:hover {
+    background-color: #26724d; /* Slightly darker green on hover */
+}
