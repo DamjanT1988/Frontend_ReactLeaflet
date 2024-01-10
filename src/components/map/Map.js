@@ -8,8 +8,9 @@ import 'leaflet-draw/dist/leaflet.draw.css';
 const { BaseLayer } = LayersControl;
 
 const Map = ({ selectedProjectId, onSave, geoJsonData }) => {
-    const [setGeoJsonData] = useState(null);
-    const featureGroupRef = useRef(null); // Access the FeatureGroup
+    const [currentGeoJsonData, setCurrentGeoJsonData] = useState(null); // Corrected state declaration
+    //const [localGeoJsonData, setLocalGeoJsonData] = useState(null); // Changed line
+    const featureGroupRef = useRef(null); // Reference to the FeatureGroup
 
     const position = [51.505, -0.09];
     const zoom = 13;
@@ -22,34 +23,42 @@ const Map = ({ selectedProjectId, onSave, geoJsonData }) => {
     }, [geoJsonData]);
 
     const handleSave = () => {
-        console.log("Saving GeoJSON Data:", geoJsonData);
-        if (geoJsonData && selectedProjectId) {
-            onSave(geoJsonData);
+        if (currentGeoJsonData && selectedProjectId) {
+            onSave(currentGeoJsonData); // Using updated state
         } else {
             console.error("No GeoJSON data or selected project ID.");
         }
     }
 
+
     const updateGeoJson = () => {
         if (featureGroupRef.current) {
             const drawnItems = featureGroupRef.current.toGeoJSON();
             console.log("Updated GeoJSON Data:", drawnItems);
-            setGeoJsonData(drawnItems);
+
+            setCurrentGeoJsonData(drawnItems); // Update state with the new GeoJSON data
         }
     };
 
+    /*
+        const updateGeoJson = () => {
+            if (featureGroupRef.current) {
+                const drawnItems = featureGroupRef.current.toGeoJSON();
+                console.log("Updated GeoJSON Data:", drawnItems);
+                setLocalGeoJsonData(drawnItems); // Changed line
+            }
+        };
+    */
+
     const onCreate = (e) => {
-        console.log("Shape created");
         updateGeoJson();
     };
 
     const onEdited = (e) => {
-        console.log("Shape edited");
         updateGeoJson();
     };
 
     const onDeleted = (e) => {
-        console.log("Shape deleted");
         updateGeoJson();
     };
 
@@ -59,10 +68,10 @@ const Map = ({ selectedProjectId, onSave, geoJsonData }) => {
             <MapContainer center={position} zoom={zoom} style={{ height: '100vh', width: '100%' }}>
                 <LayersControl position="topright">
                     <BaseLayer checked name="OpenStreetMap">
-                        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"/>
+                        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
                     </BaseLayer>
                     <BaseLayer name="Esri WorldImagery">
-                        <TileLayer url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"/>
+                        <TileLayer url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}" />
                     </BaseLayer>
                 </LayersControl>
                 <FeatureGroup ref={featureGroupRef}>

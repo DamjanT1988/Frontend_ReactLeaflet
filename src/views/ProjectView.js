@@ -19,7 +19,9 @@ const ProjectView = () => {
       fetchProjects();
     }
   }, [accessToken]);
+  
 
+  
   const handleSaveMapData = (geoJsonData) => {
     if (!selectedProject || !geoJsonData || !geoJsonData.features || geoJsonData.features.length === 0) {
       console.error("No GeoJSON data to save.");
@@ -34,25 +36,26 @@ const ProjectView = () => {
         case 'Polygon':
           url = `${API_URLS.PROJECT_DETAIL}${selectedProject.id}/add_polygon/`;
           dataToSend = {
-            name: "Polygon Name", // You may want to dynamically set this
-            status: "Active",    // And this
-            geo_data: feature.geometry
+            name: "Polygon Name", // Adjust as needed
+            status: "Active",    // Adjust as needed
+            geo_data: feature.geometry // Ensuring the geometry is directly sent
           };
           break;
         case 'LineString':
           url = `${API_URLS.PROJECT_DETAIL}${selectedProject.id}/add_line/`;
           dataToSend = {
-            name: "Line Name", // Dynamic value
-            status: "Active", // Dynamic value
-            geo_data: feature.geometry
+            name: "Line Name", // Adjust as needed
+            status: "Active", // Adjust as needed
+            geo_data: feature.geometry // Ensuring the geometry is directly sent
           };
           break;
         case 'Point':
           url = `${API_URLS.PROJECT_DETAIL}${selectedProject.id}/add_point/`;
           dataToSend = {
-            name: "Point Name", // Dynamic value
-            status: "Active", // Dynamic value
-            geo_data: feature.geometry
+            name: "Point Name", // Adjust as needed
+            status: "Active", // Adjust as needed
+            geo_data: feature.geometry, // Ensuring the geometry is directly sent
+            attributes: {} // Add default or dynamic attributes as needed
           };
           break;
         default:
@@ -75,6 +78,8 @@ const ProjectView = () => {
         .catch(error => console.error(`Error saving ${feature.geometry.type} data:`, error));
     });
   };
+
+
 
 
   const fetchProjects = () => {
