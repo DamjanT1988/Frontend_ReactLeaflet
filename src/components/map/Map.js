@@ -16,9 +16,10 @@ const Map = ({ selectedProjectId, onSave, geoJsonData }) => {
     const zoom = 13;
 
     useEffect(() => {
+        console.log("GeoJSON Data Received in Map:", geoJsonData); // Debugging log
         if (geoJsonData && featureGroupRef.current) {
-            featureGroupRef.current.clearLayers(); // Clear existing layers
-            L.geoJSON(geoJsonData).addTo(featureGroupRef.current); // Add new layers
+            featureGroupRef.current.clearLayers();
+            L.geoJSON(geoJsonData).addTo(featureGroupRef.current);
         }
     }, [geoJsonData]);
 

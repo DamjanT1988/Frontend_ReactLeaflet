@@ -21,7 +21,7 @@ const ProjectView = () => {
   }, [accessToken]);
   
 
-  
+
   const handleSaveMapData = (geoJsonData) => {
     if (!selectedProject || !geoJsonData || !geoJsonData.features || geoJsonData.features.length === 0) {
       console.error("No GeoJSON data to save.");
@@ -97,61 +97,52 @@ const ProjectView = () => {
   // State for storing GeoJSON data
   const [geoJsonData, setGeoJsonData] = useState(null);
 
+
   const viewProjectDetails = (projectId) => {
-    // Fetch the details of the selected project along with its GIS data
-    fetch(`${API_URLS.PROJECT_DETAIL}${projectId}/`, {
-      method: 'GET',
-      headers: new Headers({
-        'Authorization': `Bearer ${accessToken}`,
-      }),
-    })
-      .then(response => response.json())
-      .then(data => {
-          console.log('Project details:', data);
-          setSelectedProject(data); // Has to be on top
+  // Fetch the details of the selected project along with its GIS data
+  fetch(`${API_URLS.PROJECT_DETAIL}${projectId}/`, {
+    method: 'GET',
+    headers: new Headers({
+      'Authorization': `Bearer ${accessToken}`,
+    }),
+  })
+    .then(response => response.json())
+    .then(data => {
+      console.log('Project details:', data);
+      setSelectedProject(data); // Set the selected project
 
-        /*
-        const polygonFeatures = data.polygon_data && data.polygon_data.features ? data.polygon_data.features : [];
-        const lineFeatures = data.line_data && data.line_data.features ? data.line_data.features : [];
-        const pointFeatures = data.point_data && data.point_data.features ? data.point_data.features : [];
-
-        const updatedData = {
-          ...data,
-          polygon_data: polygonFeatures,
-          line_data: lineFeatures,
-          point_data: pointFeatures,
+      // Process GeoJSON data for polygons, lines, and points
+      const processedGeoJsonData = {
+        type: 'FeatureCollection',
+        features: [
+          // Process polygon data
+          ...(data.polygon_data.features || []).map(polygon => ({
+            type: 'Feature',
+            geometry: polygon.geometry,
+            properties: { ...polygon.properties, type: 'Polygon' }
+          })),
+          // Process line data
+          ...(data.line_data.features || []).map(line => ({
+            type: 'Feature',
+            geometry: line.geometry,
+            properties: { ...line.properties, type: 'LineString' }
+          })),
+          // Process point data
+          ...(data.point_data.features || []).map(point => ({
+            type: 'Feature',
+            geometry: point.geometry,
+            properties: { ...point.properties, type: 'Point' }
+          })),
+        ],
       };
-        setSelectedProject(updatedData);
-        */
 
-        // Assuming your project data includes fields for polygon_data, line_data, and point_data
-        const processedGeoJsonData = {
-          type: 'FeatureCollection',
-          features: [
-            ...data.polygon_data.map(polygon => ({
-              type: 'Feature',
-              geometry: polygon.geo_data,
-              properties: { ...polygon, type: 'Polygon' }
-            })),
-            ...data.line_data.map(line => ({
-              type: 'Feature',
-              geometry: line.geo_data,
-              properties: { ...line, type: 'LineString' }
-            })),
-            ...data.point_data.map(point => ({
-              type: 'Feature',
-              geometry: point.geo_data,
-              properties: { ...point, type: 'Point' }
-            })),
-          ],
-        };
-        // Set the geoJsonData in the Map component
-        setGeoJsonData(processedGeoJsonData);
-            // Hide the form   
-            setShowForm(true);  // This line will hide the form
-      })
-      .catch(error => console.error('Error fetching project details:', error));
-  };
+      // Set the geoJsonData in the Map component
+      setGeoJsonData(processedGeoJsonData);
+      setShowForm(false); // Hide the form
+    })
+    .catch(error => console.error('Error fetching project details:', error));
+};
+
 
 
   const handleProjectCreate = (event) => {
