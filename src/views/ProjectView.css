@@ -16,6 +16,10 @@
     margin-bottom: 30px; /* Space after the main title */
 }
 
+.project-details-container {
+    padding: 10px;
+}
+
 /* Style for each project */
 .project {
     background-color: #fff; /* White background for each project */
@@ -33,6 +37,16 @@
 /* Style for project descriptions */
 .project > p {
     margin-bottom: 10px; /* Space after the project description */
+}
+
+.project-back {
+    background-color: #30A875; /* Green color for the back link */
+    color: white; /* White text for the back link */
+    text-decoration: none; /* Remove link underlines */
+    margin-right: 20px; /* Space after the back link */
+    float: right;
+    display: flex;
+    padding: 6px;
 }
 
 /* Style for the 'View Details' button */
@@ -68,9 +82,6 @@
     display: block; /* Show the form */
   }
   
-  .project {
-    /* Existing styles */
-  }
 
   
 /* Form for creating a new project */

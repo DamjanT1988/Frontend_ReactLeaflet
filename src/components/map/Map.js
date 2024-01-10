@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { MapContainer, TileLayer, LayersControl, FeatureGroup, GeoJSON } from 'react-leaflet';
+import { MapContainer, TileLayer, LayersControl, FeatureGroup, GeoJSON, useMap } from 'react-leaflet';
 import { EditControl } from "react-leaflet-draw";
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -18,8 +18,13 @@ const Map = ({ selectedProjectId, onSave, geoJsonData }) => {
     useEffect(() => {
         console.log("GeoJSON Data Received in Map:", geoJsonData); // Debugging log
         if (geoJsonData && featureGroupRef.current) {
+            const featureGroup = featureGroupRef.current;
             featureGroupRef.current.clearLayers();
-            L.geoJSON(geoJsonData).addTo(featureGroupRef.current);
+//            L.geoJSON(geoJsonData).addTo(featureGroupRef.current);
+            // Convert GeoJSON data to Leaflet layers and add them to the FeatureGroup
+            L.geoJSON(geoJsonData, {
+                onEachFeature: (feature, layer) => featureGroup.addLayer(layer)
+            });
         }
     }, [geoJsonData]);
 
@@ -65,7 +70,7 @@ const Map = ({ selectedProjectId, onSave, geoJsonData }) => {
 
     return (
         <div>
-            <button onClick={handleSave}>Spara ritning</button>
+            <button className="toggle-form-button" onClick={handleSave}>Spara ritning</button>
             <MapContainer center={position} zoom={zoom} style={{ height: '100vh', width: '100%' }}>
                 <LayersControl position="topright">
                     <BaseLayer checked name="OpenStreetMap">

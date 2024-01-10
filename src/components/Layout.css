@@ -8,7 +8,7 @@
 .header {
     background: #d3d3d3; /* Medium grey background */
     color: #333; /* Dark grey text */
-    padding: 10px 20px;
+    padding: 5px 25px;
     display: flex;
     align-items: center;
     justify-content: space-between; /* Space between logo and navigation */
@@ -21,7 +21,7 @@
 }
 
 .logo {
-    width: 275px; /* Adjust size accordingly */
+    width: 225px; /* Adjust size accordingly */
     margin-right: -175px;
 }
 
@@ -30,7 +30,7 @@
     color: #666; /* Initial color for links */
     margin: 0 20px; /* Spacing between links */
     padding: 5px 10px; /* Padding for clickable area */
-    font-size: 275%;
+    font-size: 225%;
     font-weight: bolder;
 }
 
@@ -59,18 +59,21 @@
     border: none;
     color: #666;
     cursor: pointer;
-    margin: 5px 0;
+    margin: 1px 0;
 }
 
 .user-actions button {
-    padding: 5px 15px;
+    padding: 3px 15px;
     align-self: center;
 }
 
-.user-actions a:hover,
+.user-actions a:hover {
+    color: white;
+    background-color: #666;
+}
 .user-actions button:hover {
     color: white;
-    background-color: #30A875;
+    background-color: red;
 }
 
 .footer {

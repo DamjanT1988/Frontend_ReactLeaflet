@@ -19,7 +19,7 @@ const ProjectView = () => {
       fetchProjects();
     }
   }, [accessToken]);
-  
+
 
 
   const handleSaveMapData = (geoJsonData) => {
@@ -99,49 +99,49 @@ const ProjectView = () => {
 
 
   const viewProjectDetails = (projectId) => {
-  // Fetch the details of the selected project along with its GIS data
-  fetch(`${API_URLS.PROJECT_DETAIL}${projectId}/`, {
-    method: 'GET',
-    headers: new Headers({
-      'Authorization': `Bearer ${accessToken}`,
-    }),
-  })
-    .then(response => response.json())
-    .then(data => {
-      console.log('Project details:', data);
-      setSelectedProject(data); // Set the selected project
-
-      // Process GeoJSON data for polygons, lines, and points
-      const processedGeoJsonData = {
-        type: 'FeatureCollection',
-        features: [
-          // Process polygon data
-          ...(data.polygon_data.features || []).map(polygon => ({
-            type: 'Feature',
-            geometry: polygon.geometry,
-            properties: { ...polygon.properties, type: 'Polygon' }
-          })),
-          // Process line data
-          ...(data.line_data.features || []).map(line => ({
-            type: 'Feature',
-            geometry: line.geometry,
-            properties: { ...line.properties, type: 'LineString' }
-          })),
-          // Process point data
-          ...(data.point_data.features || []).map(point => ({
-            type: 'Feature',
-            geometry: point.geometry,
-            properties: { ...point.properties, type: 'Point' }
-          })),
-        ],
-      };
-
-      // Set the geoJsonData in the Map component
-      setGeoJsonData(processedGeoJsonData);
-      setShowForm(false); // Hide the form
+    // Fetch the details of the selected project along with its GIS data
+    fetch(`${API_URLS.PROJECT_DETAIL}${projectId}/`, {
+      method: 'GET',
+      headers: new Headers({
+        'Authorization': `Bearer ${accessToken}`,
+      }),
     })
-    .catch(error => console.error('Error fetching project details:', error));
-};
+      .then(response => response.json())
+      .then(data => {
+        console.log('Project details:', data);
+        setSelectedProject(data); // Set the selected project
+
+        // Process GeoJSON data for polygons, lines, and points
+        const processedGeoJsonData = {
+          type: 'FeatureCollection',
+          features: [
+            // Process polygon data
+            ...(data.polygon_data.features || []).map(polygon => ({
+              type: 'Feature',
+              geometry: polygon.geometry,
+              properties: { ...polygon.properties, type: 'Polygon' }
+            })),
+            // Process line data
+            ...(data.line_data.features || []).map(line => ({
+              type: 'Feature',
+              geometry: line.geometry,
+              properties: { ...line.properties, type: 'LineString' }
+            })),
+            // Process point data
+            ...(data.point_data.features || []).map(point => ({
+              type: 'Feature',
+              geometry: point.geometry,
+              properties: { ...point.properties, type: 'Point' }
+            })),
+          ],
+        };
+
+        // Set the geoJsonData in the Map component
+        setGeoJsonData(processedGeoJsonData);
+        setShowForm(false); // Hide the form
+      })
+      .catch(error => console.error('Error fetching project details:', error));
+  };
 
 
 
@@ -180,10 +180,12 @@ const ProjectView = () => {
     // Display only the selected project
     return (
       <div className="project-details-container">
-        <h2>{selectedProject.project_name}</h2>
-        <p>{selectedProject.description}</p>
+      <h1>Projekt</h1>
+      <button className="project-back" onClick={() => setSelectedProject(null)}>Tillbaka till projektlista</button>
+  
+        <h2>Projektnamn: {selectedProject.project_name}</h2>
+        <p>Projektbeskrivning: {selectedProject.description}</p>
         {/* Display other details */}
-        {/*<button onClick={() => setSelectedProject(null)}>Back to Projects</button>*/}
         <Map
           selectedProjectId={selectedProject.id}
           onSave={handleSaveMapData}
