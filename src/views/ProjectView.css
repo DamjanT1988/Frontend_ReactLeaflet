@@ -13,7 +13,7 @@
 /* Style for the main title */
 .project-container > h1 {
     color: #30A875; /* Green color for main heading */
-    margin-bottom: 30px; /* Space after the main title */
+    margin-bottom: 20px; /* Space after the main title */
 }
 
 .project-details-container {
@@ -29,9 +29,19 @@
 }
 
 /* Style for project titles */
-.project > h2 {
+h2 {
     color: #30A875; /* Green color for project titles */
+    font-weight: bolder;
     margin-bottom: 10px; /* Space after the project title */
+    font-size: 130%;
+}
+
+h3 {
+    color: #30A875; /* Green color for project titles */
+    font-weight: bold;
+    margin-bottom: 10px; /* Space after the project title */
+    font-size: 110%;
+    font-style: italic;
 }
 
 /* Style for project descriptions */
@@ -69,7 +79,7 @@
     padding: 10px 20px;
     border: none;
     cursor: pointer;
-    margin-bottom: 20px; /* Spacing before form or list */
+    margin-bottom: 5px; /* Spacing before form or list */
   }
   
   .form-container {
@@ -83,9 +93,14 @@
   }
   
 
+  .save-status {
+    color: red; /* Consistent color for messages */
+    font-weight: bold;
+    margin-left: 10px;
+  }
   
 /* Form for creating a new project */
-.form-container {
+.form-container, .form-survey {
     margin-top: 40px; /* Space before the form */
 }
 

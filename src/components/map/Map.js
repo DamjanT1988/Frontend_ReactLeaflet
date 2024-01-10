@@ -11,6 +11,7 @@ const Map = ({ selectedProjectId, onSave, geoJsonData }) => {
     const [currentGeoJsonData, setCurrentGeoJsonData] = useState(null); // Corrected state declaration
     //const [localGeoJsonData, setLocalGeoJsonData] = useState(null); // Changed line
     const featureGroupRef = useRef(null); // Reference to the FeatureGroup
+    const [saveStatus, setSaveStatus] = useState(''); // New state for status message
 
     const position = [51.505, -0.09];
     const zoom = 13;
@@ -30,9 +31,13 @@ const Map = ({ selectedProjectId, onSave, geoJsonData }) => {
 
     const handleSave = () => {
         if (currentGeoJsonData && selectedProjectId) {
-            onSave(currentGeoJsonData); // Using updated state
+            setSaveStatus('Saving...'); // Update status message
+            onSave(currentGeoJsonData)
+              .then(() => setSaveStatus('Data saved successfully!')) // Update status on successful save
+              .catch(() => setSaveStatus('Error saving data')); // Update status on error
         } else {
             console.error("No GeoJSON data or selected project ID.");
+            setSaveStatus('No data to save'); // Update status if no data
         }
     }
 
@@ -71,6 +76,7 @@ const Map = ({ selectedProjectId, onSave, geoJsonData }) => {
     return (
         <div>
             <button className="toggle-form-button" onClick={handleSave}>Spara ritning</button>
+            <span className="save-status">{saveStatus}</span> {/* Display status message */}
             <MapContainer center={position} zoom={zoom} style={{ height: '100vh', width: '100%' }}>
                 <LayersControl position="topright">
                     <BaseLayer checked name="OpenStreetMap">

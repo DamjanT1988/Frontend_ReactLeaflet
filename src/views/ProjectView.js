@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { API_URLS } from '../constants/APIURLS';
 import './ProjectView.css';
 import Map from '../components/map/Map.js';
+import Survey from '../components/survey/Survey.js';
 
 const ProjectView = () => {
   const [projects, setProjects] = useState([]);
@@ -11,6 +12,7 @@ const ProjectView = () => {
   const accessToken = localStorage.getItem('accessToken');
   const [showForm, setShowForm] = useState(false);
   const toggleFormVisibility = () => setShowForm(!showForm);
+
 
   useEffect(() => {
     if (!accessToken) {
@@ -25,12 +27,14 @@ const ProjectView = () => {
   const handleSaveMapData = (geoJsonData) => {
     if (!selectedProject || !geoJsonData || !geoJsonData.features || geoJsonData.features.length === 0) {
       console.error("No GeoJSON data to save.");
-      return;
+      return Promise.reject("No GeoJSON data to save.");
     }
 
-    geoJsonData.features.forEach(feature => {
+
+    const savePromises = geoJsonData.features.map(feature => {
       let url;
       let dataToSend;
+
 
       switch (feature.geometry.type) {
         case 'Polygon':
@@ -63,23 +67,26 @@ const ProjectView = () => {
           return;
       }
 
-      fetch(url, {
+      return fetch(url, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${accessToken}`,
         },
         body: JSON.stringify(dataToSend),
-      })
-        .then(response => response.json())
-        .then(data => {
-          console.log(`${feature.geometry.type} data saved:`, data);
-        })
-        .catch(error => console.error(`Error saving ${feature.geometry.type} data:`, error));
+      }).then(response => response.json());
     });
+
+    return Promise.all(savePromises)
+      .then(data => {
+        console.log("All features saved:", data);
+        return data; // Resolve the promise with the saved data
+      })
+      .catch(error => {
+        console.error("Error saving features:", error);
+        return Promise.reject(error); // Reject the promise on error
+      });
   };
-
-
 
 
   const fetchProjects = () => {
@@ -96,6 +103,7 @@ const ProjectView = () => {
 
   // State for storing GeoJSON data
   const [geoJsonData, setGeoJsonData] = useState(null);
+
 
 
   const viewProjectDetails = (projectId) => {
@@ -172,7 +180,10 @@ const ProjectView = () => {
         console.error('Error creating project:', error);
         // Optionally, handle form visibility based on error response
       });
+
+
   };
+
 
 
 
@@ -180,12 +191,19 @@ const ProjectView = () => {
     // Display only the selected project
     return (
       <div className="project-details-container">
-      <h1>Projekt</h1>
-      <button className="project-back" onClick={() => setSelectedProject(null)}>Tillbaka till projektlista</button>
-  
+        <h1>Projekt</h1>
+        <button className="project-back" onClick={() => setSelectedProject(null)}>Tillbaka till projektlista</button>
+
+        {/* PROJECT INFO. */}
         <h2>Projektnamn: {selectedProject.project_name}</h2>
-        <p>Projektbeskrivning: {selectedProject.description}</p>
-        {/* Display other details */}
+        <p>{selectedProject.description}</p>
+
+        {/* SURVEY */}
+        <h3>Projektformulär</h3>
+        <Survey />
+
+        {/* MAP */}
+        <h3>Projektkarta</h3>
         <Map
           selectedProjectId={selectedProject.id}
           onSave={handleSaveMapData}
