@@ -203,11 +203,9 @@ const handleProjectCreate = (event) => {
         <p>{selectedProject.description}</p>
 
         {/* SURVEY */}
-        <h3>Projektformulär</h3>
         <Survey />
 
         {/* MAP */}
-        <h3>Projektkarta</h3>
         <Map
           selectedProjectId={selectedProject.id}
           onSave={handleSaveMapData}

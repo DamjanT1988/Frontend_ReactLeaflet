@@ -136,10 +136,10 @@ const SettingsView = () => {
     })
       .then(response => response.json())
       .then(data => {
-        setStatusMessageUser("User information updated!");
+        setStatusMessageUser("Användarinformation sparad!");
       })
       .catch(error => {
-        setStatusMessageUser("Failed to update user information. Try again later.");
+        setStatusMessageUser("Misslyckats att spara. Försök igen senare.");
       });
 
   };
@@ -159,13 +159,13 @@ const SettingsView = () => {
     })
       .then(response => response.json())
       .then(data => {
-        setStatusMessagePayment("Payment information updated!");
+        setStatusMessagePayment("Betalinformation sparad!");
         if (!paymentExists) {
           setPaymentExists(true); // Update state to reflect that payment now exists
         }
       })
       .catch(error => {
-        setStatusMessagePayment("Failed to update payment information. Try again later.");
+        setStatusMessagePayment("Misslyckats att spara. Försök igen senare.");
       });
 
   };

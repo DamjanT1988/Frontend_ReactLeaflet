@@ -38,6 +38,10 @@ const Survey = () => {
     return (
         <div className="survey-container">
             <form onSubmit={handleSurveySubmit}>
+            <h3>Projektformulär</h3>
+
+            <button type="submit">Spara formulär</button>
+            <br />
                 <label htmlFor="species">Art:</label>
                 <select
                     name="species"
@@ -62,7 +66,6 @@ const Survey = () => {
                     onChange={handleSurveyChange}
                 ></textarea>
 
-                <button type="submit">Spara!</button>
             </form>
         </div>
     );

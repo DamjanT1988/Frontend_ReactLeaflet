@@ -1,7 +1,7 @@
 // Import necessary modules and components
 import React, { useState, useRef, useEffect } from 'react';
 import { MapContainer, TileLayer, LayersControl, FeatureGroup, GeoJSON } from 'react-leaflet';
-import { EditControl } from "react-leaflet-draw";
+import { EditControl, drawControl } from "react-leaflet-draw";
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-draw/dist/leaflet.draw.css';
@@ -22,25 +22,55 @@ const Map = ({ selectedProjectId, onSave, geoJsonData }) => {
     const position = [51.505, -0.09];
     const zoom = 13;
 
+
     // Effect hook to handle received GeoJSON data
     useEffect(() => {
-        if (geoJsonData && featureGroupRef.current) {
-            const featureGroup = featureGroupRef.current;
-            featureGroup.clearLayers();
-            // Convert GeoJSON data to Leaflet layers and add them to the FeatureGroup
-            L.geoJSON(geoJsonData, {
-                onEachFeature: (feature, layer) => featureGroup.addLayer(layer)
-            });
+        const addGeoJsonLayers = () => {
+            if (geoJsonData && featureGroupRef.current) {
+                const featureGroup = featureGroupRef.current.leafletElement;
+                if (featureGroup) {
+                    featureGroup.clearLayers();
+                    // Create a new GeoJSON layer and add it to the FeatureGroup
+                    L.geoJSON(geoJsonData).eachLayer(layer => featureGroup.addLayer(layer));
+                }
+            }
+        };
+
+        if (!featureGroupRef.current) {
+            // If the FeatureGroup is not available yet, wait until it is
+            const intervalId = setInterval(() => {
+                if (featureGroupRef.current) {
+                    clearInterval(intervalId);
+                    addGeoJsonLayers();
+                }
+            }, 100);
+        } else {
+            addGeoJsonLayers();
         }
     }, [geoJsonData]);
+
+
+    // Function to handle when a new layer is added to the map
+    const onLayerAdd = () => {
+        if (geoJsonData && featureGroupRef.current) {
+            const featureGroup = featureGroupRef.current.leafletElement;
+            if (featureGroup) {
+                featureGroup.clearLayers();
+                // Create a new GeoJSON layer and add it to the FeatureGroup
+                L.geoJSON(geoJsonData).eachLayer(layer => featureGroup.addLayer(layer));
+            }
+        }
+    };
+
+
 
     // Function to handle save operation
     const handleSave = () => {
         if (currentGeoJsonData && selectedProjectId) {
             setSaveStatus('Saving...');
             onSave(currentGeoJsonData)
-              .then(() => setSaveStatus('Data saved successfully!'))
-              .catch(() => setSaveStatus('Error saving data'));
+                .then(() => setSaveStatus('Data saved successfully!'))
+                .catch(() => setSaveStatus('Error saving data'));
         } else {
             setSaveStatus('No data to save');
         }
@@ -59,12 +89,25 @@ const Map = ({ selectedProjectId, onSave, geoJsonData }) => {
     const onEdited = () => updateGeoJson();
     const onDeleted = () => updateGeoJson();
 
+    // Function to handle when FeatureGroup is mounted
+    const onMounted = () => {
+        if (geoJsonData && featureGroupRef.current) {
+            const featureGroup = featureGroupRef.current.leafletElement;
+            if (featureGroup) {
+                featureGroup.clearLayers();
+                // Create a new GeoJSON layer and add it to the FeatureGroup
+                L.geoJSON(geoJsonData).eachLayer(layer => featureGroup.addLayer(layer));
+            }
+        }
+    };
+
     // Render the Map component
     return (
         <div>
+            <h3>Projektkarta</h3>
             <button className="toggle-form-button" onClick={handleSave}>Spara ritning</button>
             <span className="save-status">{saveStatus}</span>
-            <MapContainer center={position} zoom={zoom} style={{ height: '100vh', width: '100%' }}>
+            <MapContainer center={position} zoom={zoom} style={{ height: '100vh', width: '100%' }} onlayeradd={onLayerAdd}>
                 <LayersControl position="topright">
                     <BaseLayer checked name="OpenStreetMap">
                         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
@@ -79,10 +122,21 @@ const Map = ({ selectedProjectId, onSave, geoJsonData }) => {
                         onCreated={onCreate}
                         onEdited={onEdited}
                         onDeleted={onDeleted}
+                        onMounted={onMounted}
                         draw={{ rectangle: false }}
                     />
+                    {geoJsonData && <GeoJSON
+                        data={geoJsonData}
+                        onEachFeature={(feature, layer) => {
+                            if (featureGroupRef.current) {
+                                const featureGroup = featureGroupRef.current.leafletElement;
+                                if (featureGroup) {
+                                    featureGroup.addLayer(layer);
+                                }
+                            }
+                        }}
+                    />}
                 </FeatureGroup>
-                {geoJsonData && <GeoJSON data={geoJsonData} />}
             </MapContainer>
         </div>
     );
