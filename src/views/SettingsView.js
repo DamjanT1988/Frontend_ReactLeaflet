@@ -123,16 +123,14 @@ const SettingsView = () => {
     e.preventDefault();
     const accessToken = localStorage.getItem('accessToken');
 
-    if (!existingPassword) {
-      setStatusMessageUser("Skriv in befintligt lösenord!");    
-      return;
-    } else if (existingPassword) {
+    if (existingPassword) {
       userDetails.password = existingPassword;
-    } else {
-      if (userDetails.password !== userDetails.confirmPassword) {
-        setStatusMessageUser("Nytt lösenord matchar inte.");
-        return;
-      }
+    } else if (!userDetails.password || userDetails.password !== userDetails.confirmPassword) {
+      setStatusMessageUser("Lösenorden matchar inte!");
+      return;
+    } else if (!existingPassword && !userDetails.password) {
+      setStatusMessageUser("Skriv in befintligt lösenord!");
+      return;
     }
 
     fetch(API_URLS.USER_INFO, {
@@ -178,8 +176,6 @@ const SettingsView = () => {
       });
 
   };
-
-
 
 
   return (
