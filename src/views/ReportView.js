@@ -16,7 +16,7 @@ const ReportView = () => {
     // Dependency array is empty, meaning it will run once on mount
   }, []); // Empty dependency array ensures effect runs once after initial render
 
-  return <div>Report</div>;
+  return <div>  <h1>Rapport</h1></div>;
 };
 
 export default ReportView;

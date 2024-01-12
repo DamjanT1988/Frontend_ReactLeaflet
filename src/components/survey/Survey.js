@@ -42,14 +42,18 @@ const Survey = () => {
 
             <button type="submit">Spara formulär</button>
             <br />
-                <label htmlFor="species">Art:</label>
-                <select
-                    name="species"
-                    value={surveyData.species}
-                    onChange={handleSurveyChange}
-                >
-                    {/* Populate this select element with species options */}
-                </select>
+            <label htmlFor="species">Art:</label>
+            <select
+                name="species"
+                value={surveyData.species}
+                onChange={handleSurveyChange}
+            >
+                {speciesList.map(species => (
+                    <option key={species.taxon_id} value={species.taxon_id}>
+                        {species.species_name_common}
+                    </option>
+                ))}
+            </select>
 
                 <label htmlFor="observationDate">Observationsdatum:</label>
                 <input

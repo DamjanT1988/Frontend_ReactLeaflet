@@ -16,7 +16,7 @@ const DataView = () => {
     // Dependency array is empty, meaning it will run once on mount
   }, []); // Empty dependency array ensures effect runs once after initial render
 
-  return <div>Data</div>;
+  return <div>  <h1>Data</h1></div>;
 };
 
 export default DataView;

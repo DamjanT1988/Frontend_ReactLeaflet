@@ -16,7 +16,7 @@ const NewsView = () => {
     // Dependency array is empty, meaning it will run once on mount
   }, []); // Empty dependency array ensures effect runs once after initial render
 
-  return <div>News</div>;
+  return <div>  <h1>Nyheter</h1></div>;
 };
 
 export default NewsView;

@@ -1,10 +1,12 @@
 // RegistrationView.js
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './AuthView.css';
 import Logo from '../media/vagmiljo_logotyp_grey.png';
 import { API_URLS } from '../constants/APIURLS';
 
 const RegistrationView = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     username: '',
     email: '',
@@ -65,6 +67,8 @@ const RegistrationView = () => {
       alert("Lösenorden matchar inte!");
       return; // Stop the form from submitting
     }
+    console.log(formData);
+    
     // Proceed with API call if passwords match
     try {
       const response = await fetch(API_URLS.USER_CREATE, {
@@ -77,6 +81,7 @@ const RegistrationView = () => {
       if (response.ok) {
         console.log("User registered successfully");
         // Handle success
+        navigate('/login');
       } else {
         console.log("Failed to register");
         // Handle errors

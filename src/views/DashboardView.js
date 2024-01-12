@@ -41,7 +41,11 @@ const DashboardView = () => {
   }, [navigate]);
 
   // Render user info or any other content
-  return <div>{userInfo ? <p>Welcome {userInfo.username}</p> : 'Loading...'}</div>;
+  return <div>
+  <h1>Panel</h1>
+  {userInfo ? <h2>Welcome {userInfo.username}</h2> : 'Loading...'}
+  
+  </div>;
 };
 
 export default DashboardView;
