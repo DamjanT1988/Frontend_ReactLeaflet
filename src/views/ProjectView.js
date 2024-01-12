@@ -97,99 +97,99 @@ const ProjectView = () => {
   };
 
 
-// Function to fetch projects from the API
-const fetchProjects = () => {
-  // Fetch request to the projects API endpoint
-  fetch(API_URLS.PROJECTS, {
-    method: 'GET', // HTTP method
-    headers: new Headers({
-      'Authorization': `Bearer ${accessToken}`, // Authorization header
-    }),
-  })
-    .then(response => response.json()) // Parse the response as JSON
-    .then(data => setProjects(data)) // Set the projects state with the fetched data
-    .catch(error => console.error('Error fetching projects:', error)); // Log any errors
-};
-
-// State for storing GeoJSON data
-const [geoJsonData, setGeoJsonData] = useState(null);
-
-// Function to view the details of a project
-const viewProjectDetails = (projectId) => {
-  // Fetch request to the project detail API endpoint
-  fetch(`${API_URLS.PROJECT_DETAIL}${projectId}/`, {
-    method: 'GET', // HTTP method
-    headers: new Headers({
-      'Authorization': `Bearer ${accessToken}`, // Authorization header
-    }),
-  })
-    .then(response => response.json()) // Parse the response as JSON
-    .then(data => {
-      console.log('Project details:', data); // Log the project details
-      setSelectedProject(data); // Set the selected project state with the fetched data
-
-      // Process GeoJSON data for polygons, lines, and points
-      const processedGeoJsonData = {
-        type: 'FeatureCollection',
-        features: [
-          // Process polygon data
-          ...(data.polygon_data.features || []).map(polygon => ({
-            type: 'Feature',
-            geometry: polygon.geometry,
-            properties: { ...polygon.properties, type: 'Polygon' }
-          })),
-          // Process line data
-          ...(data.line_data.features || []).map(line => ({
-            type: 'Feature',
-            geometry: line.geometry,
-            properties: { ...line.properties, type: 'LineString' }
-          })),
-          // Process point data
-          ...(data.point_data.features || []).map(point => ({
-            type: 'Feature',
-            geometry: point.geometry,
-            properties: { ...point.properties, type: 'Point' }
-          })),
-        ],
-      };
-
-      // Set the geoJsonData state with the processed GeoJSON data
-      setGeoJsonData(processedGeoJsonData);
-      setShowForm(false); // Hide the form
+  // Function to fetch projects from the API
+  const fetchProjects = () => {
+    // Fetch request to the projects API endpoint
+    fetch(API_URLS.PROJECTS, {
+      method: 'GET', // HTTP method
+      headers: new Headers({
+        'Authorization': `Bearer ${accessToken}`, // Authorization header
+      }),
     })
-    .catch(error => console.error('Error fetching project details:', error)); // Log any errors
-};
-
-// Function to handle the creation of a project
-const handleProjectCreate = (event) => {
-  event.preventDefault(); // Prevent the default form submission behavior
-  const formData = new FormData(event.target); // Create a FormData object from the form
-  const newProject = {
-    project_name: formData.get('project_name'), // Get the project name from the form data
-    description: formData.get('description'), // Get the description from the form data
-    // Add other fields as necessary
+      .then(response => response.json()) // Parse the response as JSON
+      .then(data => setProjects(data)) // Set the projects state with the fetched data
+      .catch(error => console.error('Error fetching projects:', error)); // Log any errors
   };
 
-  // Fetch request to the projects API endpoint to create a new project
-  fetch(API_URLS.PROJECTS, {
-    method: 'POST', // HTTP method
-    headers: {
-      'Content-Type': 'application/json', // Content type header
-      'Authorization': `Bearer ${accessToken}`, // Authorization header
-    },
-    body: JSON.stringify(newProject), // Body of the request
-  })
-    .then(response => response.json()) // Parse the response as JSON
-    .then(() => {
-      fetchProjects(); // Re-fetch all projects to update the list
-      setShowForm(false); // Hide the form after successful project creation
-      console.log('Project created successfully'); // Log a success message
+  // State for storing GeoJSON data
+  const [geoJsonData, setGeoJsonData] = useState(null);
+
+  // Function to view the details of a project
+  const viewProjectDetails = (projectId) => {
+    // Fetch request to the project detail API endpoint
+    fetch(`${API_URLS.PROJECT_DETAIL}${projectId}/`, {
+      method: 'GET', // HTTP method
+      headers: new Headers({
+        'Authorization': `Bearer ${accessToken}`, // Authorization header
+      }),
     })
-    .catch(error => {
-      console.error('Error creating project:', error); // Log any errors
-      // Optionally, handle form visibility based on error response
-    });
-};
+      .then(response => response.json()) // Parse the response as JSON
+      .then(data => {
+        console.log('Project details:', data); // Log the project details
+        setSelectedProject(data); // Set the selected project state with the fetched data
+
+        // Process GeoJSON data for polygons, lines, and points
+        const processedGeoJsonData = {
+          type: 'FeatureCollection',
+          features: [
+            // Process polygon data
+            ...(data.polygon_data.features || []).map(polygon => ({
+              type: 'Feature',
+              geometry: polygon.geometry,
+              properties: { ...polygon.properties, type: 'Polygon' }
+            })),
+            // Process line data
+            ...(data.line_data.features || []).map(line => ({
+              type: 'Feature',
+              geometry: line.geometry,
+              properties: { ...line.properties, type: 'LineString' }
+            })),
+            // Process point data
+            ...(data.point_data.features || []).map(point => ({
+              type: 'Feature',
+              geometry: point.geometry,
+              properties: { ...point.properties, type: 'Point' }
+            })),
+          ],
+        };
+
+        // Set the geoJsonData state with the processed GeoJSON data
+        setGeoJsonData(processedGeoJsonData);
+        setShowForm(false); // Hide the form
+      })
+      .catch(error => console.error('Error fetching project details:', error)); // Log any errors
+  };
+
+  // Function to handle the creation of a project
+  const handleProjectCreate = (event) => {
+    event.preventDefault(); // Prevent the default form submission behavior
+    const formData = new FormData(event.target); // Create a FormData object from the form
+    const newProject = {
+      project_name: formData.get('project_name'), // Get the project name from the form data
+      description: formData.get('description'), // Get the description from the form data
+      // Add other fields as necessary
+    };
+
+    // Fetch request to the projects API endpoint to create a new project
+    fetch(API_URLS.PROJECTS, {
+      method: 'POST', // HTTP method
+      headers: {
+        'Content-Type': 'application/json', // Content type header
+        'Authorization': `Bearer ${accessToken}`, // Authorization header
+      },
+      body: JSON.stringify(newProject), // Body of the request
+    })
+      .then(response => response.json()) // Parse the response as JSON
+      .then(() => {
+        fetchProjects(); // Re-fetch all projects to update the list
+        setShowForm(false); // Hide the form after successful project creation
+        console.log('Project created successfully'); // Log a success message
+      })
+      .catch(error => {
+        console.error('Error creating project:', error); // Log any errors
+        // Optionally, handle form visibility based on error response
+      });
+  };
 
   if (selectedProject) {
     // Display only the selected project

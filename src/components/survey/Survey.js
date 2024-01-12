@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+//import { useNavigate } from 'react-router-dom';
 import { API_URLS } from '../../constants/APIURLS';
 
 
 const Survey = () => {
     const accessToken = localStorage.getItem('accessToken');
-    const navigate = useNavigate();
+    //const navigate = useNavigate();
     const [speciesList, setSpeciesList] = useState([]);
     const [surveyData, setSurveyData] = useState({
       species: '',
@@ -31,7 +31,8 @@ const Survey = () => {
 
     const handleSurveySubmit = (event) => {
         event.preventDefault();
-        // Submit logic here, potentially updating the project with new survey data
+    
+
     };
 
 
