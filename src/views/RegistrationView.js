@@ -22,7 +22,7 @@ const RegistrationView = () => {
       department: '',
       phone_number: ''
     },
-    billing_details: { // Added for billing information
+    user_payment: { // Added for billing information
       payment_email: '',
       payment_adress: '',
       payment_telephone: '',
@@ -68,7 +68,7 @@ const RegistrationView = () => {
       return; // Stop the form from submitting
     }
     console.log(formData);
-    
+
     // Proceed with API call if passwords match
     try {
       const response = await fetch(API_URLS.USER_CREATE, {
@@ -162,23 +162,23 @@ const RegistrationView = () => {
         <p>Fyll i information om fakturering.</p>
         <br />
         {/* Billing information fields */}
-        <label htmlFor="billing_details.payment_email">Fakturerings e-post:</label>
-        <input type="email" id="billing_details.payment_email" name="billing_details.payment_email" onChange={handleInputChange} />
+        <label htmlFor="user_payment.payment_email">Fakturerings e-post:</label>
+        <input type="email" id="user_payment.payment_email" name="user_payment.payment_email" onChange={handleInputChange} />
 
-        <label htmlFor="billing_details.payment_adress">Faktureringsadress:</label>
+        <label htmlFor="user_payment.payment_adress">Faktureringsadress:</label>
         <textarea
-          id="billing_details.payment_adress"
-          name="billing_details.payment_adress"
+          id="user_payment.payment_adress"
+          name="user_payment.payment_adress"
           rows="5"
           onChange={handleInputChange}
-          value={formData.billing_details.payment_adress}
+          value={formData.user_payment.payment_adress}
         ></textarea>
-        <label htmlFor="billing_details.payment_telephone">Kontakttelefonnummer:</label>
-        <input type="text" id="billing_details.payment_telephone" name="billing_details.payment_telephone" onChange={handleInputChange} />
+        <label htmlFor="user_payment.payment_telephone">Kontakttelefonnummer:</label>
+        <input type="text" id="user_payment.payment_telephone" name="user_payment.payment_telephone" onChange={handleInputChange} />
 
-        <label htmlFor="billing_details.payment_reference">Referens:</label>
+        <label htmlFor="user_payment.payment_reference">Referens:</label>
         <p>Personens namn som har hand om ekonomin.</p>
-        <input type="text" id="billing_details.payment_reference" name="billing_details.payment_reference" onChange={handleInputChange} />
+        <input type="text" id="user_payment.payment_reference" name="user_payment.payment_reference" onChange={handleInputChange} />
 
         {/* Submit button */}
         <br /><br /><br />
