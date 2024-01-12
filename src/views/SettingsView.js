@@ -40,6 +40,8 @@ const SettingsView = () => {
   const [paymentExists, setPaymentExists] = useState(false);
   const [statusMessagePayment, setStatusMessagePayment] = useState('');
   const [statusMessageUser, setStatusMessageUser] = useState('');
+  const [existingPassword, setExistingPassword] = useState('');
+  const [showPasswordUpdate, setShowPasswordUpdate] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -121,9 +123,16 @@ const SettingsView = () => {
     e.preventDefault();
     const accessToken = localStorage.getItem('accessToken');
 
-    if (userDetails.password !== userDetails.confirmPassword) {
-      setStatusMessageUser("Nytt lösenord matchar inte.");
+    if (!existingPassword) {
+      setStatusMessageUser("Skriv in befintligt lösenord!");    
       return;
+    } else if (existingPassword) {
+      userDetails.password = existingPassword;
+    } else {
+      if (userDetails.password !== userDetails.confirmPassword) {
+        setStatusMessageUser("Nytt lösenord matchar inte.");
+        return;
+      }
     }
 
     fetch(API_URLS.USER_INFO, {
@@ -253,13 +262,26 @@ const SettingsView = () => {
         <label htmlFor="phone_number">Telefonnummer:</label>
         <input type="text" id="phone_number" name="user_additional.phone_number" value={userDetails.user_additional.phone_number} onChange={handleInputChange} />
 
-        {/* Password */}
-        <label htmlFor="password">Nytt lösenord:</label>
-        <input type="password" id="password" name="password" value={userDetails.password} onChange={handleInputChange} />
+        <button type="button" className="auth-login-button" onClick={() => setShowPasswordUpdate(!showPasswordUpdate)}>Uppdatera lösenord</button>
+        {showPasswordUpdate && (
+          <>
+            {/* Password */}
+            <label htmlFor="password">Nytt lösenord:</label>
+            <input type="password" id="password" name="password" value={userDetails.password} onChange={handleInputChange} />
 
-        {/* Confirm Password */}
-        <label htmlFor="confirmPassword">Bekräfta nytt lösenord:</label>
-        <input type="password" id="confirmPassword" name="confirmPassword" value={userDetails.confirmPassword} onChange={handleInputChange} />
+            {/* Confirm Password */}
+            <label htmlFor="confirmPassword">Bekräfta nytt lösenord:</label>
+            <input type="password" id="confirmPassword" name="confirmPassword" value={userDetails.confirmPassword} onChange={handleInputChange} />
+          </>
+        )}
+
+        {!showPasswordUpdate && (
+          <div>
+            {/* Existing Password */}
+            <label htmlFor="existingPassword">Befintligt lösenord:</label>
+            <input type="password" id="existingPassword" name="existingPassword" value={existingPassword} onChange={(e) => setExistingPassword(e.target.value)} />
+          </div>
+        )}
 
         {/* Submit button */}
         <button type="submit" className="auth-login-button">Spara användarändringar</button>

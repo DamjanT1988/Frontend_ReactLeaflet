@@ -43,16 +43,16 @@ const LoginView = () => {
       const data = await response.json();
 
       if (response.ok) {
-        console.log('Login successful!');
+        console.log('Lyckad inloggning!');
         localStorage.setItem('refreshToken', data.refresh);
         localStorage.setItem('accessToken', data.access);
         navigate('/dashboard');
       } else {
-        console.error('Failed to login:', data.error);
+        console.error('Misslyckad inlogg:', data.error);
         // Handle errors, such as displaying a message to the user
       }
     } catch (error) {
-      console.error('Failed to send request:', error);
+      console.error('Kan inte skicka förfrågan:', error);
       // Handle network errors, show user feedback
     }
   };
