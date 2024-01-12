@@ -62,7 +62,7 @@ const LoginView = () => {
       <img src={Logo} alt="logo" className="auth-logo" />
       <form className="auth-form" onSubmit={handleSubmit}>
         <h1 className="auth-header">Vänligen logga in nedan!</h1>
-        <label htmlFor="userNumber">Fyll i ditt användarnummer:</label>
+        <label htmlFor="userNumber">Fyll i ditt användarnamn:</label>
         <input type="text" id="userNumber" value={userNumber} onChange={(e) => setUserNumber(e.target.value)} />
         <label htmlFor="userPassword">Fyll i ditt lösenord:</label>
         <input type="password" id="userPassword" value={userPassword} onChange={(e) => setUserPassword(e.target.value)} />

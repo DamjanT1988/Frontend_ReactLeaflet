@@ -125,13 +125,13 @@ const SettingsView = () => {
 
     if (existingPassword) {
       userDetails.password = existingPassword;
+    } else if (!existingPassword && !userDetails.password) {
+        setStatusMessageUser("Skriv in befintligt lösenord!");
+        return;
     } else if (!userDetails.password || userDetails.password !== userDetails.confirmPassword) {
       setStatusMessageUser("Lösenorden matchar inte!");
       return;
-    } else if (!existingPassword && !userDetails.password) {
-      setStatusMessageUser("Skriv in befintligt lösenord!");
-      return;
-    }
+    } 
 
     fetch(API_URLS.USER_INFO, {
       method: 'PUT',
@@ -258,7 +258,7 @@ const SettingsView = () => {
         <label htmlFor="phone_number">Telefonnummer:</label>
         <input type="text" id="phone_number" name="user_additional.phone_number" value={userDetails.user_additional.phone_number} onChange={handleInputChange} />
 
-        <button type="button" className="auth-login-button" onClick={() => setShowPasswordUpdate(!showPasswordUpdate)}>Uppdatera lösenord</button>
+        <button type="button" className="auth-login-button" onClick={() => setShowPasswordUpdate(!showPasswordUpdate)}>Ändra lösenord</button>
         {showPasswordUpdate && (
           <>
             {/* Password */}
