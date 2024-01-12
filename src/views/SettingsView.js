@@ -122,7 +122,7 @@ const SettingsView = () => {
     const accessToken = localStorage.getItem('accessToken');
 
     if (userDetails.password !== userDetails.confirmPassword) {
-      setStatusMessageUser("New password and confirm password do not match.");
+      setStatusMessageUser("Nytt lösenord matchar inte.");
       return;
     }
 
