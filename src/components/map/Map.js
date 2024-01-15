@@ -96,9 +96,13 @@ const Map = ({ selectedProjectId, onSave, geoJsonData }) => {
 */
 
 const updateGeoJson = () => {
-    if (featureGroupRef.current) {
+    // Check if the featureGroupRef and its leafletElement are available
+    if (featureGroupRef.current && featureGroupRef.current.leafletElement) {
         const updatedGeoJson = featureGroupRef.current.leafletElement.toGeoJSON();
         setCurrentGeoJsonData(updatedGeoJson);
+    } else {
+        // Handle the case where the leafletElement is not available yet
+        console.error('Leaflet element not available yet.');
     }
 };
 
