@@ -25,19 +25,28 @@ const Map = ({ selectedProjectId, onSave, geoJsonData }) => {
 
     // Effect hook to handle received GeoJSON data
     useEffect(() => {
+        if (geoJsonData && featureGroupRef.current) {
+            const featureGroup = featureGroupRef.current.leafletElement;
+            featureGroup.clearLayers();
+            L.geoJSON(geoJsonData, {
+                onEachFeature: (feature, layer) => featureGroup.addLayer(layer)
+            });
+        }
+    }, [geoJsonData]);
+
+    
+        /*
         const addGeoJsonLayers = () => {
             if (geoJsonData && featureGroupRef.current) {
                 const featureGroup = featureGroupRef.current.leafletElement;
                 if (featureGroup) {
                     featureGroup.clearLayers();
-                    // Create a new GeoJSON layer and add it to the FeatureGroup
                     L.geoJSON(geoJsonData).eachLayer(layer => featureGroup.addLayer(layer));
                 }
             }
         };
 
         if (!featureGroupRef.current) {
-            // If the FeatureGroup is not available yet, wait until it is
             const intervalId = setInterval(() => {
                 if (featureGroupRef.current) {
                     clearInterval(intervalId);
@@ -48,7 +57,7 @@ const Map = ({ selectedProjectId, onSave, geoJsonData }) => {
             addGeoJsonLayers();
         }
     }, [geoJsonData]);
-
+    */
 
     // Function to handle when a new layer is added to the map
     const onLayerAdd = () => {
@@ -77,12 +86,21 @@ const Map = ({ selectedProjectId, onSave, geoJsonData }) => {
     }
 
     // Function to update GeoJSON data
+ /*   
     const updateGeoJson = () => {
         if (featureGroupRef.current) {
             const drawnItems = featureGroupRef.current.toGeoJSON();
             setCurrentGeoJsonData(drawnItems);
         }
     };
+*/
+
+const updateGeoJson = () => {
+    if (featureGroupRef.current) {
+        const updatedGeoJson = featureGroupRef.current.leafletElement.toGeoJSON();
+        setCurrentGeoJsonData(updatedGeoJson);
+    }
+};
 
     // Functions to handle create, edit, and delete events
     const onCreate = () => updateGeoJson();

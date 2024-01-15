@@ -4,7 +4,9 @@ import { useNavigate } from 'react-router-dom';
 import { API_URLS } from '../constants/APIURLS';
 import './SettingsView.css';
 
+// Define the SettingsView component
 const SettingsView = () => {
+  // State to hold user and payment details
   const [userDetails, setUserDetails] = useState({
     username: '',
     email: '',
@@ -21,7 +23,6 @@ const SettingsView = () => {
       phone_number: '',
     }
   });
-
   const [paymentDetails, setPaymentDetails] = useState({
     active_account: false,
     Payment_latest_invoice: false,
@@ -36,14 +37,16 @@ const SettingsView = () => {
     payment_reference: '',
     payment_comment: ''
   });
-
   const [paymentExists, setPaymentExists] = useState(false);
   const [statusMessagePayment, setStatusMessagePayment] = useState('');
   const [statusMessageUser, setStatusMessageUser] = useState('');
   const [existingPassword, setExistingPassword] = useState('');
   const [showPasswordUpdate, setShowPasswordUpdate] = useState(false);
+  const [isExistingPasswordConfirmed, setIsExistingPasswordConfirmed] = useState(false);
+
   const navigate = useNavigate();
 
+  // Fetch user and payment details on component mount
   useEffect(() => {
     const accessToken = localStorage.getItem('accessToken');
     if (!accessToken) {
@@ -54,6 +57,7 @@ const SettingsView = () => {
     }
   }, [navigate]);
 
+  // Function to fetch user details
   const fetchUserDetails = (accessToken) => {
     fetch(API_URLS.USER_INFO, {
       method: 'GET',
@@ -69,6 +73,7 @@ const SettingsView = () => {
       });
   };
 
+  // Function to fetch payment details
   const fetchPaymentDetails = (accessToken) => {
     fetch(API_URLS.USER_PAYMENT_INFO, {
       method: 'GET',
@@ -92,6 +97,50 @@ const SettingsView = () => {
       });
   };
 
+  // Function to validate the existing password
+  const validateExistingPassword = (password) => {
+    return new Promise((resolve, reject) => {
+      fetch(API_URLS.USER_VALIDATE, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+        },
+        body: JSON.stringify({ username: userDetails.username, password }),
+      })
+        .then(response => {
+          if (response.ok) {
+            resolve(true);
+            userDetails.password = password;
+          } else {
+            reject("Invalid password");
+          }
+        })
+        .catch(error => reject(error));
+    });
+  };
+
+  // Function to handle password change request
+  const handlePasswordChangeRequest = () => {
+    validateExistingPassword(existingPassword)
+      .then(isValid => {
+        if (isValid) {
+          setIsExistingPasswordConfirmed(true);
+          setShowPasswordUpdate(true);
+        } else {
+          alert("Existing password is incorrect.");
+          setIsExistingPasswordConfirmed(false);
+          setShowPasswordUpdate(false);
+        }
+      })
+      .catch(error => {
+        alert("Error: " + error);
+        setIsExistingPasswordConfirmed(false);
+        setShowPasswordUpdate(false);
+      });
+  };
+
+  // Function to handle input changes
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     if (name.includes('.')) {
@@ -111,6 +160,7 @@ const SettingsView = () => {
     }
   };
 
+  // Function to handle payment input changes
   const handlePaymentInputChange = (e) => {
     const { name, value } = e.target;
     setPaymentDetails(prevState => ({
@@ -119,19 +169,42 @@ const SettingsView = () => {
     }));
   };
 
+  // Function to handle profile update
   const handleUpdateProfile = (e) => {
     e.preventDefault();
     const accessToken = localStorage.getItem('accessToken');
 
-    if (existingPassword) {
-      userDetails.password = existingPassword;
-    } else if (!existingPassword && !userDetails.password) {
-        setStatusMessageUser("Skriv in befintligt lösenord!");
-        return;
-    } else if (!userDetails.password || userDetails.password !== userDetails.confirmPassword) {
-      setStatusMessageUser("Lösenorden matchar inte!");
+    if (!existingPassword) {
+      setStatusMessageUser("Please enter your existing password.");
       return;
-    } 
+    }
+
+    validateExistingPassword(existingPassword)
+      .then(isValid => {
+        if (isValid) {
+          updateProfile(accessToken);
+        } else {
+          setStatusMessageUser("Incorrect existing password.");
+        }
+      })
+      .catch(error => {
+        setStatusMessageUser("Error: " + error);
+      });
+  };
+
+  // Function to update the profile
+  const updateProfile = (accessToken) => {
+    let updatedUserDetails = { ...userDetails };
+
+    // If password change is confirmed and new password matches confirm password,
+    // set it as the new password in userDetails
+    if (showPasswordUpdate && userDetails.newPassword === userDetails.confirmPassword) {
+      updatedUserDetails.password = userDetails.newPassword;
+    }
+
+    // Remove confirmPassword and newPassword from the payload as they are not needed in the API call
+    delete updatedUserDetails.confirmPassword;
+    delete updatedUserDetails.newPassword;
 
     fetch(API_URLS.USER_INFO, {
       method: 'PUT',
@@ -139,18 +212,21 @@ const SettingsView = () => {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${accessToken}`,
       },
-      body: JSON.stringify(userDetails),
+      body: JSON.stringify(updatedUserDetails),
     })
       .then(response => response.json())
       .then(data => {
-        setStatusMessageUser("Användarinformation sparad!");
+        setStatusMessageUser("User information saved successfully!");
+        // Update userDetails state to reflect the new password and reset newPassword and confirmPassword
+        setUserDetails({ ...updatedUserDetails, newPassword: '', confirmPassword: '' });
       })
       .catch(error => {
-        setStatusMessageUser("Misslyckats att spara. Försök igen senare.");
+        setStatusMessageUser("Failed to save. Please try again later.");
       });
-
   };
 
+
+  // Function to handle payment update
   const handleUpdatePayment = (e) => {
     e.preventDefault();
     const accessToken = localStorage.getItem('accessToken');
@@ -166,17 +242,15 @@ const SettingsView = () => {
     })
       .then(response => response.json())
       .then(data => {
-        setStatusMessagePayment("Betalinformation sparad!");
+        setStatusMessagePayment("Payment information saved!");
         if (!paymentExists) {
-          setPaymentExists(true); // Update state to reflect that payment now exists
+          setPaymentExists(true);
         }
       })
       .catch(error => {
-        setStatusMessagePayment("Misslyckats att spara. Försök igen senare.");
+        setStatusMessagePayment("Failed to save. Please try again later.");
       });
-
   };
-
 
   return (
     <div className="settings-container">
@@ -258,25 +332,43 @@ const SettingsView = () => {
         <label htmlFor="phone_number">Telefonnummer:</label>
         <input type="text" id="phone_number" name="user_additional.phone_number" value={userDetails.user_additional.phone_number} onChange={handleInputChange} />
 
-        <button type="button" className="auth-login-button" onClick={() => setShowPasswordUpdate(!showPasswordUpdate)}>Ändra lösenord</button>
-        {showPasswordUpdate && (
-          <>
-            {/* Password */}
-            <label htmlFor="password">Nytt lösenord:</label>
-            <input type="password" id="password" name="password" value={userDetails.password} onChange={handleInputChange} />
-
-            {/* Confirm Password */}
-            <label htmlFor="confirmPassword">Bekräfta nytt lösenord:</label>
-            <input type="password" id="confirmPassword" name="confirmPassword" value={userDetails.confirmPassword} onChange={handleInputChange} />
-          </>
-        )}
-
         {!showPasswordUpdate && (
           <div>
-            {/* Existing Password */}
             <label htmlFor="existingPassword">Befintligt lösenord:</label>
-            <input type="password" id="existingPassword" name="existingPassword" value={existingPassword} onChange={(e) => setExistingPassword(e.target.value)} />
+            <input
+              type="password"
+              id="password"
+              name="password"
+              value={existingPassword}
+              onChange={(e) => setExistingPassword(e.target.value)}
+            />
+            <button type="button" className="auth-login-button" onClick={handlePasswordChangeRequest}>
+              Ändra lösenord
+            </button>
           </div>
+        )}
+
+        {showPasswordUpdate && isExistingPasswordConfirmed && (
+          <>
+            <label htmlFor="password">Nytt lösenord:</label>
+            <input
+              type="password"
+              id="newPassword"
+              name="newPassword"
+              value={userDetails.newPassword}
+              onChange={handleInputChange}
+            />
+            <label htmlFor="confirmPassword">Bekräfta nytt lösenord:</label>
+            <input
+              type="password"
+              id="confirmPassword"
+              name="confirmPassword"
+              value={userDetails.confirmPassword}
+              onChange={handleInputChange}
+            />
+            {/* Submit button for password change */}
+            <button type="submit" className="auth-login-button">Spara nytt lösenord</button>
+          </>
         )}
 
         {/* Submit button */}
