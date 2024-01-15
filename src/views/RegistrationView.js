@@ -107,7 +107,7 @@ const RegistrationView = () => {
         {/* Organization Number */}
         <label htmlFor="organization_number">Organisationsnummer:</label>
         <p>Endast siffror.</p>
-        <input type="text" id="organization_number" name="user_additional.organization_name" onChange={handleInputChange} />
+        <input type="text" id="organization_number" name="user_additional.organization_number" onChange={handleInputChange} />
 
         {/* Password */}
         <label htmlFor="password">Lösenord:</label>
