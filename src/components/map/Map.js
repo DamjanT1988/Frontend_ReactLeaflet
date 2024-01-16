@@ -22,6 +22,9 @@ const Map = ({ selectedProjectId, onSave, userID, /*geoJsonData*/ }) => {
     const zoom = 13;
 
     const [geoJsonData, setGeoJsonData] = useState(null);
+        // State for save status message
+        const [saveStatus, setSaveStatus] = useState('');
+
   
     const accessToken = localStorage.getItem('accessToken'); // Get the access token from local storage
 
@@ -32,7 +35,7 @@ const Map = ({ selectedProjectId, onSave, userID, /*geoJsonData*/ }) => {
           L.geoJSON(geoJsonData).eachLayer(layer => featureGroupRef.current.addLayer(layer)); // Re-add layers
         }
   
-        if (featureGroupRef.current && geoJsonData) {
+/*        if (featureGroupRef.current && geoJsonData) {
           featureGroupRef.current.clearLayers();
           geoJsonData.features.forEach(feature => {
             if (feature.properties.isCircle) {
@@ -46,14 +49,31 @@ const Map = ({ selectedProjectId, onSave, userID, /*geoJsonData*/ }) => {
             }
           });
         }
-      }, [geoJsonData])
+    */
+        if (featureGroupRef.current && geoJsonData) {
+            featureGroupRef.current.clearLayers();
+            geoJsonData.features.forEach(feature => {
+              if (feature.properties && feature.properties.isCircle) {
+                // Recreate circles
+                const center = L.latLng(feature.geometry.coordinates[1], feature.geometry.coordinates[0]);
+                const circle = L.circle(center, { radius: feature.properties.radius });
+                circle.addTo(featureGroupRef.current);
+              } else {
+                // Handle other shapes normally
+                L.geoJSON(feature).addTo(featureGroupRef.current);
+              }
+            });
+          }
+         }, [geoJsonData])
       // Dependency array is empty, meaning it will run once on mount
-  
+
+   
       
 
 // Function to save GeoJSON data to the server
 const saveDataToServer = async () => {
     try {
+        setSaveStatus('Saving...');
         const response = await fetch(`${API_URLS.PROJECT_FILES_POST}/${userID}/${selectedProjectId}/file`, {
             method: 'POST',
             headers: {
@@ -63,14 +83,18 @@ const saveDataToServer = async () => {
             body: JSON.stringify(geoJsonData),
         });
         if (response.ok) {
+            setSaveStatus('Data saved successfully!')
             console.log('Data saved successfully');
         } else {
+            setSaveStatus('Error saving data')
             console.error('Failed to save data');
         }
     } catch (error) {
+        setSaveStatus('No data to save');
         console.error('Error:', error);
     }
 };
+
 
 // Function to load data from the server
 const loadDataFromServer = async () => {
@@ -143,47 +167,13 @@ const loadDataFromServer = async () => {
     const onDeleted = (e) => {
         updateGeoJson(); // Update GeoJSON when shapes are deleted
     };
-  
-    const onFileChange = (event) => {
-        const file = event.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                try {
-                    const data = JSON.parse(e.target.result);
-                    if (data && featureGroupRef.current) {
-                        featureGroupRef.current.clearLayers(); // Clear existing layers
-                        const layers = L.geoJSON(data); // Create new layers from GeoJSON
-                        layers.eachLayer(layer => featureGroupRef.current.addLayer(layer)); // Add new layers to feature group
-                        updateGeoJson(); // Update GeoJSON with newly added layers
-                    }
-                } catch (error) {
-                    console.error("Error reading GeoJSON: ", error);
-                }
-            };
-            reader.readAsText(file);
-        }
-    };
-  
-    const downloadGeoJson = () => {
-        if (geoJsonData) {
-            const blob = new Blob([JSON.stringify(geoJsonData)], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = 'map-data.geojson';
-            link.click();
-        } else {
-            console.error("No GeoJSON data to save.");
-        }
-    };
+
   
     return (
         <div>
         <h3>Projektkarta</h3>
-            <input type="file" onChange={onFileChange} accept=".geojson,application/json" />
-            <button onClick={saveDataToServer}>Save to Server</button>
-            <button onClick={downloadGeoJson}>Spara ritning</button>
+            <button className="toggle-form-button" onClick={saveDataToServer}>Spara ritning!</button>
+            <span className="save-status">{saveStatus}</span>
             <MapContainer center={position} zoom={zoom} style={{ height: '100vh', width: '100%' }}>
                 <LayersControl position="topright">
                     <BaseLayer checked name="OpenStreetMap">
