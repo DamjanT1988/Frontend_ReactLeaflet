@@ -2,6 +2,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { MapContainer, TileLayer, LayersControl, FeatureGroup, GeoJSON } from 'react-leaflet';
 import { EditControl, drawControl } from "react-leaflet-draw";
+import { API_URLS } from '../../constants/APIURLS'; // Import the API_URLS constant
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-draw/dist/leaflet.draw.css';
@@ -22,6 +23,8 @@ const Map = ({ selectedProjectId, onSave, userID, /*geoJsonData*/ }) => {
 
     const [geoJsonData, setGeoJsonData] = useState(null);
   
+    const accessToken = localStorage.getItem('accessToken'); // Get the access token from local storage
+
     useEffect(() => {
     
         if (featureGroupRef.current) {
@@ -46,6 +49,54 @@ const Map = ({ selectedProjectId, onSave, userID, /*geoJsonData*/ }) => {
       }, [geoJsonData])
       // Dependency array is empty, meaning it will run once on mount
   
+      
+
+// Function to save GeoJSON data to the server
+const saveDataToServer = async () => {
+    try {
+        const response = await fetch(`${API_URLS.PROJECT_FILES_POST}/${userID}/${selectedProjectId}/file`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${accessToken}` // Include the accessToken in the Authorization header
+            },
+            body: JSON.stringify(geoJsonData),
+        });
+        if (response.ok) {
+            console.log('Data saved successfully');
+        } else {
+            console.error('Failed to save data');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+    }
+};
+
+// Function to load data from the server
+const loadDataFromServer = async () => {
+    try {
+        const response = await fetch(`${API_URLS.PROJECT_FILES_GET}/${userID}/${selectedProjectId}/file`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${accessToken}` // Include the accessToken in the Authorization header
+            }
+        });
+        if (response.ok) {
+            const data = await response.json();
+            setGeoJsonData(data);
+        } else {
+            console.error('Failed to load data');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+    }
+};
+
+    // useEffect hook to call loadDataFromServer on component mount
+    useEffect(() => {
+        loadDataFromServer();
+    }, []);
+
       const updateGeoJson = () => {
         if (featureGroupRef.current) {
           const features = [];
@@ -79,11 +130,6 @@ const Map = ({ selectedProjectId, onSave, userID, /*geoJsonData*/ }) => {
           setGeoJsonData(geoJson);
         }
       };
-      
-      // Whenever you load or update the map with geoJsonData:
-      useEffect(() => {
-        
-      }, [geoJsonData]);
       
   
     const onCreate = (e) => {
@@ -136,6 +182,7 @@ const Map = ({ selectedProjectId, onSave, userID, /*geoJsonData*/ }) => {
         <div>
         <h3>Projektkarta</h3>
             <input type="file" onChange={onFileChange} accept=".geojson,application/json" />
+            <button onClick={saveDataToServer}>Save to Server</button>
             <button onClick={downloadGeoJson}>Spara ritning</button>
             <MapContainer center={position} zoom={zoom} style={{ height: '100vh', width: '100%' }}>
                 <LayersControl position="topright">

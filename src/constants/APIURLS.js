@@ -3,6 +3,7 @@
 const BASE_URL = 'http://localhost:8000/api';
 
 export const API_URLS = {
+    BASE_URL: BASE_URL,
     ADMIN: `${BASE_URL}/admin/`,
     LOGIN: `${BASE_URL}/user/login/`,
     LOGOUT: `${BASE_URL}/user/logout/`,
@@ -18,6 +19,8 @@ export const API_URLS = {
 
     PROJECTS: `${BASE_URL}/projects/`, // List and create
     PROJECT_DETAIL: `${BASE_URL}/projects/`, // Add a project ID when using this endpoint for detail view
+    PROJECT_FILES_POST: `${BASE_URL}/projects/post`, // Add a project ID when using this endpoint for detail view
+    PROJECT_FILES_GET: `${BASE_URL}/projects/get`, // Add a project ID when using this endpoint for detail view
 
     REPORTS: `${BASE_URL}/reports/`, // List reports
     REPORT_DETAIL: `${BASE_URL}/reports/`, // Add a report ID when using this endpoint for detail view
