@@ -9,6 +9,12 @@ import 'leaflet-draw/dist/leaflet.draw.css';
 const { BaseLayer } = LayersControl;
 
 const DataView = () => {
+  const [geoJsonData, setGeoJsonData] = useState(null);
+  const featureGroupRef = useRef(null); // Using useRef to access the FeatureGroup
+
+  const position = [51.505, -0.09];
+  const zoom = 13;
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -20,21 +26,67 @@ const DataView = () => {
       navigate('/login');
     }
 
-    // Dependency array is empty, meaning it will run once on mount
-  }, []); // Empty dependency array ensures effect runs once after initial render
-
-  const [geoJsonData, setGeoJsonData] = useState(null);
-  const featureGroupRef = useRef(null); // Using useRef to access the FeatureGroup
-
-  const position = [51.505, -0.09];
-  const zoom = 13;
-
-  const updateGeoJson = () => {
       if (featureGroupRef.current) {
-          const drawnItems = featureGroupRef.current.toGeoJSON();
-          setGeoJsonData(drawnItems);
+        featureGroupRef.current.clearLayers(); // Clear existing layers first
+        L.geoJSON(geoJsonData).eachLayer(layer => featureGroupRef.current.addLayer(layer)); // Re-add layers
       }
-  };
+
+      if (featureGroupRef.current && geoJsonData) {
+        featureGroupRef.current.clearLayers();
+        geoJsonData.features.forEach(feature => {
+          if (feature.properties.isCircle) {
+            // Recreate circles
+            const center = L.latLng(feature.geometry.coordinates[1], feature.geometry.coordinates[0]);
+            const circle = L.circle(center, { radius: feature.properties.radius });
+            circle.addTo(featureGroupRef.current);
+          } else {
+            // Handle other shapes normally
+            L.geoJSON(feature).addTo(featureGroupRef.current);
+          }
+        });
+      }
+    }, [geoJsonData])
+    // Dependency array is empty, meaning it will run once on mount
+
+    const updateGeoJson = () => {
+      if (featureGroupRef.current) {
+        const features = [];
+    
+        featureGroupRef.current.eachLayer(layer => {
+          if (layer instanceof L.Circle) {
+            const circleFeature = {
+              type: 'Feature',
+              properties: {
+                isCircle: true,
+                radius: layer.getRadius()
+              },
+              geometry: {
+                type: 'Point',
+                coordinates: [layer.getLatLng().lng, layer.getLatLng().lat]
+              }
+            };
+            features.push(circleFeature);
+          } else {
+            // For other shapes, use the default toGeoJSON method
+            const layerFeature = layer.toGeoJSON();
+            features.push(layerFeature);
+          }
+        });
+    
+        const geoJson = {
+          type: 'FeatureCollection',
+          features: features
+        };
+    
+        setGeoJsonData(geoJson);
+      }
+    };
+    
+    // Whenever you load or update the map with geoJsonData:
+    useEffect(() => {
+      
+    }, [geoJsonData]);
+    
 
   const onCreate = (e) => {
       updateGeoJson(); // Update GeoJSON when new shape is created
@@ -101,10 +153,9 @@ const DataView = () => {
                       onCreated={onCreate}
                       onEdited={onEdited}
                       onDeleted={onDeleted}
-                      draw={{ rectangle: false }}
+                      draw={{ rectangle: false  }}
                   />
               </FeatureGroup>
-              {geoJsonData && <GeoJSON data={geoJsonData} />}
           </MapContainer>
       </div>
   );

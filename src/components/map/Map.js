@@ -10,132 +10,140 @@ import 'leaflet-draw/dist/leaflet.draw.css';
 const { BaseLayer } = LayersControl;
 
 // Define the Map component
-const Map = ({ selectedProjectId, onSave, geoJsonData }) => {
-    // State for current GeoJSON data
-    const [currentGeoJsonData, setCurrentGeoJsonData] = useState(null);
+const Map = ({ selectedProjectId, onSave, userID, /*geoJsonData*/ }) => {
     // Reference to the FeatureGroup
     const featureGroupRef = useRef(null);
     // State for save status message
-    const [saveStatus, setSaveStatus] = useState('');
+    //const [saveStatus, setSaveStatus] = useState('');
 
     // Initial map position and zoom level
     const position = [51.505, -0.09];
     const zoom = 13;
 
-
-    // Effect hook to handle received GeoJSON data
+    const [geoJsonData, setGeoJsonData] = useState(null);
+  
     useEffect(() => {
-        if (geoJsonData && featureGroupRef.current) {
-            const featureGroup = featureGroupRef.current.leafletElement;
-            featureGroup.clearLayers();
-            L.geoJSON(geoJsonData, {
-                onEachFeature: (feature, layer) => featureGroup.addLayer(layer)
-            });
-        }
-    }, [geoJsonData]);
-
     
-        /*
-        const addGeoJsonLayers = () => {
-            if (geoJsonData && featureGroupRef.current) {
-                const featureGroup = featureGroupRef.current.leafletElement;
-                if (featureGroup) {
-                    featureGroup.clearLayers();
-                    L.geoJSON(geoJsonData).eachLayer(layer => featureGroup.addLayer(layer));
-                }
-            }
-        };
-
-        if (!featureGroupRef.current) {
-            const intervalId = setInterval(() => {
-                if (featureGroupRef.current) {
-                    clearInterval(intervalId);
-                    addGeoJsonLayers();
-                }
-            }, 100);
-        } else {
-            addGeoJsonLayers();
-        }
-    }, [geoJsonData]);
-    */
-
-    // Function to handle when a new layer is added to the map
-    const onLayerAdd = () => {
-        if (geoJsonData && featureGroupRef.current) {
-            const featureGroup = featureGroupRef.current.leafletElement;
-            if (featureGroup) {
-                featureGroup.clearLayers();
-                // Create a new GeoJSON layer and add it to the FeatureGroup
-                L.geoJSON(geoJsonData).eachLayer(layer => featureGroup.addLayer(layer));
-            }
-        }
-    };
-
-
-
-    // Function to handle save operation
-    const handleSave = () => {
-        if (currentGeoJsonData && selectedProjectId) {
-            setSaveStatus('Saving...');
-            onSave(currentGeoJsonData)
-                .then(() => setSaveStatus('Data saved successfully!'))
-                .catch(() => setSaveStatus('Error saving data'));
-        } else {
-            setSaveStatus('No data to save');
-        }
-    }
-
-    // Function to update GeoJSON data
- /*   
-    const updateGeoJson = () => {
         if (featureGroupRef.current) {
-            const drawnItems = featureGroupRef.current.toGeoJSON();
-            setCurrentGeoJsonData(drawnItems);
+          featureGroupRef.current.clearLayers(); // Clear existing layers first
+          L.geoJSON(geoJsonData).eachLayer(layer => featureGroupRef.current.addLayer(layer)); // Re-add layers
         }
-    };
-*/
-
-const updateGeoJson = () => {
-    // Check if the featureGroupRef and its leafletElement are available
-    if (featureGroupRef.current && featureGroupRef.current.leafletElement) {
-        const updatedGeoJson = featureGroupRef.current.leafletElement.toGeoJSON();
-        setCurrentGeoJsonData(updatedGeoJson);
-    } else {
-        // Handle the case where the leafletElement is not available yet
-        console.error('Leaflet element not available yet.');
-    }
-};
-
-    // Functions to handle create, edit, and delete events
-    const onCreate = () => updateGeoJson();
-    const onEdited = () => updateGeoJson();
-    const onDeleted = () => updateGeoJson();
-
-    // Function to handle when FeatureGroup is mounted
-    const onMounted = () => {
-        if (geoJsonData && featureGroupRef.current) {
-            const featureGroup = featureGroupRef.current.leafletElement;
-            if (featureGroup) {
-                featureGroup.clearLayers();
-                // Create a new GeoJSON layer and add it to the FeatureGroup
-                L.geoJSON(geoJsonData).eachLayer(layer => featureGroup.addLayer(layer));
+  
+        if (featureGroupRef.current && geoJsonData) {
+          featureGroupRef.current.clearLayers();
+          geoJsonData.features.forEach(feature => {
+            if (feature.properties.isCircle) {
+              // Recreate circles
+              const center = L.latLng(feature.geometry.coordinates[1], feature.geometry.coordinates[0]);
+              const circle = L.circle(center, { radius: feature.properties.radius });
+              circle.addTo(featureGroupRef.current);
+            } else {
+              // Handle other shapes normally
+              L.geoJSON(feature).addTo(featureGroupRef.current);
             }
+          });
+        }
+      }, [geoJsonData])
+      // Dependency array is empty, meaning it will run once on mount
+  
+      const updateGeoJson = () => {
+        if (featureGroupRef.current) {
+          const features = [];
+      
+          featureGroupRef.current.eachLayer(layer => {
+            if (layer instanceof L.Circle) {
+              const circleFeature = {
+                type: 'Feature',
+                properties: {
+                  isCircle: true,
+                  radius: layer.getRadius()
+                },
+                geometry: {
+                  type: 'Point',
+                  coordinates: [layer.getLatLng().lng, layer.getLatLng().lat]
+                }
+              };
+              features.push(circleFeature);
+            } else {
+              // For other shapes, use the default toGeoJSON method
+              const layerFeature = layer.toGeoJSON();
+              features.push(layerFeature);
+            }
+          });
+      
+          const geoJson = {
+            type: 'FeatureCollection',
+            features: features
+          };
+      
+          setGeoJsonData(geoJson);
+        }
+      };
+      
+      // Whenever you load or update the map with geoJsonData:
+      useEffect(() => {
+        
+      }, [geoJsonData]);
+      
+  
+    const onCreate = (e) => {
+        updateGeoJson(); // Update GeoJSON when new shape is created
+    };
+  
+    const onEdited = (e) => {
+        updateGeoJson(); // Update GeoJSON when shapes are edited
+    };
+  
+    const onDeleted = (e) => {
+        updateGeoJson(); // Update GeoJSON when shapes are deleted
+    };
+  
+    const onFileChange = (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    if (data && featureGroupRef.current) {
+                        featureGroupRef.current.clearLayers(); // Clear existing layers
+                        const layers = L.geoJSON(data); // Create new layers from GeoJSON
+                        layers.eachLayer(layer => featureGroupRef.current.addLayer(layer)); // Add new layers to feature group
+                        updateGeoJson(); // Update GeoJSON with newly added layers
+                    }
+                } catch (error) {
+                    console.error("Error reading GeoJSON: ", error);
+                }
+            };
+            reader.readAsText(file);
         }
     };
-
-    // Render the Map component
+  
+    const downloadGeoJson = () => {
+        if (geoJsonData) {
+            const blob = new Blob([JSON.stringify(geoJsonData)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'map-data.geojson';
+            link.click();
+        } else {
+            console.error("No GeoJSON data to save.");
+        }
+    };
+  
     return (
         <div>
-            <h3>Projektkarta</h3>
-            <button className="toggle-form-button" onClick={handleSave}>Spara ritning</button>
-            <span className="save-status">{saveStatus}</span>
-            <MapContainer center={position} zoom={zoom} style={{ height: '100vh', width: '100%' }} onlayeradd={onLayerAdd}>
+        <h3>Projektkarta</h3>
+            <input type="file" onChange={onFileChange} accept=".geojson,application/json" />
+            <button onClick={downloadGeoJson}>Spara ritning</button>
+            <MapContainer center={position} zoom={zoom} style={{ height: '100vh', width: '100%' }}>
                 <LayersControl position="topright">
                     <BaseLayer checked name="OpenStreetMap">
-                        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"/>
                     </BaseLayer>
                     <BaseLayer name="Esri WorldImagery">
-                        <TileLayer url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}" />
+                        <TileLayer url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"/>
                     </BaseLayer>
                 </LayersControl>
                 <FeatureGroup ref={featureGroupRef}>
@@ -144,25 +152,12 @@ const updateGeoJson = () => {
                         onCreated={onCreate}
                         onEdited={onEdited}
                         onDeleted={onDeleted}
-                        onMounted={onMounted}
-                        draw={{ rectangle: false }}
+                        draw={{ rectangle: false  }}
                     />
-                    {geoJsonData && <GeoJSON
-                        data={geoJsonData}
-                        onEachFeature={(feature, layer) => {
-                            if (featureGroupRef.current) {
-                                const featureGroup = featureGroupRef.current.leafletElement;
-                                if (featureGroup) {
-                                    featureGroup.addLayer(layer);
-                                }
-                            }
-                        }}
-                    />}
                 </FeatureGroup>
             </MapContainer>
         </div>
     );
-};
-
+  };
 // Export the Map component
 export default Map;

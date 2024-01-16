@@ -199,7 +199,7 @@ const ProjectView = () => {
         <button className="project-back" onClick={() => setSelectedProject(null)}>Tillbaka till projektlista</button>
 
         {/* PROJECT INFO. */}
-        <h2>Projektnamn: {selectedProject.project_name}</h2>
+        <h2>Projektnamn: {selectedProject.project_name} - #{selectedProject.id}</h2>
         <p>{selectedProject.description}</p>
 
         {/* SURVEY */}
@@ -210,6 +210,7 @@ const ProjectView = () => {
           selectedProjectId={selectedProject.id}
           onSave={handleSaveMapData}
           geoJsonData={geoJsonData}
+          userID={selectedProject.user}
         />
       </div>
     );
@@ -238,7 +239,7 @@ const ProjectView = () => {
 
       {[...projects].reverse().map(project => (
         <div key={project.id} className='project'>
-          <h2>{project.project_name}</h2>
+          <h2>{project.project_name} - #{project.id}</h2>
           <p>{project.description}</p>
           <button onClick={() => viewProjectDetails(project.id)}>Välj projekt!</button>
         </div>
