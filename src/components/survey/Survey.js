@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
-//import { useNavigate } from 'react-router-dom';
 import { API_URLS } from '../../constants/APIURLS';
-
+import UserSpecies from '../Species/UserSpecies';
 
 const Survey = () => {
     const accessToken = localStorage.getItem('accessToken');
@@ -12,6 +11,7 @@ const Survey = () => {
       observationDate: '',
       notes: '',
     });
+    const [showUserSpecies, setShowUserSpecies] = useState(false);
 
     useEffect(() => {
         // Fetch species list when the component mounts
@@ -38,6 +38,8 @@ const Survey = () => {
 
     return (
         <div className="survey-container">
+
+
             <form onSubmit={handleSurveySubmit}>
             <h3>Projektformulär</h3>
 
@@ -72,6 +74,16 @@ const Survey = () => {
                 ></textarea>
 
             </form>
+
+            <button
+            className="toggle-form-button"
+            type="button"  // Change type to "button" so it doesn't submit the form
+            onClick={() => setShowUserSpecies(!showUserSpecies)}
+        >
+            {showUserSpecies ? 'Dölj artformlär' : 'Lägg till en art'}
+        </button>
+
+        {showUserSpecies && <UserSpecies />}
         </div>
     );
 }

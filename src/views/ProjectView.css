@@ -33,14 +33,14 @@ h2 {
     color: #30A875; /* Green color for project titles */
     font-weight: bolder;
     margin-bottom: 10px; /* Space after the project title */
-    font-size: 130%;
+    font-size: 150%;
 }
 
 h3 {
     color: #30A875; /* Green color for project titles */
     font-weight: bold;
     margin-bottom: 10px; /* Space after the project title */
-    font-size: 110%;
+    font-size: 135%;
     font-style: italic;
 }
 
@@ -212,4 +212,87 @@ h3 {
 /* Add any additional styles for hover, focus, or active states as desired */
 .survey-container button:hover {
     background-color: #26724d; /* Slightly darker green on hover */
+}
+
+/* UserSpecies.css */
+
+/* Container for the entire user species view, similar to project-container */
+.user-species-container {
+    background-color: #d3d3d3; /* Medium grey background */
+    color: #666; /* Dark grey text */
+    width: 768px; /* Consistent width */
+    margin: 50px auto; /* Center the container */
+    padding: 20px; /* Padding for the container */
+    box-sizing: border-box;
+}
+
+/* Style for the main title, similar to project-container > h1 */
+.user-species-container > h1 {
+    color: #30A875; /* Green color for main heading */
+    margin-bottom: 20px; /* Space after the main title */
+}
+
+/* Style for each species item in the list */
+.species-list li {
+    background-color: #fff; /* White background for each species item */
+    border: 1px solid #ccc; /* Border for each species item */
+    padding: 15px; /* Padding inside each species item */
+    margin-bottom: 15px; /* Space between species items */
+    box-shadow: 0px 2px 5px rgba(0,0,0,0.1); /* Optional: add shadow for depth */
+    list-style-type: none; /* Remove list bullets */
+}
+
+/* Adjusting the form layout */
+.user-species-container .form-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* Three columns */
+    grid-gap: 20px; /* Space between grid items */
+    margin-bottom: 20px; /* Space below the form */
+}
+
+.user-species-container .form-container input[type="text"],
+.user-species-container .form-container textarea {
+    width: 100%; /* Adjust width to fit grid columns */
+    margin-bottom: 15px; /* Vertical space between fields */
+}
+
+/* Adjust the textarea to span two rows vertically */
+.user-species-container .form-container textarea {
+    grid-row: span 2; /* Span two rows */
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .user-species-container .form-container {
+        grid-template-columns: 1fr; /* One column on smaller screens */
+    }
+    .user-species-container .form-container textarea {
+        grid-row: auto; /* Reset row span for smaller screens */
+    }
+}
+
+/* Hover effect for buttons */
+.user-species-container button:hover {
+    background-color: #26724d; /* Slightly darker green on hover */
+}
+
+/* Style for the 'Add Species' button, similar to project > button */
+.user-species-container button {
+    background-color: #30A875; /* Green background for consistency */
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    cursor: pointer;
+    display: inline-block; /* So it doesn't take the full width */
+    margin-bottom: 10px; /* Space after the button */
+}
+
+/* Reusing styles for form fields and labels from ProjectView.css */
+.user-species-container .form-container label,
+.user-species-container input[type="text"],
+.user-species-container textarea {
+    /* Styles are inherited from ProjectView.css */
+    display: block; /* Ensure the label goes on a new line */
+    margin-bottom: 5px; /* Small space between label and input */
+    font-weight: bold; /* Make labels bold for clarity */
 }
