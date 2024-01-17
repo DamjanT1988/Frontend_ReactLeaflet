@@ -4,6 +4,7 @@ import { API_URLS } from '../constants/APIURLS';
 
 const DashboardView = () => {
   const [userInfo, setUserInfo] = useState(null);
+  const [rememberMe, setRememberMe] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -14,6 +15,9 @@ const DashboardView = () => {
       navigate('/login');
       return;
     }
+
+    const savedRememberMe = localStorage.getItem('rememberMe') === 'true';
+    setRememberMe(savedRememberMe);
 
     const fetchUserInfo = async () => {
       try {
@@ -42,9 +46,9 @@ const DashboardView = () => {
 
   // Render user info or any other content
   return <div>
-  <h1>Panel</h1>
-  {userInfo ? <h2>Welcome {userInfo.username}</h2> : 'Loading...'}
-  
+    <h1>Panel</h1>
+    {userInfo ? <h2>Welcome {userInfo.username}</h2> : 'Loading...'}
+
   </div>;
 };
 

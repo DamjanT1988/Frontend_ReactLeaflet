@@ -199,7 +199,7 @@ const ProjectView = () => {
         <button className="project-back" onClick={() => setSelectedProject(null)}>Tillbaka till projektlista</button>
 
         {/* PROJECT INFO. */}
-        <h2>Projektnamn: {selectedProject.project_name} - #{selectedProject.id}</h2>
+        <h2>Projektnamn och -nummer: {selectedProject.project_name} - #{selectedProject.id}</h2>
         <p>{selectedProject.description}</p>
 
         {/* SURVEY */}

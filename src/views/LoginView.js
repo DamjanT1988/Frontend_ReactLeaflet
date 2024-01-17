@@ -7,12 +7,12 @@ import { API_URLS } from '../constants/APIURLS';
 const LoginView = () => {
   const [userNumber, setUserNumber] = useState('');
   const [userPassword, setUserPassword] = useState('');
+  const [rememberMe, setRememberMe] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
-     // When the component mounts
-     document.body.style.backgroundColor = '#d3d3d3';
-   
+    // When the component mounts
+    document.body.style.backgroundColor = '#d3d3d3';
 
     // Check if the access token exists
     const accessToken = localStorage.getItem('accessToken');
@@ -20,10 +20,10 @@ const LoginView = () => {
       navigate('/dashboard'); // If the access token exists in localStorage, navigate to Dashboard
     }
     // Dependency array is empty, meaning it will run once on mount
-            // When the component unmounts
-            return () => {
-              document.body.style.backgroundColor = null; // or set to a default color
-            };
+    // When the component unmounts
+    return () => {
+      document.body.style.backgroundColor = null; // or set to a default color
+    };
   }, []); // Empty dependency array means it only runs on the first render
 
   const handleSubmit = async (e) => {
@@ -37,6 +37,7 @@ const LoginView = () => {
         body: JSON.stringify({
           username: userNumber,
           password: userPassword,
+          rememberMe: rememberMe
         }),
       });
 
@@ -47,6 +48,9 @@ const LoginView = () => {
         localStorage.setItem('refreshToken', data.refresh);
         localStorage.setItem('accessToken', data.access);
         navigate('/dashboard');
+        // When setting the token
+        localStorage.setItem('rememberMe', rememberMe);
+
       } else {
         console.error('Misslyckad inlogg:', data.error);
         // Handle errors, such as displaying a message to the user
@@ -66,13 +70,18 @@ const LoginView = () => {
         <input type="text" id="userNumber" value={userNumber} onChange={(e) => setUserNumber(e.target.value)} />
         <label htmlFor="userPassword">Fyll i ditt lösenord:</label>
         <input type="password" id="userPassword" value={userPassword} onChange={(e) => setUserPassword(e.target.value)} />
-        <br/>
+        <br />
         <div className="auth-remember">
           <label htmlFor="rememberMe">Komihåg</label>
-          <input type="checkbox" id="rememberMe" /> 
+          <input
+            type="checkbox"
+            id="rememberMe"
+            checked={rememberMe}
+            onChange={(e) => setRememberMe(e.target.checked)}
+          />
         </div>
         <button type="submit" className="auth-login-button">LOGGA IN!</button>
-        <br/>
+        <br />
         <a href="/forgot-password" className="auth-forgot-link">Glömt inloggningsuppgifter? Tryck här!</a>
       </form>
     </div>
