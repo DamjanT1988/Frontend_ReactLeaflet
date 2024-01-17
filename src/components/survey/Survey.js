@@ -41,7 +41,7 @@ const Survey = () => {
             <form onSubmit={handleSurveySubmit}>
             <h3>Projektformulär</h3>
 
-            <button type="submit">Spara formulär</button>
+            <button className="toggle-form-button" type="submit">Spara formulär</button>
             <br />
             <label htmlFor="species">Art:</label>
             <select

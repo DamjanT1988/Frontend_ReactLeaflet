@@ -36,6 +36,7 @@ const App = () => {
                 {/* Default path or 404 Not Found View */}
                 <Route path="/" element={<DashboardView />} />
                 {/* Add other routes as needed */}
+                <Route path="/project/:projectId" element={<ProjectView />} />
               </Routes>
             </Layout>
           }

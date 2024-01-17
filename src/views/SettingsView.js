@@ -267,7 +267,7 @@ const SettingsView = () => {
         {/* Payment Address */}
         <div>
           <label htmlFor="payment_adress">Faktureringsadress:</label>
-          <input type="text" id="payment_adress" name="payment_adress" value={paymentDetails.payment_adress} onChange={handlePaymentInputChange} />
+          <textarea type="text" id="payment_adress" rows="4" name="payment_adress" value={paymentDetails.payment_adress} onChange={handlePaymentInputChange}></textarea>
         </div>
 
         {/* Payment Telephone */}

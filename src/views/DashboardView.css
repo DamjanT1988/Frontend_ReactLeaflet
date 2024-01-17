@@ -1,0 +1,33 @@
+/* DashboardView.css */
+
+/* Container for the entire dashboard view */
+.dashboard-container {
+    background-color: #d3d3d3; /* Medium grey background, similar to project-container */
+    color: #666; /* Dark grey text, consistent with project-container */
+    width: 768px; /* Consistent width with project-container */
+    margin: 50px auto; /* Center the container */
+    padding: 20px; /* Padding for the container */
+    box-sizing: border-box;
+}
+
+/* Style for the dashboard main title */
+.dashboard-container > h1 {
+    color: #30A875; /* Green color for main heading, consistent with project-container */
+    margin-bottom: 20px; /* Space after the main title */
+}
+
+/* Style for the 'Latest Projects' section */
+.latest-projects {
+    padding: 10px;
+}
+
+/* Add any additional responsive adjustments or hover, focus, active states as needed */
+@media (max-width: 768px) {
+    .dashboard-container {
+        width: 95%; /* Adjust width for smaller screens */
+    }
+}
+
+.project > button:hover {
+    background-color: #26724d; /* Slightly darker green on hover, consistent with ProjectView.css */
+}

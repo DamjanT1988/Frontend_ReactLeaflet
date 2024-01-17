@@ -10,6 +10,7 @@ const Footer = () => {
         <p>T: 073-739 19 65</p>
         <p>A: Dagvindsgatan 8, Karlstad</p>
         <p>E: <a href="mailto:info@vagochmiljo.se">info@vagochmiljo.se</a></p>
+        <p>H: <a href="http://www.vagochmiljo.se">www.vagochmiljo.se</a></p>
       </div>
       <div className="footer-section">
       <h4>Genvägar</h4>

@@ -5,6 +5,8 @@ import { API_URLS } from '../constants/APIURLS'; // Import the API_URLS constant
 import './ProjectView.css'; // Import the CSS for this component
 import Map from '../components/map/Map.js'; // Import the Map component
 import Survey from '../components/survey/Survey.js'; // Import the Survey component
+import { useParams } from 'react-router-dom';
+
 
 /**
  * Represents the view for managing projects.
@@ -18,6 +20,13 @@ const ProjectView = () => {
   const accessToken = localStorage.getItem('accessToken'); // Get the access token from local storage
   const [showForm, setShowForm] = useState(false); // State for controlling the visibility of the form
   const toggleFormVisibility = () => setShowForm(!showForm); // Function to toggle the visibility of the form
+  const { projectId } = useParams(); // Assuming the URL parameter is named 'projectId'
+
+  useEffect(() => {
+    if (projectId) {
+        viewProjectDetails(projectId);
+    }
+  }, [projectId]);
 
   // Use effect hook to fetch projects if access token is available
   useEffect(() => {
@@ -199,7 +208,7 @@ const ProjectView = () => {
         <button className="project-back" onClick={() => setSelectedProject(null)}>Tillbaka till projektlista</button>
 
         {/* PROJECT INFO. */}
-        <h2>Projektnamn och -nummer: {selectedProject.project_name} - #{selectedProject.id}</h2>
+        <h2>Projekt: {selectedProject.project_name} - #{selectedProject.id}</h2>
         <p>{selectedProject.description}</p>
 
         {/* SURVEY */}
@@ -233,7 +242,7 @@ const ProjectView = () => {
           <label htmlFor="description">Beskrivning:</label>
           <textarea id="description" name="description" required></textarea>
 
-          <button type="submit">Skapa projekt!</button> <br /><br />
+          <button className="toggle-form-button"type="submit">Skapa projekt!</button> <br /><br />
         </form>
       )}
 
@@ -241,8 +250,8 @@ const ProjectView = () => {
         <div key={project.id} className='project'>
           <h2>{project.project_name} - #{project.id}</h2>
           <p>{project.description}</p>
-          <button onClick={() => viewProjectDetails(project.id)}>Välj projekt!</button>
-        </div>
+          <button className="toggle-form-button" onClick={() => viewProjectDetails(project.id)}>Välj projekt!</button>
+        </div> 
       ))}
     </div>
   );

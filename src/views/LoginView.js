@@ -127,7 +127,7 @@ const LoginView = () => {
               value={resetUsername}
               onChange={(e) => setResetUsername(e.target.value)}
             />
-            <p>Ett nytt lösenord skickas till den angivna användaremejl. Därefter kan ni sätta egen lösenord i kontoinställningar.</p>
+            <p>Ett nytt lösenord skickas till ert kontoemejl. Därefter kan ni logga in för att sätta egen lösenord i kontoinställningar.</p>
             <button className="auth-login-button" onClick={handlePasswordReset}>Skicka nytt lösenord!</button>
           </div>
         )}
