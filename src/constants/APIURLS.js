@@ -7,6 +7,7 @@ export const API_URLS = {
     ADMIN: `${BASE_URL}/admin/`,
     LOGIN: `${BASE_URL}/user/login/`,
     LOGOUT: `${BASE_URL}/user/logout/`,
+    RESET: `${BASE_URL}/user/reset/`,
     USER_INFO: `${BASE_URL}/user/info/`,
     USER_CREATE: `${BASE_URL}/user/create/`,
     USER_DELETE: `${BASE_URL}/user/delete/`, // Specify a user ID when using this endpoint

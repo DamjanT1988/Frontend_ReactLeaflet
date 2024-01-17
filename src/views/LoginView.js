@@ -8,6 +8,8 @@ const LoginView = () => {
   const [userNumber, setUserNumber] = useState('');
   const [userPassword, setUserPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
+  const [resetUsername, setResetUsername] = useState('');
+  const [showPasswordReset, setShowPasswordReset] = useState(false); // State to track visibility of password reset fields
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -61,6 +63,34 @@ const LoginView = () => {
     }
   };
 
+  const handlePasswordReset = async () => {
+    try {
+      const response = await fetch(API_URLS.RESET, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username: resetUsername }),
+      });
+  
+      if (response.ok) {
+        console.log('Password reset email sent.');
+        // Show some confirmation message to the user
+      } else {
+        console.error('Failed to send password reset email.');
+        // Handle errors, such as displaying a message to the user
+      }
+    } catch (error) {
+      console.error('Error sending password reset request:', error);
+      // Handle network errors, show user feedback
+    }
+  };  
+
+  const togglePasswordReset = () => {
+    setShowPasswordReset(!showPasswordReset); // Toggle the visibility
+  };
+
+
   return (
     <div className="auth-container">
       <img src={Logo} alt="logo" className="auth-logo" />
@@ -82,8 +112,25 @@ const LoginView = () => {
         </div>
         <button type="submit" className="auth-login-button">LOGGA IN!</button>
         <br />
-        <a href="/forgot-password" className="auth-forgot-link">Glömt inloggningsuppgifter? Tryck här!</a>
-      </form>
+        <button type="button" onClick={togglePasswordReset} className="auth-forgot-link">
+          Glömt inloggningsuppgifter? Tryck här!
+        </button>
+        </form>
+        <br />
+
+        <br /><br />
+        {showPasswordReset && (
+          <div className="password-reset-section auth-form">
+          <label>Ange ditt användarnamn:</label>
+            <input
+              type="text"
+              value={resetUsername}
+              onChange={(e) => setResetUsername(e.target.value)}
+            />
+            <p>Ett nytt lösenord skickas till den angivna användaremejl. Därefter kan ni sätta egen lösenord i kontoinställningar.</p>
+            <button className="auth-login-button" onClick={handlePasswordReset}>Skicka nytt lösenord!</button>
+          </div>
+        )}
     </div>
   );
 };

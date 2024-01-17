@@ -86,6 +86,7 @@ h1 {
     border: none;
     cursor: pointer;
     float: right; /* Aligns the button to the right */
+    text-transform: uppercase;
   }
   
   .auth-forgot-link {
