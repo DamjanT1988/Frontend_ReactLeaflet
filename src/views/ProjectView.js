@@ -205,7 +205,7 @@ const ProjectView = () => {
     return (
       <div className="project-details-container">
         <h1>Projekt</h1>
-        <button className="project-back" onClick={() => setSelectedProject(null)}>Tillbaka till projektlista</button>
+        <button className="project-back" onClick={() => setSelectedProject(null)}>Tillbaka till projektlista!</button>
 
         {/* PROJECT INFO. */}
         <h2>Projekt: {selectedProject.project_name} - #{selectedProject.id}</h2>

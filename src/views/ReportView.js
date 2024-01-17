@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'; // Import the useNavigate hook f
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-draw/dist/leaflet.draw.css';
+import UserSpecies from '../components/Species/UserSpecies';
 
 const ReportView = () => {
   const navigate = useNavigate();
@@ -19,6 +20,7 @@ const ReportView = () => {
 
   return (
       <div>
+      <UserSpecies />
       </div>
   );
 };

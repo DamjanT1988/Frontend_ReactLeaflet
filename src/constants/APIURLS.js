@@ -17,6 +17,7 @@ export const API_URLS = {
 
     SPECIES_LIST: `${BASE_URL}/species/`,
     USER_SPECIES_LIST: `${BASE_URL}/species/user/`,
+    USER_SPECIES_CREATE: `${BASE_URL}/species/user/create/`,
 
     PROJECTS: `${BASE_URL}/projects/`, // List and create
     PROJECT_DETAIL: `${BASE_URL}/projects/`, // Add a project ID when using this endpoint for detail view
