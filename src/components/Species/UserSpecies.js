@@ -19,6 +19,7 @@ const UserSpecies = () => {
     const [searchResults, setSearchResults] = useState([]);
     const [isFetchingSpecies, setIsFetchingSpecies] = useState(false);
     const fileInputRef = useRef(null);
+    const exampleCsvFileUrl = process.env.PUBLIC_URL + '/media/accepteratformatuppladdning.csv';
 
     const handleSearch = async () => {
         try {
@@ -247,7 +248,7 @@ const UserSpecies = () => {
                     value={speciesData.source}
                     onChange={handleChange}
                 />
-                <button type="submit">Lägg till art i egna databank</button>
+                <button type="submit">Lägg till art ovan i egna databank</button>
             </form>
 
             <input
@@ -258,6 +259,9 @@ const UserSpecies = () => {
                 style={{ display: 'none' }}
             />
             <button onClick={handleFileUploadClick}>Lägg till arter från fil till egen databank</button>
+            
+                <a href={exampleCsvFileUrl} download>Accepterad fil och format</a>
+            
 
             <div className="species-search">
                 <input
