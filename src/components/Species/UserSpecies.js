@@ -119,7 +119,7 @@ useEffect(() => {
                     rows="3"
                     placeholder="Artinformation"
                     value={speciesData.species_data}
-                    onChange={handleChange}
+                    onChange={handleChange} 
                 />
                 <input
                     type="text"

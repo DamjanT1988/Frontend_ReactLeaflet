@@ -20,7 +20,6 @@ const ReportView = () => {
 
   return (
       <div>
-      <UserSpecies />
       </div>
   );
 };
