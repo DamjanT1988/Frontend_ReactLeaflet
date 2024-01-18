@@ -20,8 +20,17 @@ const UserSpecies = () => {
     const [isFetchingSpecies, setIsFetchingSpecies] = useState(false);
     const fileInputRef = useRef(null);
     const exampleCsvFileUrl = process.env.PUBLIC_URL + '/media/accepteratformatuppladdning.csv';
+    const [statusMessage, setStatusMessage] = useState('');
+    const [showPopup, setShowPopup] = useState(false);
+
+    const displayStatusPopup = (message) => {
+        setStatusMessage(message);
+        setShowPopup(true);
+        setTimeout(() => setShowPopup(false), 3500); 
+    };
 
     const handleSearch = async () => {
+        displayStatusPopup('Hämtar sökresultat..');
         try {
             const response = await fetch(`https://api.artdatabanken.se/information/v1/speciesdataservice/v1/speciesdata/search?searchString=${searchQuery}`, {
                 method: 'GET',
@@ -35,6 +44,7 @@ const UserSpecies = () => {
                 setSearchResults(data);
             } else {
                 console.error('Failed to fetch search results');
+                displayStatusPopup('Kunde inte hämnta sökresultat!');
             }
         } catch (error) {
             console.error('Error during search:', error);
@@ -54,7 +64,8 @@ const UserSpecies = () => {
             });
             if (!response.ok) {
                 // Fallback to local API if external API fails
-                response = await fetch(`${API_URLS.SPECIES_LIST}/${taxonId}`);
+                //response = await fetch(`${API_URLS.SPECIES_LIST}/${taxonId}`);
+                displayStatusPopup('Kunde inte hämta data!');
             }
 
             const rawData = await response.json();
@@ -121,10 +132,12 @@ const UserSpecies = () => {
 
             if (response.ok) {
                 console.log('Species added successfully');
+                displayStatusPopup('Lagt till art!');
                 fetchUserSpecies(); // Fetch the updated species list
                 // Handle successful addition (e.g., clearing the form)
             } else {
                 console.error('Failed to add species');
+                displayStatusPopup('Kunde inte lägga till art!');
                 // Handle errors
             }
         } catch (error) {
@@ -173,8 +186,10 @@ const UserSpecies = () => {
 
                 if (response.ok) {
                     console.log('Species item added successfully');
+                    displayStatusPopup('Lagt till arter från fil!');
                 } else {
                     console.error('Failed to add species item');
+                    displayStatusPopup('Kunde innte lägga till arter från fil!');
                 }
             } catch (error) {
                 console.error('Error submitting species item:', error);
@@ -211,7 +226,9 @@ const UserSpecies = () => {
 
     return (
         <div className="user-species-container">
-            <h1>Lägg till din egen art</h1>
+            
+            <h1>Lägg till din egen art</h1>¨
+            
             <form onSubmit={handleSubmit}>
                 <input
                     type="text"
@@ -258,11 +275,10 @@ const UserSpecies = () => {
                 ref={fileInputRef}
                 style={{ display: 'none' }}
             />
-            <button onClick={handleFileUploadClick}>Lägg till arter från fil till egen databank</button>
+            <button onClick={handleFileUploadClick}>Lägg till arter från fil i egna databank</button>
             
                 <a href={exampleCsvFileUrl} download>Accepterad fil och format</a>
-            
-
+        
             <div className="species-search">
                 <input
                     type="text"
@@ -280,6 +296,10 @@ const UserSpecies = () => {
                         <p>{result.swedishName} ({result.scientificName}) - taxon-ID: {result.taxonId}</p>
                     </div>
                 ))}
+            </div>
+
+            <div className={`status-popup ${showPopup ? 'show' : ''}`}>
+                {statusMessage}
             </div>
         </div>
     );

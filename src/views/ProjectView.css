@@ -317,3 +317,25 @@ h3 {
 .search-results div:hover {
     background-color: #f5f5f5;
 }
+
+.status-popup {
+    position: fixed;
+    font-size: 135%;
+    left: 50%;
+    bottom: 20px;
+    transform: translateX(-50%);
+    background-color: red;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    display: none; /* Initially hidden */
+    opacity: 0;
+    transition: opacity 0.5s, bottom 0.5s;
+    z-index: 1000; /* Ensure it's above other elements */
+}
+
+.status-popup.show {
+    display: block;
+    opacity: 1;
+    bottom: 20px; /* Adjust as needed for visibility */
+}
