@@ -17,7 +17,6 @@ const Map = ({ selectedProjectId, onSave, userID, /*geoJsonData*/ }) => {
   const zoom = 13;
   const [geoJsonData, setGeoJsonData] = useState(null);
   const [saveStatus, setSaveStatus] = useState('');
-
   const accessToken = localStorage.getItem('accessToken'); // Get the access token from local storage
 
   useEffect(() => {
