@@ -122,7 +122,7 @@ const Map = ({ selectedProjectId, onSave, userID, /*geoJsonData*/ }) => {
         features: features
       };
 
-      console.log('geoJson: ', geoJson);
+      console.log('geojson: ', geoJson);
       setGeoJsonData(geoJson);
     }
   };
