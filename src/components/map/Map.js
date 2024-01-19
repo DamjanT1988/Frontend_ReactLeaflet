@@ -4,11 +4,80 @@ import { MapContainer, TileLayer, LayersControl, FeatureGroup, GeoJSON } from 'r
 import { EditControl, drawControl } from "react-leaflet-draw";
 import { API_URLS } from '../../constants/APIURLS'; // Import the API_URLS constant
 import L from 'leaflet';
+import 'leaflet-draw';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-draw/dist/leaflet.draw.css';
 
 // Destructure BaseLayer from LayersControl
 const { BaseLayer } = LayersControl;
+
+// Direct manipulation for Swedish localization
+L.drawLocal.draw.toolbar.buttons = {
+  polyline: 'Rita en polylinje',
+  polygon: 'Rita en polygon',
+  rectangle: 'Rita en rektangel',
+  circle: 'Rita en cirkel',
+  marker: 'Placera en markör',
+  circlemarker: 'Placera en cirkelmarkör',
+};
+L.drawLocal.draw.toolbar.actions = {
+  title: 'Avbryt ritning',
+  text: 'Avbryt',
+};
+L.drawLocal.draw.toolbar.finish = {
+  title: 'Avsluta ritning',
+  text: 'Avsluta',
+};
+L.drawLocal.draw.toolbar.undo = {
+  title: 'Ta bort sista punkten',
+  text: 'Ta bort sista punkten',
+};
+L.drawLocal.draw.handlers.circle.tooltip = {
+  start: 'Klicka och dra för att rita en cirkel.',
+};
+L.drawLocal.draw.handlers.circlemarker.tooltip = {
+  start: 'Klicka på kartan för att placera en cirkelmarkör.',
+};
+L.drawLocal.draw.handlers.marker.tooltip = {
+  start: 'Klicka på kartan för att placera en markör.',
+};
+L.drawLocal.draw.handlers.polygon.tooltip = {
+  start: 'Klicka för att börja rita en figur.',
+  cont: 'Klicka för att fortsätta rita figuren.',
+  end: 'Klicka på första punkten för att avsluta denna figur.',
+};
+L.drawLocal.draw.handlers.polyline.tooltip = {
+  start: 'Klicka för att börja rita en linje.',
+  cont: 'Klicka för att fortsätta rita linjen.',
+  end: 'Klicka på sista punkten för att avsluta linjen.',
+};
+L.drawLocal.draw.handlers.rectangle.tooltip = {
+  start: 'Klicka och dra för att rita en rektangel.',
+};
+
+L.drawLocal.edit.toolbar.actions.save = {
+  title: 'Spara ändringar',
+  text: 'Spara',
+};
+L.drawLocal.edit.toolbar.actions.cancel = {
+  title: 'Avbryt redigering, kasta alla ändringar',
+  text: 'Avbryt',
+};
+L.drawLocal.edit.toolbar.actions.clearAll = {
+  title: 'Rensa alla lager',
+  text: 'Rensa alla',
+};
+L.drawLocal.edit.toolbar.buttons.edit = 'Redigera lager';
+L.drawLocal.edit.toolbar.buttons.editDisabled = 'Inga lager att redigera';
+L.drawLocal.edit.toolbar.buttons.remove = 'Ta bort lager';
+L.drawLocal.edit.toolbar.buttons.removeDisabled = 'Inga lager att ta bort';
+L.drawLocal.edit.handlers.edit.tooltip = {
+  text: 'Dra handtag eller markörer för att redigera funktioner.',
+  subtext: 'Klicka på avbryt för att ångra ändringar.',
+};
+L.drawLocal.edit.handlers.remove.tooltip = {
+  text: 'Klicka på en funktion för att ta bort',
+};
 
 // Define the Map component
 const Map = ({ selectedProjectId, onSave, userID, /*geoJsonData*/ }) => {
@@ -18,6 +87,7 @@ const Map = ({ selectedProjectId, onSave, userID, /*geoJsonData*/ }) => {
   const [geoJsonData, setGeoJsonData] = useState(null);
   const [saveStatus, setSaveStatus] = useState('');
   const accessToken = localStorage.getItem('accessToken'); // Get the access token from local storage
+ 
 
   useEffect(() => {
     if (featureGroupRef.current) {
@@ -139,6 +209,8 @@ const Map = ({ selectedProjectId, onSave, userID, /*geoJsonData*/ }) => {
     updateGeoJson(); // Update GeoJSON when shapes are deleted
   };
 
+
+
   return (
     <div>
       <h3>Projektkarta</h3>
@@ -146,10 +218,10 @@ const Map = ({ selectedProjectId, onSave, userID, /*geoJsonData*/ }) => {
       <span className="save-status">{saveStatus}</span>
       <MapContainer center={position} zoom={zoom} style={{ height: '100vh', width: '100%' }}>
         <LayersControl position="topright">
-          <BaseLayer checked name="OpenStreetMap">
+          <BaseLayer checked name="Informationskarta">
             <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
           </BaseLayer>
-          <BaseLayer name="Esri WorldImagery">
+          <BaseLayer name="Satellitkarta">
             <TileLayer url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}" />
           </BaseLayer>
         </LayersControl>
