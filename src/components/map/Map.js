@@ -22,23 +22,23 @@ const Map = ({ selectedProjectId, onSave, userID, /*geoJsonData*/ }) => {
   useEffect(() => {
     if (featureGroupRef.current) {
       featureGroupRef.current.clearLayers(); // Clear existing layers first
-      L.geoJSON(geoJsonData).eachLayer(layer => featureGroupRef.current.addLayer(layer)); // Re-add layers
+      if (geoJsonData) {
+        L.geoJSON(geoJsonData, {
+          onEachFeature: (feature, layer) => {
+            if (feature.properties && feature.properties.isCircle) {
+              // If the feature is a circle, recreate it
+              const center = L.latLng(feature.geometry.coordinates[1], feature.geometry.coordinates[0]);
+              const circle = L.circle(center, { radius: feature.properties.radius });
+              circle.addTo(featureGroupRef.current);
+            } else {
+              // Add other shapes directly
+              layer.addTo(featureGroupRef.current);
+            }
+          }
+        });
+      }
     }
-    if (featureGroupRef.current && geoJsonData) {
-      featureGroupRef.current.clearLayers();
-      geoJsonData.features.forEach(feature => {
-        if (feature.properties && feature.properties.isCircle) {
-          // Recreate circles
-          const center = L.latLng(feature.geometry.coordinates[1], feature.geometry.coordinates[0]);
-          const circle = L.circle(center, { radius: feature.properties.radius });
-          circle.addTo(featureGroupRef.current);
-        } else {
-          // Handle other shapes normally
-          L.geoJSON(feature).addTo(featureGroupRef.current);
-        }
-      });
-    }
-  }, [geoJsonData])
+  }, [geoJsonData]);
 
   // Function to save GeoJSON data to the server
   const saveDataToServer = async () => {
