@@ -4,7 +4,7 @@ import '../../views/ProjectView.css'; // Import the CSS for this component
 import Papa from 'papaparse';
 import * as XLSX from 'xlsx';
 
-const UserSpecies = () => {
+const UserAddSpecies = (props) => {
     const [speciesData, setSpeciesData] = useState({
         taxon_id: '' || null,
         species_name_common: '',
@@ -14,7 +14,6 @@ const UserSpecies = () => {
     });
     const accessToken = localStorage.getItem('accessToken');
     const [userSpeciesList, setUserSpeciesList] = useState([]);
-
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState([]);
     const [isFetchingSpecies, setIsFetchingSpecies] = useState(false);
@@ -134,7 +133,15 @@ const UserSpecies = () => {
                 console.log('Species added successfully');
                 displayStatusPopup('Lagt till art!');
                 fetchUserSpecies(); // Fetch the updated species list
-                // Handle successful addition (e.g., clearing the form)
+                // Clearing the form fields
+                setSpeciesData({
+                    taxon_id: '',
+                    species_name_common: '',
+                    latin_name: '',
+                    species_data: '',
+                    source: ''
+                });
+                props.onUserSpeciesAdded(); 
             } else {
                 console.error('Failed to add species');
                 displayStatusPopup('Kunde inte lägga till art!');
@@ -227,7 +234,7 @@ const UserSpecies = () => {
     return (
         <div className="user-species-container">
             
-            <h1>Lägg till din egen art</h1>¨
+            <h1>Lägg till din egen art</h1>
             
             <form onSubmit={handleSubmit}>
                 <input
@@ -282,7 +289,7 @@ const UserSpecies = () => {
             <div className="species-search">
                 <input
                     type="text"
-                    placeholder="Sök på vetenskapligt namn, latinsk namn eller taxon-ID.. Tryck på sökresultatobjekt för autofill."
+                    placeholder="Sök vetenskapligt & latinskt namn; taxon-ID.. Tryck på sökresultatobjekt för autofill."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                 />
@@ -305,4 +312,4 @@ const UserSpecies = () => {
     );
 };
 
-export default UserSpecies;
+export default UserAddSpecies;
