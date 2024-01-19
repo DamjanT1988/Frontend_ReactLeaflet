@@ -12,24 +12,15 @@ const { BaseLayer } = LayersControl;
 
 // Define the Map component
 const Map = ({ selectedProjectId, onSave, userID, /*geoJsonData*/ }) => {
-  // Reference to the FeatureGroup
   const featureGroupRef = useRef(null);
-  // State for save status message
-  //const [saveStatus, setSaveStatus] = useState('');
-
-  // Initial map position and zoom level
   const position = [51.505, -0.09];
   const zoom = 13;
-
   const [geoJsonData, setGeoJsonData] = useState(null);
-  // State for save status message
   const [saveStatus, setSaveStatus] = useState('');
-
 
   const accessToken = localStorage.getItem('accessToken'); // Get the access token from local storage
 
   useEffect(() => {
-
     if (featureGroupRef.current) {
       featureGroupRef.current.clearLayers(); // Clear existing layers first
       L.geoJSON(geoJsonData).eachLayer(layer => featureGroupRef.current.addLayer(layer)); // Re-add layers
@@ -49,10 +40,6 @@ const Map = ({ selectedProjectId, onSave, userID, /*geoJsonData*/ }) => {
       });
     }
   }, [geoJsonData])
-  // Dependency array is empty, meaning it will run once on mount
-
-
-
 
   // Function to save GeoJSON data to the server
   const saveDataToServer = async () => {
@@ -78,7 +65,6 @@ const Map = ({ selectedProjectId, onSave, userID, /*geoJsonData*/ }) => {
       console.error('Error:', error);
     }
   };
-
 
   // Function to load data from the server
   const loadDataFromServer = async () => {
@@ -139,7 +125,6 @@ const Map = ({ selectedProjectId, onSave, userID, /*geoJsonData*/ }) => {
     }
   };
 
-
   const onCreate = (e) => {
     updateGeoJson(); // Update GeoJSON when new shape is created
   };
@@ -151,7 +136,6 @@ const Map = ({ selectedProjectId, onSave, userID, /*geoJsonData*/ }) => {
   const onDeleted = (e) => {
     updateGeoJson(); // Update GeoJSON when shapes are deleted
   };
-
 
   return (
     <div>
