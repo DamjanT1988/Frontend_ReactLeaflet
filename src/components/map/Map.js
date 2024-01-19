@@ -55,6 +55,7 @@ const Map = ({ selectedProjectId, onSave, userID, /*geoJsonData*/ }) => {
       if (response.ok) {
         setSaveStatus('Data saved successfully!')
         console.log('Data saved successfully');
+        console.log('geoJsonData: ', geoJsonData);
       } else {
         setSaveStatus('Error saving data')
         console.error('Failed to save data');
@@ -77,6 +78,7 @@ const Map = ({ selectedProjectId, onSave, userID, /*geoJsonData*/ }) => {
       if (response.ok) {
         const data = await response.json();
         setGeoJsonData(data);
+        console.log('data: ', data);
       } else {
         console.error('Failed to load data');
       }
@@ -120,6 +122,7 @@ const Map = ({ selectedProjectId, onSave, userID, /*geoJsonData*/ }) => {
         features: features
       };
 
+      console.log('geoJson: ', geoJson);
       setGeoJsonData(geoJson);
     }
   };
