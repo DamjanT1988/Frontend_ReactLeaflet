@@ -134,7 +134,6 @@ const ProjectView = () => {
     })
       .then(response => response.json()) // Parse the response as JSON
       .then(data => {
-        console.log('Project details:', data); // Log the project details
         setSelectedProject(data); // Set the selected project state with the fetched data
 
         // Process GeoJSON data for polygons, lines, and points
