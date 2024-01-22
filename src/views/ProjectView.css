@@ -14,6 +14,7 @@
 .project-container > h1 {
     color: #30A875; /* Green color for main heading */
     margin-bottom: 20px; /* Space after the main title */
+    text-align: center; /* Center the main title */
 }
 
 .project-details-container {
@@ -29,6 +30,9 @@
 }
 
 /* Style for project titles */
+h1 {
+    text-align: left;
+}
 h2 {
     color: #30A875; /* Green color for project titles */
     font-weight: bolder;
