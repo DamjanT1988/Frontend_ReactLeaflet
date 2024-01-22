@@ -40,6 +40,7 @@ const ProjectView = () => {
       navigate('/login'); // Navigate to the login page
     } else { // If there is an access token
       fetchProjects(); // Fetch the projects
+      navigate('/project');
     }
   }, [accessToken]); // Dependency array for the useEffect hook
 
