@@ -87,9 +87,6 @@ const Map = ({ selectedProjectId, onSave, userID, /*geoJsonData*/ }) => {
   const [geoJsonData, setGeoJsonData] = useState(null);
   const [saveStatus, setSaveStatus] = useState('');
   const accessToken = localStorage.getItem('accessToken'); // Get the access token from local storage
-  //const [cropCoordinates, setCropCoordinates] = useState(null);
-  //const [invertedMaskLayer, setInvertedMaskLayer] = useState(null);
-  //const [rectangleLayer, setRectangleLayer] = useState(null);
   const [isRectangleDrawn, setIsRectangleDrawn] = useState(false);
 
 
@@ -125,26 +122,11 @@ const Map = ({ selectedProjectId, onSave, userID, /*geoJsonData*/ }) => {
         });
 
         featureGroupRef.current.eachLayer(layer => {
-        if (layer.feature && layer.feature.properties.shape === "rectangleCrop") {
-          setIsRectangleDrawn(true);
-        }
-      });
-      }
-
-      //load  in crop coordinates
-      /*
-      const bounds = [[51.531763, -0.213547], [51.5, -0.06]];
-
-        // Create and style the rectangle
-        const rectangle = L.rectangle(bounds, {
-          color: 'red',
-          weight: 2,
-          fillOpacity: 0.2
+          if (layer.feature && layer.feature.properties.shape === "rectangleCrop") {
+            setIsRectangleDrawn(true);
+          }
         });
-  
-        // Add the rectangle to the map
-        rectangle.addTo(featureGroupRef.current);
-        */
+      }
     }
   }, [geoJsonData]);
 
@@ -177,25 +159,14 @@ const Map = ({ selectedProjectId, onSave, userID, /*geoJsonData*/ }) => {
     const invertedPolygon = L.polygon([outerCoords, innerCoords], {
       color: 'grey',
       fillColor: 'black',
-      fillOpacity: 0.3 // Adjust for desired opacity outside the smaller rectangle
+      fillOpacity: 0.5 // Adjust for desired opacity outside the smaller rectangle
     }).addTo(featureGroupRef.current);
-
-
-    //invertedPolygon.on('click', deleteRectangleAndMask);
-    //setInvertedMaskLayer(invertedPolygon);
-    //setRectangleLayer(layer);
 
     // Optionally, bring the original rectangle to front
     rectangleLayer.bringToFront();
 
     // Add a property to identify the mask
     invertedPolygon.isMask = true;
-
-    // Store the inverted mask layer reference
-    //setInvertedMaskLayer(invertedPolygon);
-    //return invertedPolygon;
-    console.log('createlayer: ', featureGroupRef.current);
-    console.log('rectanglelayr: ', rectangleLayer);
   };
 
   const updateInvertedMask = (rectangleLayer, invertedMask) => {
@@ -222,21 +193,6 @@ const Map = ({ selectedProjectId, onSave, userID, /*geoJsonData*/ }) => {
 
 
   };
-
-  /*  const deleteRectangleAndMask = (rectangleLayer, invertedMask) => {
-      featureGroupRef.current.removeLayer(rectangleLayer);
-      featureGroupRef.current.removeLayer(invertedMask);
-    };
-  */
-  /*
-  const deleteRectangleAndMask = () => {
-    if (invertedMaskLayer) {
-      //featureGroupRef.current.removeLayer(rectangleLayer);
-      featureGroupRef.current.removeLayer(invertedMaskLayer);
-      setInvertedMaskLayer(null);
-    }
-  };
-  */
 
   // Function to save GeoJSON data to the server
   const saveDataToServer = async () => {
@@ -285,43 +241,11 @@ const Map = ({ selectedProjectId, onSave, userID, /*geoJsonData*/ }) => {
     }
   };
 
-
   // useEffect hook to call loadDataFromServer on component mount
   useEffect(() => {
     loadDataFromServer();
 
   }, []);
-
-  /*
-  const redCrop = () => {
-
-      featureGroupRef.current.clearLayers(); // Clear existing layers first
-      L.geoJSON(geoJsonData, {
-        style: (feature) => {
-          if (feature.properties.shape === "rectangle") {
-            return {
-              color: 'red',
-              weight: 2,
-              fillOpacity: 0.2
-            };
-          }
-        }
-      }).addTo(featureGroupRef.current);
-
-      featureGroupRef.current.eachLayer(layer => {
-        if (layer.feature && layer.feature.properties.shape === "rectangle") {
-          layer.setStyle({
-            color: 'red',
-            weight: 2,
-            fillOpacity: 0.2
-          });
-        }
-      });
-
-    
-  };
-  */
-
 
   const updateGeoJson = () => {
     if (featureGroupRef.current) {
@@ -369,16 +293,18 @@ const Map = ({ selectedProjectId, onSave, userID, /*geoJsonData*/ }) => {
           };
           features.push(rectangleFeature);
 
-          //updateInvertedMask(layer, featureGroupRef.current.getLayers()[1]);
+
+
         } else {
           // For other shapes, use the default toGeoJSON method
           const layerFeature = layer.toGeoJSON();
-          features.push(layerFeature); 
+          features.push(layerFeature);
+          setIsRectangleDrawn(false);
         }
 
       });
 
-      if (features == 0 || features == null || features == undefined || features == '' || features !== features.properties.shape === "rectangleCrop") {
+      if (features == 0 || features == null || features == undefined || features == '') {
         setIsRectangleDrawn(false);
       }
 
@@ -394,57 +320,11 @@ const Map = ({ selectedProjectId, onSave, userID, /*geoJsonData*/ }) => {
 
 
   const onCreate = (e) => {
-    /*   const { layer } = e;
-       if (layer instanceof L.Rectangle) {
-         // Style the rectangle
-         layer.setStyle({
-           color: 'red',        // Color of the rectangle border
-           fillColor: 'red',    // Color of the rectangle fill
-           fillOpacity: 0.2,    // Transparency of the fill
-           weight: 2            // Width of the rectangle border
-         });
-         
-         /*
-         const bounds = layer.getBounds();
-         setCropCoordinates(bounds.toBBoxString()); // or use bounds.getNorthEast(), bounds.getSouthWest()
-         */
-    /*
-    const bounds = layer.getBounds();
-    const rectangleCoordinates = [
-      bounds.getSouthWest().lng, bounds.getSouthWest().lat,
-      bounds.getNorthWest().lng, bounds.getNorthWest().lat,
-      bounds.getNorthEast().lng, bounds.getNorthEast().lat,
-      bounds.getSouthEast().lng, bounds.getSouthEast().lat,
-      bounds.getSouthWest().lng, bounds.getSouthWest().lat // Closing the loop
-    ];
-
-    // Create a new GeoJSON feature
-    const newFeature = {
-      type: "Feature",
-      properties: {
-        shape: "rectangle"
-      },
-      geometry: {
-        type: "Polygon",
-        coordinates: [rectangleCoordinates]
-      }
-    };
-
-    // Update the geoJsonData state
-    setGeoJsonData(prevData => ({
-      ...prevData,
-      features: [...prevData.features, newFeature]
-    }));
-    */
-    // Optionally, send this data to the server
-    // ...
-    //}
-    // Send these coordinates to the server or use as needed
     if (e.layer instanceof L.Rectangle) {
       setIsRectangleDrawn(true);
       // ... rest of the logic for rectangle creation ...
     }
-    
+
     updateGeoJson(); // Update GeoJSON when new shape is created
   };
 
@@ -473,23 +353,6 @@ const Map = ({ selectedProjectId, onSave, userID, /*geoJsonData*/ }) => {
   };
 
   const onDeleted = (e) => {
-    //deleteRectangleAndMask();
-    // Attach the event handler to the rectangle layer
-    //featureGroupRef.on('click', deleteRectangleAndMask);
-    // Check if the deleted layer is a rectangle with the 'rectangleCrop' property
-    /*
-          if (e.layer.feature && e.layer.feature.properties.shape === "rectangleCrop") {
-      // Find the associated inverted mask and delete it
-      featureGroupRef.current.eachLayer(layer => {
-        if (layer !== e.layer && !layer.feature) { // Assuming the mask doesn't have a 'feature' property
-          featureGroupRef.current.removeLayer(layer);
-        }
-      });
-    }
-*/
-    // Attach a click event to the rectangle layer to delete both
-    //e.layer.on('click', () => deleteRectangleAndMask(e.layer));
-
     updateGeoJson(); // Update GeoJSON when shapes are deleted
   };
 
@@ -517,11 +380,11 @@ const Map = ({ selectedProjectId, onSave, userID, /*geoJsonData*/ }) => {
 
             draw={{
               rectangle: isRectangleDrawn ? false : {
-      shapeOptions: {
-        color: 'red',
-        weight: 2,
-        fillOpacity: 0.2
-      }
+                shapeOptions: {
+                  color: 'red',
+                  weight: 2,
+                  fillOpacity: 0.2
+                }
               }
             }}
           />
