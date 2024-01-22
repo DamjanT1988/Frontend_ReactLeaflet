@@ -57,23 +57,23 @@ const Survey = () => {
         event.preventDefault();
     };
 
-const updateUserSpeciesList = async () => {
-    try {
-        const response = await fetch(API_URLS.USER_SPECIES_LIST, {
-            headers: new Headers({
-                'Authorization': `Bearer ${accessToken}`,
-            }),
-        });
-        if (response.ok) {
-            const data = await response.json();
-            setUserSpeciesData(data);
-        } else {
-            console.error('Failed to fetch user species data');
+    const updateUserSpeciesList = async () => {
+        try {
+            const response = await fetch(API_URLS.USER_SPECIES_LIST, {
+                headers: new Headers({
+                    'Authorization': `Bearer ${accessToken}`,
+                }),
+            });
+            if (response.ok) {
+                const data = await response.json();
+                setUserSpeciesData(data);
+            } else {
+                console.error('Failed to fetch user species data');
+            }
+        } catch (error) {
+            console.error('Error fetching user species data:', error);
         }
-    } catch (error) {
-        console.error('Error fetching user species data:', error);
-    }
-};
+    };
 
 
     return (
@@ -92,7 +92,7 @@ const updateUserSpeciesList = async () => {
                     onChange={handleSurveyChange}
                 >
                     {speciesList.map(species => (
-                        <option key={species.taxon_id} value={species.taxon_id}>
+                        <option key={`central-${species.taxon_id}`} value={species.taxon_id}>
                             {species.species_name_common}
                         </option>
                     ))}
@@ -105,8 +105,8 @@ const updateUserSpeciesList = async () => {
                     onChange={handleSurveyChange}
                 >
                     {/* Render species from the user species list */}
-                    {userSpeciesData.map(species => (
-                        <option key={species.taxon_id} value={species.taxon_id}>
+                    {userSpeciesData.map((species, index) => (
+                        <option key={`user-${index}-${species.taxon_id}`} value={species.taxon_id}>
                             {species.species_name_common} (Your Species)
                         </option>
                     ))}
@@ -137,7 +137,7 @@ const updateUserSpeciesList = async () => {
                 {showUserSpecies ? 'Dölj artformlär' : 'Lägg till en art'}
             </button>
 
-{showUserSpecies && <UserAddSpecies onUserSpeciesAdded={updateUserSpeciesList} />}
+            {showUserSpecies && <UserAddSpecies onUserSpeciesAdded={updateUserSpeciesList} />}
 
         </div>
     );

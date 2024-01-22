@@ -286,8 +286,6 @@ const ProjectView = () => {
         </>
       )}
 
-
-
         {/* SURVEY */}
         <Survey />
 

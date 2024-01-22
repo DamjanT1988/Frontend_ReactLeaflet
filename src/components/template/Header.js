@@ -14,20 +14,24 @@ const Header = () => {
     navigate('/login');
   };
 
+  const getNavLinkClass = (isActive) => {
+    return isActive ? 'active' : undefined;
+  };
+
   return (
     <header className="header">
       <div className="logo-container">
         <img src={Logo} alt="logo" className="logo" />
       </div>
       <nav className="main-nav">
-        <NavLink to="/dashboard" activeClassName="active">PANEL</NavLink>
-        <NavLink to="/project" activeClassName="active">PROJEKT</NavLink>
-        <NavLink to="/report" activeClassName="active">RAPPORT</NavLink>
-        <NavLink to="/data" activeClassName="active">DATA</NavLink>
+        <NavLink to="/dashboard" className={({ isActive }) => getNavLinkClass(isActive)}>PANEL</NavLink>
+        <NavLink to="/project" className={({ isActive }) => getNavLinkClass(isActive)}>PROJEKT</NavLink>
+        <NavLink to="/report" className={({ isActive }) => getNavLinkClass(isActive)}>RAPPORT</NavLink>
+        <NavLink to="/data" className={({ isActive }) => getNavLinkClass(isActive)}>DATA</NavLink>
       </nav>
       <div className="user-actions">
-        <NavLink to="/news" activeClassName="active">NYHETER</NavLink>
-        <NavLink to="/settings" activeClassName="active">ANVÄNDARKONTO</NavLink>
+        <NavLink to="/news" className={({ isActive }) => getNavLinkClass(isActive)}>NYHETER</NavLink>
+        <NavLink to="/settings" className={({ isActive }) => getNavLinkClass(isActive)}>ANVÄNDARKONTO</NavLink>
         <button onClick={handleLogout}>LOGGA UT</button>
       </div>
     </header>
