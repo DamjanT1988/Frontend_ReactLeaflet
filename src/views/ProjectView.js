@@ -21,10 +21,16 @@ const ProjectView = () => {
   const [showForm, setShowForm] = useState(false); // State for controlling the visibility of the form
   const toggleFormVisibility = () => setShowForm(!showForm); // Function to toggle the visibility of the form
   const { projectId } = useParams(); // Assuming the URL parameter is named 'projectId'
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [editedProject, setEditedProject] = useState({
+    project_name: '',
+    description: ''
+  });
+
 
   useEffect(() => {
     if (projectId) {
-        viewProjectDetails(projectId);
+      viewProjectDetails(projectId);
     }
   }, [projectId]);
 
@@ -199,16 +205,88 @@ const ProjectView = () => {
       });
   };
 
+  const updateProjectInfo = () => {
+    if (!selectedProject) {
+      console.error("No project selected for updating.");
+      return;
+    }
+
+    // URL for updating the project details
+    const url = `${API_URLS.PROJECT_DETAIL}${selectedProject.id}/`;
+
+    // Example data to update (modify as needed)
+    const updatedData = {
+        project_name: editedProject.project_name,
+        description: editedProject.description,
+      // ...add other fields that you want to update
+    };
+
+    // Fetch request to update the project details
+    fetch(url, {
+      method: 'PUT', // PUT method for updating
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${accessToken}`
+      },
+      body: JSON.stringify(updatedData)
+    })
+      .then(response => response.json())
+      .then(updatedProject => {
+        console.log("Project updated successfully:", updatedProject);
+        setSelectedProject(updatedProject); // Update the selected project state
+        toggleEditMode(); // Toggle the edit mode
+      })
+      .catch(error => console.error('Error updating project:', error));
+  };
+
+  const toggleEditMode = () => {
+    setIsEditMode(!isEditMode);
+    if (!isEditMode) {
+      setEditedProject({
+        project_name: selectedProject.project_name,
+        description: selectedProject.description
+      });
+    }
+  };
+  
+  // Call this function when the "Edit" button is clicked
+  
+
   if (selectedProject) {
     // Display only the selected project
     return (
       <div className="project-details-container">
         <h1>Projekt</h1>
         <button className="project-back" onClick={() => setSelectedProject(null)}>Tillbaka till projektlista!</button>
-
+        <button className="project-back" onClick={toggleEditMode}>
+        {isEditMode ? "Avbryt" : "Redigera projektinformation!"}
+      </button>
+      {isEditMode && <button className="project-back" onClick={updateProjectInfo}>Spara ändringar</button>}
         {/* PROJECT INFO. */}
-        <h2>Projekt: {selectedProject.project_name} - #{selectedProject.id}</h2>
-        <p>{selectedProject.description}</p>
+        {isEditMode ? (
+        <>
+        <br />
+          <input 
+            type="text"
+            className="editable-field"
+            value={editedProject.project_name}
+            onChange={(e) => setEditedProject({...editedProject, project_name: e.target.value})}
+          />
+          <br />
+          <textarea
+            className="editable-field"
+            value={editedProject.description}
+            onChange={(e) => setEditedProject({...editedProject, description: e.target.value})}
+          />
+        </>
+      ) : (
+        <>
+          <h2>Projekt: {selectedProject.project_name}</h2>
+          <p>{selectedProject.description}</p>
+        </>
+      )}
+
+
 
         {/* SURVEY */}
         <Survey />
@@ -241,7 +319,7 @@ const ProjectView = () => {
           <label htmlFor="description">Beskrivning:</label>
           <textarea id="description" name="description" required></textarea>
 
-          <button className="toggle-form-button"type="submit">Skapa projekt!</button> <br /><br />
+          <button className="toggle-form-button" type="submit">Skapa projekt!</button> <br /><br />
         </form>
       )}
 
@@ -250,7 +328,7 @@ const ProjectView = () => {
           <h2>{project.project_name} - #{project.id}</h2>
           <p>{project.description}</p>
           <button className="toggle-form-button" onClick={() => viewProjectDetails(project.id)}>Välj projekt!</button>
-        </div> 
+        </div>
       ))}
     </div>
   );

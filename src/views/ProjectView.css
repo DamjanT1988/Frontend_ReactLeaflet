@@ -339,3 +339,59 @@ h3 {
     opacity: 1;
     bottom: 20px; /* Adjust as needed for visibility */
 }
+
+/* ProjectView.css */
+
+/* ...existing styles... */
+
+/* Style for editable project name and description fields */
+.editable-field {
+    border: 1px solid #ccc; /* Consistent border */
+    padding: 10px; /* Padding for comfortable editing */
+    width: 35%; /* Expand to full width on focus */    
+    margin-bottom: 10px; /* Space between fields */
+  }
+  
+  .editable-field:focus {
+    outline: none; /* Remove default focus outline */
+
+    border-color: #30A875; /* Highlight with green border on focus */
+  }
+  
+  /* Style for the 'Edit' and 'Save Changes' buttons */
+  .edit-button, .save-changes-button {
+    background-color: #30A875; /* Consistent green background */
+    color: white; /* White text for visibility */
+    border: none; /* No border for a cleaner look */
+    padding: 8px 16px; /* Comfortable padding */
+    margin-top: 10px; /* Space from the last field or button */
+    cursor: pointer; /* Pointer to indicate clickability */
+    font-size: 90%; /* Slightly smaller font size for subtlety */
+  }
+  
+  .edit-button:hover, .save-changes-button:hover {
+    background-color: #26724d; /* Darker green on hover for interaction feedback */
+  }
+  
+  /* Style for canceling edit mode */
+  .cancel-edit-button {
+    background-color: #bbb; /* Neutral grey for cancel button */
+    margin-left: 10px; /* Space from the save button */
+  }
+  
+  .cancel-edit-button:hover {
+    background-color: #999; /* Slightly darker on hover */
+  }
+  
+  /* Responsive adjustments for form and buttons */
+  @media (max-width: 768px) {
+    .editable-field, 
+    .edit-button, 
+    .save-changes-button, 
+    .cancel-edit-button {
+      width: 100%; /* Full width for smaller screens */
+    }
+  }
+  
+  /* ...additional styles as needed... */
+  
