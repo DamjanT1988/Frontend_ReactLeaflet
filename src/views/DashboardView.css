@@ -1,19 +1,27 @@
 /* DashboardView.css */
+h1 {
+    text-align: center;
+    bottom: 0px;
+}
 
 /* Container for the entire dashboard view */
 .dashboard-container {
     background-color: #d3d3d3; /* Medium grey background, similar to project-container */
     color: #666; /* Dark grey text, consistent with project-container */
     width: 768px; /* Consistent width with project-container */
-    margin: 50px auto; /* Center the container */
+    margin: 15px auto; /* Center the container */
     padding: 20px; /* Padding for the container */
+    padding-top: 7.5px; /* Remove top padding to align with project-container */
     box-sizing: border-box;
 }
 
+
 /* Style for the dashboard main title */
-.dashboard-container > h1 {
+.dashboard-container > h2 {
     color: #30A875; /* Green color for main heading, consistent with project-container */
     margin-bottom: 20px; /* Space after the main title */
+    text-transform: uppercase;
+    text-align: center;
 }
 
 /* Style for the 'Latest Projects' section */

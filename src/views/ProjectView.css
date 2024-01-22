@@ -21,6 +21,10 @@
     padding: 10px;
 }
 
+.project-details-container > h1 {
+    text-align: left;
+}
+
 /* Style for each project */
 .project {
     background-color: #fff; /* White background for each project */
@@ -30,9 +34,6 @@
 }
 
 /* Style for project titles */
-h1 {
-    text-align: left;
-}
 
 h2 {
     color: #30A875; /* Green color for project titles */

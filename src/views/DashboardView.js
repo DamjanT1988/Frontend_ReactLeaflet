@@ -84,7 +84,7 @@ const DashboardView = () => {
             </div>
           ))
         ) : (
-          <p>Inga projekt.</p>
+          <p>Inga projekt finns.</p>
         )}
       </div>
     </div>
