@@ -90,6 +90,8 @@ const Map = ({ selectedProjectId, onSave, userID, /*geoJsonData*/ }) => {
   //const [cropCoordinates, setCropCoordinates] = useState(null);
   //const [invertedMaskLayer, setInvertedMaskLayer] = useState(null);
   //const [rectangleLayer, setRectangleLayer] = useState(null);
+  const [isRectangleDrawn, setIsRectangleDrawn] = useState(false);
+
 
 
   useEffect(() => {
@@ -122,6 +124,11 @@ const Map = ({ selectedProjectId, onSave, userID, /*geoJsonData*/ }) => {
           }
         });
 
+        featureGroupRef.current.eachLayer(layer => {
+        if (layer.feature && layer.feature.properties.shape === "rectangleCrop") {
+          setIsRectangleDrawn(true);
+        }
+      });
       }
 
       //load  in crop coordinates
@@ -270,7 +277,6 @@ const Map = ({ selectedProjectId, onSave, userID, /*geoJsonData*/ }) => {
         setGeoJsonData(data);
         console.log('data: ', data);
 
-
       } else {
         console.error('Failed to load data');
       }
@@ -367,9 +373,14 @@ const Map = ({ selectedProjectId, onSave, userID, /*geoJsonData*/ }) => {
         } else {
           // For other shapes, use the default toGeoJSON method
           const layerFeature = layer.toGeoJSON();
-          features.push(layerFeature);
+          features.push(layerFeature); 
         }
+
       });
+
+      if (features == 0 || features == null || features == undefined || features == '' || features !== features.properties.shape === "rectangleCrop") {
+        setIsRectangleDrawn(false);
+      }
 
       const geoJson = {
         type: 'FeatureCollection',
@@ -429,6 +440,11 @@ const Map = ({ selectedProjectId, onSave, userID, /*geoJsonData*/ }) => {
     // ...
     //}
     // Send these coordinates to the server or use as needed
+    if (e.layer instanceof L.Rectangle) {
+      setIsRectangleDrawn(true);
+      // ... rest of the logic for rectangle creation ...
+    }
+    
     updateGeoJson(); // Update GeoJSON when new shape is created
   };
 
@@ -500,12 +516,12 @@ const Map = ({ selectedProjectId, onSave, userID, /*geoJsonData*/ }) => {
             onDeleted={onDeleted}
 
             draw={{
-              rectangle: {
-                shapeOptions: {
-                  color: 'red',
-                  weight: 2,
-                  fillOpacity: 0.2
-                }
+              rectangle: isRectangleDrawn ? false : {
+      shapeOptions: {
+        color: 'red',
+        weight: 2,
+        fillOpacity: 0.2
+      }
               }
             }}
           />
