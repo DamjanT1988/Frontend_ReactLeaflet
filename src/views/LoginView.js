@@ -11,6 +11,7 @@ const LoginView = () => {
   const [resetUsername, setResetUsername] = useState('');
   const [showPasswordReset, setShowPasswordReset] = useState(false); // State to track visibility of password reset fields
   const navigate = useNavigate();
+  const [statusMessage, setStatusMessage] = useState('');
 
   useEffect(() => {
     // When the component mounts
@@ -30,6 +31,7 @@ const LoginView = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setStatusMessage(''); // Clear any existing messages
     try {
       const response = await fetch(API_URLS.LOGIN, {
         method: 'POST',
@@ -52,9 +54,11 @@ const LoginView = () => {
         navigate('/dashboard');
         // When setting the token
         localStorage.setItem('rememberMe', rememberMe);
+        setStatusMessage('Lyckad inloggning! Omdirigerar...');
 
       } else {
         console.error('Misslyckad inlogg:', data.error);
+        setStatusMessage('Misslyckad inloggning. Kontrollera dina uppgifter.');
         // Handle errors, such as displaying a message to the user
       }
     } catch (error) {
@@ -64,6 +68,7 @@ const LoginView = () => {
   };
 
   const handlePasswordReset = async () => {
+    setStatusMessage(''); // Clear any existing messages
     try {
       const response = await fetch(API_URLS.RESET, {
         method: 'POST',
@@ -75,13 +80,16 @@ const LoginView = () => {
   
       if (response.ok) {
         console.log('Password reset email sent.');
+        setStatusMessage('Ett e-postmeddelande för återställning av lösenord har skickats.');
         // Show some confirmation message to the user
       } else {
         console.error('Failed to send password reset email.');
+        setStatusMessage('Misslyckades. Kontrollera angivna uppgifter.');
         // Handle errors, such as displaying a message to the user
       }
     } catch (error) {
       console.error('Error sending password reset request:', error);
+      setStatusMessage('Ett fel uppstod vid skickande av lösenordsåterställning.');
       // Handle network errors, show user feedback
     }
   };  
@@ -111,7 +119,9 @@ const LoginView = () => {
           />
         </div>
         <button type="submit" className="auth-login-button">LOGGA IN!</button>
-        <br />
+        <br /><br />
+        <p className="status-message">{statusMessage}</p>
+        <br /><br />
         <button type="button" onClick={togglePasswordReset} className="auth-forgot-link">
           Glömt inloggningsuppgifter? Tryck här!
         </button>

@@ -29,6 +29,7 @@ const RegistrationView = () => {
       payment_reference: ''
     }
   });
+  const [statusMessage, setStatusMessage] = useState(''); // State for status message
 
   useEffect(() => {
     // When the component mounts
@@ -62,9 +63,10 @@ const RegistrationView = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setStatusMessage(''); // Clear any existing messages
     // Check if passwords match
     if (formData.password !== formData.confirm_password) {
-      alert("Lösenorden matchar inte!");
+      setStatusMessage("Lösenorden matchar inte!");
       return; // Stop the form from submitting
     }
     console.log(formData);
@@ -80,14 +82,19 @@ const RegistrationView = () => {
       });
       if (response.ok) {
         console.log("User registered successfully");
+        setStatusMessage("Användare registrerad framgångsrikt.");
         // Handle success
+        setTimeout(() => {
         navigate('/login');
+        }, 3000);
       } else {
         console.log("Failed to register");
+        setStatusMessage("Registrering misslyckades. Kontrollera inmatade uppgifter.");
         // Handle errors
       }
     } catch (error) {
       console.error("Failed to send data", error);
+      setStatusMessage("Kunde inte skicka data. Kontrollera din internetanslutning.");
     }
   };
 
@@ -183,7 +190,7 @@ const RegistrationView = () => {
         {/* Submit button */}
         <br /><br /><br />
         <button type="submit" className="auth-login-button">Registrera</button>
-
+        <p className="status-message">{statusMessage}</p>
       </form>
     </div>
   );
