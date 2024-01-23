@@ -49,7 +49,7 @@ const ProjectView = () => {
     // Check if there is a selected project and GeoJSON data to save
     if (!selectedProject || !geoJsonData || !geoJsonData.features || geoJsonData.features.length === 0) {
       console.error("No GeoJSON data to save."); // Log an error message
-      return Promise.reject("No GeoJSON data to save."); // Reject the promise
+      return Promise.reject("Ingen GeoJSON-data att spara."); // Reject the promise
     }
 
     // Map over the features in the GeoJSON data

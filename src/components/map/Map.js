@@ -113,7 +113,7 @@ const Map = ({ selectedProjectId, onSave, userID, /*geoJsonData*/ }) => {
           if (layer.feature && layer.feature.properties.shape === "rectangleCrop") {
             layer.setStyle({
               color: 'red',
-              weight: 5,
+              weight: 10,
               fillOpacity: 0
             });
             // Create an inverted mask
@@ -197,7 +197,7 @@ const Map = ({ selectedProjectId, onSave, userID, /*geoJsonData*/ }) => {
   // Function to save GeoJSON data to the server
   const saveDataToServer = async () => {
     try {
-      setSaveStatus('Saving...');
+      setSaveStatus('Sparar...');
       const response = await fetch(`${API_URLS.PROJECT_FILES_POST}/${userID}/${selectedProjectId}/file`, {
         method: 'POST',
         headers: {
@@ -207,11 +207,11 @@ const Map = ({ selectedProjectId, onSave, userID, /*geoJsonData*/ }) => {
         body: JSON.stringify(geoJsonData),
       });
       if (response.ok) {
-        setSaveStatus('Data saved successfully!')
+        setSaveStatus('Kartdata sparad!')
         console.log('Data saved successfully');
         console.log('geoJsonData: ', geoJsonData);
       } else {
-        setSaveStatus('Error saving data')
+        setSaveStatus('Fel i sparande av kartdata')
         console.error('Failed to save data');
       }
     } catch (error) {
