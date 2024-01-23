@@ -26,7 +26,8 @@ const ProjectView = () => {
     project_name: '',
     description: ''
   });
-
+  const [searchTerm, setSearchTerm] = useState(''); // State for search term
+  const [sortOrder, setSortOrder] = useState('desc'); // State for sort order ('asc' or 'desc')
 
   useEffect(() => {
     if (projectId) {
@@ -43,6 +44,29 @@ const ProjectView = () => {
       navigate('/project');
     }
   }, [accessToken]); // Dependency array for the useEffect hook
+
+ // Function to handle the search input change
+ const handleSearchChange = (e) => {
+  setSearchTerm(e.target.value.toLowerCase());
+};
+
+// Function to toggle the sort order
+const toggleSortOrder = () => {
+  setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+};
+
+// Filter and sort projects
+const filteredProjects = projects
+  .filter(project => project.project_name.toLowerCase().includes(searchTerm))
+  .sort((a, b) => {
+    const nameA = a.project_name.toLowerCase();
+    const nameB = b.project_name.toLowerCase();
+    if (sortOrder === 'asc') {
+      return nameA < nameB ? -1 : nameA > nameB ? 1 : 0;
+    } else {
+      return nameA > nameB ? -1 : nameA < nameB ? 1 : 0;
+    }
+  });
 
   // Function to handle saving map data
   const handleSaveMapData = (geoJsonData) => {
@@ -302,8 +326,10 @@ const ProjectView = () => {
   }
 
   return (
-    <div className="project-container">
+<div className="project-container">
       <h1>Mina projekt</h1>
+      
+
       <button className="toggle-form-button" onClick={toggleFormVisibility}>
         {showForm ? "Dölj formulär" : "Lägg till nytt projekt"}
       </button>
@@ -322,13 +348,25 @@ const ProjectView = () => {
         </form>
       )}
 
-      {[...projects].reverse().map(project => (
+      <div className="project-controls">
+        <input
+          type="text"
+          placeholder="Sök projekt..."
+          onChange={handleSearchChange}
+        />
+        <button onClick={toggleSortOrder}>
+          Sortera: {sortOrder === 'asc' ? 'stigande' : 'fallande'}
+        </button>
+      </div>
+
+      {filteredProjects.map(project => (
         <div key={project.id} className='project'>
           <h2>{project.project_name} - #{project.id}</h2>
           <p>{project.description}</p>
           <button className="toggle-form-button" onClick={() => viewProjectDetails(project.id)}>Välj projekt!</button>
         </div>
       ))}
+
     </div>
   );
 };

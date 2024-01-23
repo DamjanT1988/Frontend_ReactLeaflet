@@ -399,5 +399,54 @@ h3 {
     }
   }
   
-  /* ...additional styles as needed... */
-  
+/* Project Controls for Search and Sort */
+.project-controls {
+    display: flex; /* Aligns items in a row */
+    justify-content: space-between; /* Spaces items evenly */
+    align-items: center; /* Vertically centers items */
+    padding: 10px; /* Padding for the container */
+    margin-bottom: 20px; /* Space below the controls */
+    margin-top: 20px;
+    background-color: #fff; /* White background */
+    border: 1px solid #ccc; /* Border for distinction */
+    border-radius: 5px; /* Rounded corners */
+    box-shadow: 0px 2px 5px rgba(0,0,0,0.1); /* Subtle shadow for depth */
+}
+
+/* Style for the search input */
+.project-controls input[type="text"] {
+    flex-grow: 1; /* Allows input to take available space */
+    padding: 8px; /* Padding for the input */
+    margin-right: 10px; /* Space between input and button */
+    border: 1px solid #ccc; /* Consistent border */
+    border-radius: 4px; /* Rounded corners for input */
+    font-size: 100%; /* Default font size */
+}
+
+/* Style for the sort button */
+.project-controls button {
+    background-color: #30A875; /* Green background */
+    color: white; /* White text */
+    border: none; /* No border */
+    padding: 8px 16px; /* Padding for the button */
+    border-radius: 4px; /* Rounded corners for button */
+    cursor: pointer; /* Pointer cursor */
+    font-size: 100%; /* Consistent font size */
+}
+
+/* Hover effect for the sort button */
+.project-controls button:hover {
+    background-color: #26724d; /* Slightly darker green on hover */
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .project-controls {
+        flex-direction: column; /* Stack items vertically on smaller screens */
+        align-items: stretch; /* Stretch items to fill width */
+    }
+
+    .project-controls input[type="text"] {
+        margin-bottom: 10px; /* Space between input and button on small screens */
+    }
+}
