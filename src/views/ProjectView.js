@@ -24,7 +24,17 @@ const ProjectView = () => {
   const [isEditMode, setIsEditMode] = useState(false);
   const [editedProject, setEditedProject] = useState({
     project_name: '',
-    description: ''
+    description: '',
+    reason: '',
+    mapping_area_description: '',
+    ordering_organization: '',
+    object_version: '',
+    project_identity: '', // manually entered or auto-assigned
+    period_start: '', // start of the time period
+    period_end: '', // end of the time period
+    executing_organization: '',
+    version_start: '', // start of the version validity period
+    version_end: '', // end of the version validity period
   });
   const [searchTerm, setSearchTerm] = useState(''); // State for search term
   const [sortOrder, setSortOrder] = useState('desc'); // State for sort order ('asc' or 'desc')
@@ -45,28 +55,27 @@ const ProjectView = () => {
     }
   }, [accessToken]); // Dependency array for the useEffect hook
 
- // Function to handle the search input change
- const handleSearchChange = (e) => {
-  setSearchTerm(e.target.value.toLowerCase());
-};
+  // Function to handle the search input change
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value.toLowerCase());
+  };
 
-// Function to toggle the sort order
-const toggleSortOrder = () => {
-  setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
-};
+  // Function to toggle the sort order
+  const toggleSortOrder = () => {
+    setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+  };
 
-// Filter and sort projects
-const filteredProjects = projects
-  .filter(project => project.project_name.toLowerCase().includes(searchTerm))
-  .sort((a, b) => {
-    const nameA = a.project_name.toLowerCase();
-    const nameB = b.project_name.toLowerCase();
-    if (sortOrder === 'asc') {
-      return nameA < nameB ? -1 : nameA > nameB ? 1 : 0;
-    } else {
-      return nameA > nameB ? -1 : nameA < nameB ? 1 : 0;
-    }
-  });
+  // Filter and sort projects
+  const filteredProjects = projects
+    .filter(project => project.project_name.toLowerCase().includes(searchTerm))
+    .sort((a, b) => {
+      if (sortOrder === 'asc') {
+        return a.id - b.id; // Ascending order
+      } else {
+        return b.id - a.id; // Descending order
+      }
+    });
+
 
   // Function to handle saving map data
   const handleSaveMapData = (geoJsonData) => {
@@ -204,9 +213,18 @@ const filteredProjects = projects
     event.preventDefault(); // Prevent the default form submission behavior
     const formData = new FormData(event.target); // Create a FormData object from the form
     const newProject = {
-      project_name: formData.get('project_name'), // Get the project name from the form data
-      description: formData.get('description'), // Get the description from the form data
-      // Add other fields as necessary
+      project_name: formData.get('project_name'),
+      description: formData.get('description'),
+      reason: formData.get('reason'),
+      mapping_area_description: formData.get('mappingAreaDescription'),
+      ordering_organization: formData.get('orderingOrganization'),
+      object_version: formData.get('objectVersion'),
+      project_identity: formData.get('projectIdentity'), // manually entered or auto-assigned
+      period_start: formData.get('periodStart'), // start of the time period
+      period_end: formData.get('periodEnd'), // end of the time period
+      executing_organization: formData.get('executingOrganization'),
+      version_start: formData.get('versionStart'), // start of the version validity period
+      version_end: formData.get('versionEnd'), // end of the version validity period
     };
 
     // Fetch request to the projects API endpoint to create a new project
@@ -241,9 +259,19 @@ const filteredProjects = projects
 
     // Example data to update (modify as needed)
     const updatedData = {
-        project_name: editedProject.project_name,
-        description: editedProject.description,
-      // ...add other fields that you want to update
+      project_name: editedProject.project_name,
+      description: editedProject.description,
+      reason: editedProject.reason,
+      mapping_area_description: editedProject.mapping_area_description,
+      ordering_organization: editedProject.ordering_organization,
+      object_version: editedProject.object_version,
+      project_identity: editedProject.project_identity, // manually entered or auto-assigned
+      period_start: editedProject.period_start, // start of the time period
+      period_end: editedProject.period_end, // end of the time period
+      executing_organization: editedProject.executing_organization,
+      version_start: editedProject.version_start, // start of the version validity period
+      version_end: editedProject.version_end, // end of the version validity period
+
     };
 
     // Fetch request to update the project details
@@ -273,9 +301,9 @@ const filteredProjects = projects
       });
     }
   };
-  
+
   // Call this function when the "Edit" button is clicked
-  
+
 
   if (selectedProject) {
     // Display only the selected project
@@ -284,32 +312,123 @@ const filteredProjects = projects
         <h1>Projekt</h1>
         <button className="project-back" onClick={() => setSelectedProject(null)}>Tillbaka till projektlista!</button>
         <button className="project-back" onClick={toggleEditMode}>
-        {isEditMode ? "Avbryt" : "Redigera projektinformation!"}
-      </button>
-      {isEditMode && <button className="project-back" onClick={updateProjectInfo}>Spara ändringar</button>}
+          {isEditMode ? "Avbryt" : "Redigera projektinformation!"}
+        </button>
+        {isEditMode && <button className="project-back" onClick={updateProjectInfo}>Spara ändringar</button>}
         {/* PROJECT INFO. */}
         {isEditMode ? (
-        <>
-        <br />
-          <input 
-            type="text"
-            className="editable-field"
-            value={editedProject.project_name}
-            onChange={(e) => setEditedProject({...editedProject, project_name: e.target.value})}
-          />
-          <br />
-          <textarea
-            className="editable-field"
-            value={editedProject.description}
-            onChange={(e) => setEditedProject({...editedProject, description: e.target.value})}
-          />
-        </>
-      ) : (
-        <>
-          <h2>Projekt: {selectedProject.project_name}</h2>
-          <p>{selectedProject.description}</p>
-        </>
-      )}
+          <>
+            <label>Projektnamn:</label>
+            <input
+              type="text"
+              className="editable-field"
+              value={editedProject.project_name}
+              onChange={(e) => setEditedProject({ ...editedProject, project_name: e.target.value })}
+            />
+
+            <label>Beskrivning:</label>
+            <textarea
+              className="project-textarea"
+              value={editedProject.description}
+              onChange={(e) => setEditedProject({ ...editedProject, description: e.target.value })}
+            />
+
+            <label>Anledning:</label>
+            <input
+              type="text"
+              className="editable-field"
+              value={editedProject.reason}
+              onChange={(e) => setEditedProject({ ...editedProject, reason: e.target.value })}
+            />
+
+            <label>Kartläggningsområdesbeskrivning:</label>
+            <textarea
+              className="project-textarea"
+              value={editedProject.mapping_area_description}
+              onChange={(e) => setEditedProject({ ...editedProject, mapping_area_description: e.target.value })}
+            />
+
+            <label>Beställande organisation:</label>
+            <input
+              type="text"
+              className="editable-field"
+              value={editedProject.ordering_organization}
+              onChange={(e) => setEditedProject({ ...editedProject, ordering_organization: e.target.value })}
+            />
+
+            <label>Utförande organisation:</label>
+            <input
+              type="text"
+              className="editable-field"
+              value={editedProject.executing_organization}
+              onChange={(e) => setEditedProject({ ...editedProject, executing_organization: e.target.value })}
+            />
+
+            <label>Objektversion:</label>
+            <input
+              type="text"
+              className="editable-field"
+              value={editedProject.object_version}
+              onChange={(e) => setEditedProject({ ...editedProject, object_version: e.target.value })}
+            />
+
+            <label>Projektidentitet:</label>
+            <input
+              type="text"
+              className="editable-field"
+              value={editedProject.project_identity}
+              onChange={(e) => setEditedProject({ ...editedProject, project_identity: e.target.value })}
+            />
+
+            <label>Projektperiod Start:</label>
+            <input
+              type="date"
+              className="editable-field"
+              value={editedProject.period_start}
+              onChange={(e) => setEditedProject({ ...editedProject, period_start: e.target.value })}
+            />
+
+            <label>Projektperiod Slut:</label>
+            <input
+              type="date"
+              className="editable-field"
+              value={editedProject.period_end}
+              onChange={(e) => setEditedProject({ ...editedProject, period_end: e.target.value })}
+            />
+
+            <label>Versionsgiltighetsperiod Start:</label>
+            <input
+              type="date"
+              className="editable-field"
+              value={editedProject.version_start}
+              onChange={(e) => setEditedProject({ ...editedProject, version_start: e.target.value })}
+            />
+
+            <label>Versionsgiltighetsperiod Slut:</label>
+            <input
+              type="date"
+              className="editable-field"
+              value={editedProject.version_end}
+              onChange={(e) => setEditedProject({ ...editedProject, version_end: e.target.value })}
+            />
+          </>
+        ) : (
+          <>
+            <p><strong>Projektnamn: {selectedProject.project_name}</strong></p>
+            <p><strong>Beskrivning:</strong></p>
+            <textarea readOnly value={selectedProject.description} className="project-textarea" />
+            <p><strong>Anledning:</strong> {selectedProject.reason}</p>
+            <p><strong>Kartläggningsområdesbeskrivning:</strong> </p>
+            <textarea readOnly value={selectedProject.mapping_area_description} className="project-textarea" />
+            <p><strong>Beställande organisation:</strong> {selectedProject.ordering_organization}</p>
+            <p><strong>Utförande organisation:</strong> {selectedProject.executing_organization}</p>
+            <p><strong>Objektversion:</strong> {selectedProject.object_version}</p>
+            <p><strong>Projektidentitet:</strong> {selectedProject.project_identity}</p>
+            <p><strong>Projektperiod Start:</strong> {selectedProject.period_start}</p>
+            <p><strong>Projektperiod Slut:</strong> {selectedProject.period_end}</p>
+            <p><strong>Versionsgiltighetsperiod Start:</strong> {selectedProject.version_start}</p>
+            <p><strong>Versionsgiltighetsperiod Slut:</strong> {selectedProject.version_end}</p>          </>
+        )}
 
         {/* SURVEY */}
         <Survey />
@@ -326,9 +445,9 @@ const filteredProjects = projects
   }
 
   return (
-<div className="project-container">
+    <div className="project-container">
       <h1>Mina projekt</h1>
-      
+
 
       <button className="toggle-form-button" onClick={toggleFormVisibility}>
         {showForm ? "Dölj formulär" : "Lägg till nytt projekt"}
@@ -341,12 +460,44 @@ const filteredProjects = projects
           <label htmlFor="project_name">Projektnamn:</label>
           <input type="text" id="project_name" name="project_name" required />
 
-          <label htmlFor="description">Beskrivning:</label>
+          <label htmlFor="projectIdentity">Projektidentitet:</label>
+          <input type="text" id="projectIdentity" name="projectIdentity" required />
+
+          <label htmlFor="description">Projektbeskrivning:</label>
           <textarea id="description" name="description" required></textarea>
 
-          <button className="toggle-form-button" type="submit">Skapa projekt!</button> <br /><br />
+          {/* New fields for specified attributes */}
+          <label htmlFor="reason">Anledning:</label>
+          <input type="text" id="reason" name="reason" />
+
+          <label htmlFor="mappingAreaDescription">Beskrivning av kartläggningsområde:</label>
+          <textarea id="mappingAreaDescription" name="mappingAreaDescription"></textarea>
+
+          <label htmlFor="orderingOrganization">Beställande organisation:</label>
+          <input type="text" id="orderingOrganization" name="orderingOrganization" />
+
+          <label htmlFor="executingOrganization">Utförande organisation:</label>
+          <input type="text" id="executingOrganization" name="executingOrganization" />
+
+          <label htmlFor="objectVersion">Objektversion:</label>
+          <input type="text" id="objectVersion" name="objectVersion" />
+
+          <label htmlFor="periodStart">Projektperiod Start:</label>
+          <input type="date" id="periodStart" name="periodStart" required />
+
+          <label htmlFor="periodEnd">Projektperiod Slut:</label>
+          <input type="date" id="periodEnd" name="periodEnd" required />
+
+          <label htmlFor="versionStart">Versionsgiltighetsperiod Start:</label>
+          <input type="date" id="versionStart" name="versionStart" required />
+
+          <label htmlFor="versionEnd">Versionsgiltighetsperiod Slut:</label>
+          <input type="date" id="versionEnd" name="versionEnd" required />
+
+          <button className="toggle-form-button" type="submit">Skapa projekt!</button>
         </form>
-      )}
+      )
+      }
 
       <div className="project-controls">
         <input
@@ -355,19 +506,21 @@ const filteredProjects = projects
           onChange={handleSearchChange}
         />
         <button onClick={toggleSortOrder}>
-          Sortera: {sortOrder === 'asc' ? 'stigande' : 'fallande'}
+          Sortera: {sortOrder === 'asc' ? 'äldst' : 'senaste'}
         </button>
       </div>
 
-      {filteredProjects.map(project => (
-        <div key={project.id} className='project'>
-          <h2>{project.project_name} - #{project.id}</h2>
-          <p>{project.description}</p>
-          <button className="toggle-form-button" onClick={() => viewProjectDetails(project.id)}>Välj projekt!</button>
-        </div>
-      ))}
+      {
+        filteredProjects.map(project => (
+          <div key={project.id} className='project'>
+            <h2>{project.project_name} - #{project.id}</h2>
+            <p>{project.description}</p>
+            <button className="toggle-form-button" onClick={() => viewProjectDetails(project.id)}>Välj projekt!</button>
+          </div>
+        ))
+      }
 
-    </div>
+    </div >
   );
 };
 

@@ -7,6 +7,8 @@ import L from 'leaflet';
 import 'leaflet-draw';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-draw/dist/leaflet.draw.css';
+//import cropIcon from '../../media/crop.png'; // Ensure this path is correct
+
 
 // Destructure BaseLayer from LayersControl
 const { BaseLayer } = LayersControl;
@@ -79,6 +81,14 @@ L.drawLocal.edit.handlers.remove.tooltip = {
   text: 'Klicka på en funktion för att ta bort',
 };
 
+/*
+// Custom Icon for Rectangle Tool
+const customRectangleIcon = new L.Icon({
+  iconUrl: cropIcon,
+  iconSize: [20, 20] // Adjust as needed
+});
+*/
+
 // Define the Map component
 const Map = ({ selectedProjectId, onSave, userID, /*geoJsonData*/ }) => {
   const featureGroupRef = useRef(null);
@@ -90,8 +100,19 @@ const Map = ({ selectedProjectId, onSave, userID, /*geoJsonData*/ }) => {
   const [isRectangleDrawn, setIsRectangleDrawn] = useState(false);
 
 
-
+  /*
   useEffect(() => {
+    // Customization for Leaflet Draw
+    L.drawLocal.draw.toolbar.buttons.rectangle = 'Crop Map Area'; // Custom tooltip text for rectangle button
+    L.drawLocal.draw.handlers.rectangle = {
+      tooltip: { start: 'Click and drag to draw a rectangle.' },
+      icon: customRectangleIcon // Use the custom icon
+    };
+  }, []);
+*/
+
+
+    useEffect(() => {
     if (featureGroupRef.current) {
       featureGroupRef.current.clearLayers(); // Clear existing layers first
       if (geoJsonData) {
@@ -357,6 +378,8 @@ const Map = ({ selectedProjectId, onSave, userID, /*geoJsonData*/ }) => {
   };
 
 
+
+
   return (
     <div>
       <h3>Projektkarta</h3>
@@ -384,7 +407,8 @@ const Map = ({ selectedProjectId, onSave, userID, /*geoJsonData*/ }) => {
                   color: 'red',
                   weight: 2,
                   fillOpacity: 0.2
-                }
+                },
+                //icon: customRectangleIcon 
               }
             }}
           />

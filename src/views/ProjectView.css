@@ -439,6 +439,23 @@ h3 {
     background-color: #26724d; /* Slightly darker green on hover */
 }
 
+.project-textarea {
+    width: 35%; /* Sets the width to occupy the full width of its container */
+    min-height: 50px; /* Sets a minimum height */
+    max-height: 200px; /* Sets a maximum height */
+    resize: none; /* Disables resizing of the textarea */
+    border: 1px solid #ccc; /* Adds a border */
+    padding: 10px; /* Adds some padding inside the textarea */
+    margin-bottom: 15px; /* Adds some space below the textarea */
+    background-color: #f9f9f9; /* Sets a background color */
+    color: #333; /* Sets the text color */
+  }
+  
+  .project-details-container > label {
+    display: block; /* Labels on a new line */
+    margin-bottom: 5px; /* Space between label and field */
+    font-weight: bold; /* Bold labels */
+}
 /* Responsive adjustments */
 @media (max-width: 768px) {
     .project-controls {
@@ -450,3 +467,12 @@ h3 {
         margin-bottom: 10px; /* Space between input and button on small screens */
     }
 }
+
+/* Custom style for rectangle draw button */
+.leaflet-draw-draw-rectangle {
+    background-image: url('../media/crop.png');
+
+    background-size: 20px 20px; /* Adjust as needed */
+    /* Add any additional styles */
+  }
+  
