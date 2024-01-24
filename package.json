@@ -6,6 +6,7 @@
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
+    "buffer": "^6.0.3",
     "leaflet": "^1.9.4",
     "papaparse": "^5.4.1",
     "react": "^18.2.0",
@@ -14,6 +15,7 @@
     "react-leaflet-draw": "^0.20.4",
     "react-router-dom": "^6.21.1",
     "react-scripts": "5.0.1",
+    "shpjs": "^4.0.4",
     "web-vitals": "^2.1.4",
     "xlsx": "^0.18.5"
   },

@@ -326,7 +326,24 @@ const ProjectView = () => {
               onChange={(e) => setEditedProject({ ...editedProject, project_name: e.target.value })}
             />
 
-            <label>Beskrivning:</label>
+            <label>Projektidentitet:</label>
+            <input
+              type="text"
+              className="editable-field"
+              value={editedProject.project_identity}
+              onChange={(e) => setEditedProject({ ...editedProject, project_identity: e.target.value })}
+            />
+
+            <label>Objektversion:</label>
+            <input
+              type="text"
+              className="editable-field"
+              value={editedProject.object_version}
+              onChange={(e) => setEditedProject({ ...editedProject, object_version: e.target.value })}
+            />
+
+
+            <label>Beskrivning och anteckningar:</label>
             <textarea
               className="project-textarea"
               value={editedProject.description}
@@ -364,22 +381,6 @@ const ProjectView = () => {
               onChange={(e) => setEditedProject({ ...editedProject, executing_organization: e.target.value })}
             />
 
-            <label>Objektversion:</label>
-            <input
-              type="text"
-              className="editable-field"
-              value={editedProject.object_version}
-              onChange={(e) => setEditedProject({ ...editedProject, object_version: e.target.value })}
-            />
-
-            <label>Projektidentitet:</label>
-            <input
-              type="text"
-              className="editable-field"
-              value={editedProject.project_identity}
-              onChange={(e) => setEditedProject({ ...editedProject, project_identity: e.target.value })}
-            />
-
             <label>Projektperiod Start:</label>
             <input
               type="date"
@@ -414,16 +415,16 @@ const ProjectView = () => {
           </>
         ) : (
           <>
-            <p><strong>Projektnamn: {selectedProject.project_name}</strong></p>
-            <p><strong>Beskrivning:</strong></p>
+            <p><strong>Projektnamn:</strong> {selectedProject.project_name}</p>
+            <p><strong>Projektidentitet:</strong> {selectedProject.project_identity}</p>
+            <p><strong>Objektversion:</strong> {selectedProject.object_version}</p>
+            <p><strong>Beskrivning och anteckningar:</strong></p>
             <textarea readOnly value={selectedProject.description} className="project-textarea" />
             <p><strong>Anledning:</strong> {selectedProject.reason}</p>
             <p><strong>Kartläggningsområdesbeskrivning:</strong> </p>
             <textarea readOnly value={selectedProject.mapping_area_description} className="project-textarea" />
             <p><strong>Beställande organisation:</strong> {selectedProject.ordering_organization}</p>
             <p><strong>Utförande organisation:</strong> {selectedProject.executing_organization}</p>
-            <p><strong>Objektversion:</strong> {selectedProject.object_version}</p>
-            <p><strong>Projektidentitet:</strong> {selectedProject.project_identity}</p>
             <p><strong>Projektperiod Start:</strong> {selectedProject.period_start}</p>
             <p><strong>Projektperiod Slut:</strong> {selectedProject.period_end}</p>
             <p><strong>Versionsgiltighetsperiod Start:</strong> {selectedProject.version_start}</p>

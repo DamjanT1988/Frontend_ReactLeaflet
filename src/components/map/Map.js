@@ -8,7 +8,10 @@ import 'leaflet-draw';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-draw/dist/leaflet.draw.css';
 //import cropIcon from '../../media/crop.png'; // Ensure this path is correct
+import shp from 'shpjs';
+import { Buffer } from 'buffer';
 
+window.Buffer = Buffer;
 
 // Destructure BaseLayer from LayersControl
 const { BaseLayer } = LayersControl;
@@ -98,6 +101,7 @@ const Map = ({ selectedProjectId, onSave, userID, /*geoJsonData*/ }) => {
   const [saveStatus, setSaveStatus] = useState('');
   const accessToken = localStorage.getItem('accessToken'); // Get the access token from local storage
   const [isRectangleDrawn, setIsRectangleDrawn] = useState(false);
+  const [shapeLayers, setShapeLayers] = useState([]);
 
 
   /*
@@ -151,6 +155,22 @@ const Map = ({ selectedProjectId, onSave, userID, /*geoJsonData*/ }) => {
     }
   }, [geoJsonData]);
 
+  const handleFileUpload = async (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = async (event) => {
+        try {
+          const arrayBuffer = event.target.result;
+          const geojson = await shp.parseZip(arrayBuffer);
+          setShapeLayers(geojson.features);
+        } catch (error) {
+          console.error('Error parsing shapefile:', error);
+        }
+      };
+      reader.readAsArrayBuffer(file);
+    }
+  };
 
   const createInvertedMask = (rectangleLayer) => {
     const bounds = rectangleLayer.getBounds();
@@ -385,6 +405,7 @@ const Map = ({ selectedProjectId, onSave, userID, /*geoJsonData*/ }) => {
       <h3>Projektkarta</h3>
       <button className="toggle-form-button" onClick={saveDataToServer}>Spara ritning!</button>
       <span className="save-status">{saveStatus}</span>
+      <input type="file" onChange={handleFileUpload} />
       <MapContainer center={position} zoom={zoom} style={{ height: '100vh', width: '100%' }}>
         <LayersControl position="topright">
           <BaseLayer checked name="Informationskarta">
@@ -412,6 +433,9 @@ const Map = ({ selectedProjectId, onSave, userID, /*geoJsonData*/ }) => {
               }
             }}
           />
+           {shapeLayers.map((feature, index) => (
+            <GeoJSON key={index} data={feature} />
+          ))}
         </FeatureGroup>
       </MapContainer>
     </div>
