@@ -313,21 +313,24 @@ useEffect(() => {
       reader.onload = async (event) => {
         try {
           const arrayBuffer = event.target.result;
-          const geojson = await shp.parseZip(arrayBuffer);
-          console.log('Original geojson:', geojson); // Log original GeoJSON
+          const parsedGeojson = await shp.parseZip(arrayBuffer);
+          console.log('Original geojson:', parsedGeojson);
   
-          // Check each coordinate and log if invalid
-          geojson.features.forEach(feature => {
-            feature.geometry.coordinates.forEach(coord => {
-              if (!Array.isArray(coord) || coord.length !== 2 || coord.some(c => c == null)) {
-                console.error('Invalid coordinate:', coord);
+          if (Array.isArray(parsedGeojson)) {
+            // If parsedGeojson is an array, extract features from each FeatureCollection
+            const allFeatures = parsedGeojson.reduce((acc, featureCollection) => {
+              if (featureCollection.type === "FeatureCollection" && featureCollection.features) {
+                return [...acc, ...featureCollection.features];
               }
-            });
-          });
+              return acc;
+            }, []);
   
-          // Directly use the parsed GeoJSON without transformation
-          setShapeLayers(geojson.features);
-          setGeoJsonData(geojson);
+            setShapeLayers(allFeatures); // Update the shapeLayers state
+            setGeoJsonData({ type: "FeatureCollection", features: allFeatures }); // Update the geoJsonData state
+          } else {
+            // Handle the case where parsedGeojson is not an array (if necessary)
+            console.error('Parsed data is not in expected format:', parsedGeojson);
+          }
         } catch (error) {
           console.error('Error parsing shapefile:', error);
         }
@@ -335,6 +338,7 @@ useEffect(() => {
       reader.readAsArrayBuffer(file);
     }
   };
+  
     
   
 
@@ -613,7 +617,7 @@ useEffect(() => {
               }
             }}
           />
-           {shapeLayers.map((feature, index) => (
+          {shapeLayers && shapeLayers.length > 0 && shapeLayers.map((feature, index) => (
             <GeoJSON key={index} data={feature} />
           ))}
         </FeatureGroup>
