@@ -7,6 +7,7 @@
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
     "buffer": "^6.0.3",
+    "jszip": "^3.10.1",
     "leaflet": "^1.9.4",
     "papaparse": "^5.4.1",
     "react": "^18.2.0",
@@ -15,15 +16,16 @@
     "react-leaflet-draw": "^0.20.4",
     "react-router-dom": "^6.21.1",
     "react-scripts": "5.0.1",
+    "shapefile": "^0.6.6",
     "shpjs": "^4.0.4",
     "web-vitals": "^2.1.4",
     "xlsx": "^0.18.5"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "start": "react-app-rewired start",
+    "build": "react-app-rewired build",
+    "test": "react-app-rewired test",
+    "eject": "react-app-rewired eject"
   },
   "eslintConfig": {
     "extends": [
@@ -42,5 +44,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "react-app-rewired": "^2.2.1"
   }
 }

@@ -9,9 +9,11 @@ import 'leaflet/dist/leaflet.css';
 import 'leaflet-draw/dist/leaflet.draw.css';
 //import cropIcon from '../../media/crop.png'; // Ensure this path is correct
 import shp from 'shpjs';
-import { Buffer } from 'buffer';
+//import Shapefile from "shapefile";
+import JSZip from "jszip";
+import { read } from 'shapefile';
 
-window.Buffer = Buffer;
+
 
 // Destructure BaseLayer from LayersControl
 const { BaseLayer } = LayersControl;
@@ -155,6 +157,81 @@ const Map = ({ selectedProjectId, onSave, userID, /*geoJsonData*/ }) => {
     }
   }, [geoJsonData]);
 
+  /*
+  const handleFileUpload = async (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = async (event) => {
+        try {
+          const arrayBuffer = event.target.result;
+          console.log('arrayBuffer: ', arrayBuffer);
+          const geojson = await shp.parseZip(arrayBuffer);
+          console.log('geojson: ', geojson);
+          setShapeLayers(geojson.features);
+        } catch (error) {
+          console.error('Error parsing shapefile:', error);
+        }
+      };
+      reader.readAsArrayBuffer(file);
+    }
+  };
+  */
+/*
+  const handleFileUpload = async (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = async (event) => {
+        try {
+          const arrayBuffer = event.target.result;
+          const zip = new JSZip();
+          const contents = await zip.loadAsync(arrayBuffer);
+  
+          // Find .shp and .dbf files in the zip
+          const shpFileName = Object.keys(contents.files).find((filename) => filename.endsWith(".shp"));
+          const dbfFileName = Object.keys(contents.files).find((filename) => filename.endsWith(".dbf"));
+  
+          if (shpFileName && dbfFileName) {
+            const shpData = await contents.files[shpFileName].async("arraybuffer");
+            const dbfData = await contents.files[dbfFileName].async("arraybuffer");
+  
+            const geojson = await Shapefile.read(shpData, dbfData);
+            console.log('geojson: ', geojson);
+            setShapeLayers(geojson.features);
+          }
+        } catch (error) {
+          console.error('Error parsing shapefile:', error);
+        }
+      };
+      reader.readAsArrayBuffer(file);
+    }
+  };
+  */
+
+  /*
+  const handleFileUpload = async (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = async (event) => {
+        try {
+          const arrayBuffer = event.target.result;
+          // Convert the ArrayBuffer to a stream
+          const stream = new Blob([arrayBuffer]).stream();
+          // Use the `read` function from the shapefile library
+          const geojson = await read(stream);
+          console.log('geojson:', geojson);
+          setShapeLayers(geojson.features);
+        } catch (error) {
+          console.error('Error parsing shapefile:', error);
+        }
+      };
+      reader.readAsArrayBuffer(file);
+    }
+  };
+  */
+/*
   const handleFileUpload = async (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -163,6 +240,28 @@ const Map = ({ selectedProjectId, onSave, userID, /*geoJsonData*/ }) => {
         try {
           const arrayBuffer = event.target.result;
           const geojson = await shp.parseZip(arrayBuffer);
+          console.log('geojson:', geojson);
+          setShapeLayers(geojson.features);
+        } catch (error) {
+          console.error('Error parsing shapefile:', error);
+        }
+      };
+      reader.readAsArrayBuffer(file);
+    }
+  };
+  */
+  const handleFileUpload = async (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = async (event) => {
+        try {
+          const arrayBuffer = event.target.result;
+          // Convert the ArrayBuffer to a stream
+          const stream = new Blob([arrayBuffer]).stream();
+          // Use the `read` function from the shapefile library
+          const geojson = await read(stream);
+          console.log('geojson:', geojson);
           setShapeLayers(geojson.features);
         } catch (error) {
           console.error('Error parsing shapefile:', error);
