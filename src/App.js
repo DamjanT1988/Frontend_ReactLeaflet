@@ -12,6 +12,10 @@ import ProjectView from './views/ProjectView';
 import ReportView from './views/ReportView';
 import DataView from './views/DataView';
 // ... any other imports you might need
+//import { Buffer } from 'buffer';
+//window.Buffer = Buffer;
+//global.Buffer = global.Buffer || require('buffer').Buffer;
+
 
 const App = () => {
   return (

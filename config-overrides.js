@@ -1,16 +1,30 @@
+const NodePolyfillPlugin = require("node-polyfill-webpack-plugin");
+
 module.exports = function override(config, env) {
-    // Add a fallback for 'buffer' in the resolve configuration
+  config.plugins = (config.plugins || []).concat([
+    new NodePolyfillPlugin()
+  ]);
+  return config;
+};
+
+
+
+/*
+module.exports = function override(config, env) {
+    // Add a fallback for 'buffer' and 'fs' in the resolve configuration
     config.resolve = {
         ...config.resolve, // Spread existing resolve configuration
         fallback: {
             ...config.resolve.fallback, // Spread any existing fallbacks
-            'buffer': require.resolve('buffer/'), // Add buffer polyfill
+            fs: false, // Add false for fs
+            Buffer: false, // Add false for Buffer
         },
     };
 
     // Return the modified config
     return config;
 };
+*/
 
 
 /*

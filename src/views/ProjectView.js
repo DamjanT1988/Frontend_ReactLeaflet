@@ -6,6 +6,8 @@ import './ProjectView.css'; // Import the CSS for this component
 import Map from '../components/map/Map.js'; // Import the Map component
 import Survey from '../components/survey/Survey.js'; // Import the Survey component
 import { useParams } from 'react-router-dom';
+//import { Buffer } from 'buffer';
+//window.Buffer = Buffer;
 
 
 /**

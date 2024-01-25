@@ -12,6 +12,9 @@ import shp from 'shpjs';
 //import Shapefile from "shapefile";
 import JSZip from "jszip";
 import { read } from 'shapefile';
+//import { Buffer } from 'buffer';
+//window.Buffer = Buffer;
+
 
 
 
@@ -117,6 +120,20 @@ const Map = ({ selectedProjectId, onSave, userID, /*geoJsonData*/ }) => {
   }, []);
 */
 
+/*
+// New useEffect to handle adding shapefile layers to the map
+useEffect(() => {
+  if (featureGroupRef.current && shapeLayers.length > 0) {
+    // Clear any existing layers
+    featureGroupRef.current.clearLayers();
+    
+    // Add each shape layer to the map
+    shapeLayers.forEach(feature => {
+      L.geoJSON(feature).addTo(featureGroupRef.current);
+    });
+  }
+}, [shapeLayers]); // Depend on shapeLayers
+*/
 
     useEffect(() => {
     if (featureGroupRef.current) {
@@ -157,8 +174,8 @@ const Map = ({ selectedProjectId, onSave, userID, /*geoJsonData*/ }) => {
     }
   }, [geoJsonData]);
 
-  /*
-  const handleFileUpload = async (e) => {
+  
+  const handleFileUpload1 = async (e) => {
     const file = e.target.files[0];
     if (file) {
       const reader = new FileReader();
@@ -176,9 +193,9 @@ const Map = ({ selectedProjectId, onSave, userID, /*geoJsonData*/ }) => {
       reader.readAsArrayBuffer(file);
     }
   };
-  */
-/*
-  const handleFileUpload = async (e) => {
+  
+  /*
+  const handleFileUpload2 = async (e) => {
     const file = e.target.files[0];
     if (file) {
       const reader = new FileReader();
@@ -207,10 +224,10 @@ const Map = ({ selectedProjectId, onSave, userID, /*geoJsonData*/ }) => {
       reader.readAsArrayBuffer(file);
     }
   };
-  */
+*/  
 
-  /*
-  const handleFileUpload = async (e) => {
+  
+  const handleFileUpload3 = async (e) => {
     const file = e.target.files[0];
     if (file) {
       const reader = new FileReader();
@@ -230,9 +247,8 @@ const Map = ({ selectedProjectId, onSave, userID, /*geoJsonData*/ }) => {
       reader.readAsArrayBuffer(file);
     }
   };
-  */
-/*
-  const handleFileUpload = async (e) => {
+
+  const handleFileUpload4 = async (e) => {
     const file = e.target.files[0];
     if (file) {
       const reader = new FileReader();
@@ -249,8 +265,9 @@ const Map = ({ selectedProjectId, onSave, userID, /*geoJsonData*/ }) => {
       reader.readAsArrayBuffer(file);
     }
   };
-  */
-  const handleFileUpload = async (e) => {
+
+
+  const handleFileUpload5 = async (e) => {
     const file = e.target.files[0];
     if (file) {
       const reader = new FileReader();
@@ -270,6 +287,64 @@ const Map = ({ selectedProjectId, onSave, userID, /*geoJsonData*/ }) => {
       reader.readAsArrayBuffer(file);
     }
   };
+  
+  const handleFileUpload6 = async (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = async (event) => {
+        try {
+          const arrayBuffer = event.target.result;
+          const geojson = await shp(arrayBuffer);
+          // Process the GeoJSON data as needed for your application
+          console.log('Parsed GeoJSON:', geojson);
+        } catch (error) {
+          console.error('Error parsing shapefile:', error);
+        }
+      };
+      reader.readAsArrayBuffer(file);
+    }
+  };
+
+  const handleFileUpload7 = async (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = async (event) => {
+        try {
+          const arrayBuffer = event.target.result;
+          const geojson = await shp.parseZip(arrayBuffer);
+          console.log('Original geojson:', geojson); // Log original GeoJSON
+  
+          // Check each coordinate and log if invalid
+          geojson.features.forEach(feature => {
+            feature.geometry.coordinates.forEach(coord => {
+              if (!Array.isArray(coord) || coord.length !== 2 || coord.some(c => c == null)) {
+                console.error('Invalid coordinate:', coord);
+              }
+            });
+          });
+  
+          // Directly use the parsed GeoJSON without transformation
+          setShapeLayers(geojson.features);
+          setGeoJsonData(geojson);
+        } catch (error) {
+          console.error('Error parsing shapefile:', error);
+        }
+      };
+      reader.readAsArrayBuffer(file);
+    }
+  };
+    
+  
+
+  useEffect(() => {
+    if (geoJsonData && featureGroupRef.current) {
+      const geoJsonLayer = L.geoJSON(geoJsonData);
+      geoJsonLayer.addTo(featureGroupRef.current);
+    }
+  }, [geoJsonData]);
+
 
   const createInvertedMask = (rectangleLayer) => {
     const bounds = rectangleLayer.getBounds();
@@ -504,7 +579,13 @@ const Map = ({ selectedProjectId, onSave, userID, /*geoJsonData*/ }) => {
       <h3>Projektkarta</h3>
       <button className="toggle-form-button" onClick={saveDataToServer}>Spara ritning!</button>
       <span className="save-status">{saveStatus}</span>
-      <input type="file" onChange={handleFileUpload} />
+      1<input type="file" onChange={handleFileUpload1} />
+
+      4<input type="file" onChange={handleFileUpload4} />
+      
+      6<input type="file" onChange={handleFileUpload6} />
+      7<input type="file" onChange={handleFileUpload7} />
+
       <MapContainer center={position} zoom={zoom} style={{ height: '100vh', width: '100%' }}>
         <LayersControl position="topright">
           <BaseLayer checked name="Informationskarta">
