@@ -9,13 +9,17 @@ import 'leaflet/dist/leaflet.css';
 import 'leaflet-draw/dist/leaflet.draw.css';
 //import cropIcon from '../../media/crop.png'; // Ensure this path is correct
 import shp from 'shpjs';
-//import Shapefile from "shapefile";
 import JSZip from "jszip";
 import { read } from 'shapefile';
 //import { Buffer } from 'buffer';
 //window.Buffer = Buffer;
 
-
+delete L.Icon.Default.prototype._getIconUrl
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
+  iconUrl: require('leaflet/dist/images/marker-icon.png'),
+  shadowUrl: require('leaflet/dist/images/marker-shadow.png')
+});
 
 
 // Destructure BaseLayer from LayersControl
@@ -101,7 +105,7 @@ const customRectangleIcon = new L.Icon({
 const Map = ({ selectedProjectId, onSave, userID, /*geoJsonData*/ }) => {
   const featureGroupRef = useRef(null);
   const position = [51.505, -0.09];
-  const zoom = 13;
+  const zoom = 12;
   const [geoJsonData, setGeoJsonData] = useState(null);
   const [saveStatus, setSaveStatus] = useState('');
   const accessToken = localStorage.getItem('accessToken'); // Get the access token from local storage
@@ -120,20 +124,6 @@ const Map = ({ selectedProjectId, onSave, userID, /*geoJsonData*/ }) => {
   }, []);
 */
 
-/*
-// New useEffect to handle adding shapefile layers to the map
-useEffect(() => {
-  if (featureGroupRef.current && shapeLayers.length > 0) {
-    // Clear any existing layers
-    featureGroupRef.current.clearLayers();
-    
-    // Add each shape layer to the map
-    shapeLayers.forEach(feature => {
-      L.geoJSON(feature).addTo(featureGroupRef.current);
-    });
-  }
-}, [shapeLayers]); // Depend on shapeLayers
-*/
 
     useEffect(() => {
     if (featureGroupRef.current) {
@@ -174,81 +164,7 @@ useEffect(() => {
     }
   }, [geoJsonData]);
 
-  
-  const handleFileUpload1 = async (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = async (event) => {
-        try {
-          const arrayBuffer = event.target.result;
-          console.log('arrayBuffer: ', arrayBuffer);
-          const geojson = await shp.parseZip(arrayBuffer);
-          console.log('geojson: ', geojson);
-          setShapeLayers(geojson.features);
-        } catch (error) {
-          console.error('Error parsing shapefile:', error);
-        }
-      };
-      reader.readAsArrayBuffer(file);
-    }
-  };
-  
-  /*
-  const handleFileUpload2 = async (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = async (event) => {
-        try {
-          const arrayBuffer = event.target.result;
-          const zip = new JSZip();
-          const contents = await zip.loadAsync(arrayBuffer);
-  
-          // Find .shp and .dbf files in the zip
-          const shpFileName = Object.keys(contents.files).find((filename) => filename.endsWith(".shp"));
-          const dbfFileName = Object.keys(contents.files).find((filename) => filename.endsWith(".dbf"));
-  
-          if (shpFileName && dbfFileName) {
-            const shpData = await contents.files[shpFileName].async("arraybuffer");
-            const dbfData = await contents.files[dbfFileName].async("arraybuffer");
-  
-            const geojson = await Shapefile.read(shpData, dbfData);
-            console.log('geojson: ', geojson);
-            setShapeLayers(geojson.features);
-          }
-        } catch (error) {
-          console.error('Error parsing shapefile:', error);
-        }
-      };
-      reader.readAsArrayBuffer(file);
-    }
-  };
-*/  
-
-  
-  const handleFileUpload3 = async (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = async (event) => {
-        try {
-          const arrayBuffer = event.target.result;
-          // Convert the ArrayBuffer to a stream
-          const stream = new Blob([arrayBuffer]).stream();
-          // Use the `read` function from the shapefile library
-          const geojson = await read(stream);
-          console.log('geojson:', geojson);
-          setShapeLayers(geojson.features);
-        } catch (error) {
-          console.error('Error parsing shapefile:', error);
-        }
-      };
-      reader.readAsArrayBuffer(file);
-    }
-  };
-
-  const handleFileUpload4 = async (e) => {
+  const handleFileUpload = async (e) => {
     const file = e.target.files[0];
     if (file) {
       const reader = new FileReader();
@@ -256,7 +172,6 @@ useEffect(() => {
         try {
           const arrayBuffer = event.target.result;
           const geojson = await shp.parseZip(arrayBuffer);
-          console.log('geojson:', geojson);
           setShapeLayers(geojson.features);
         } catch (error) {
           console.error('Error parsing shapefile:', error);
@@ -265,90 +180,6 @@ useEffect(() => {
       reader.readAsArrayBuffer(file);
     }
   };
-
-
-  const handleFileUpload5 = async (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = async (event) => {
-        try {
-          const arrayBuffer = event.target.result;
-          // Convert the ArrayBuffer to a stream
-          const stream = new Blob([arrayBuffer]).stream();
-          // Use the `read` function from the shapefile library
-          const geojson = await read(stream);
-          console.log('geojson:', geojson);
-          setShapeLayers(geojson.features);
-        } catch (error) {
-          console.error('Error parsing shapefile:', error);
-        }
-      };
-      reader.readAsArrayBuffer(file);
-    }
-  };
-  
-  const handleFileUpload6 = async (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = async (event) => {
-        try {
-          const arrayBuffer = event.target.result;
-          const geojson = await shp(arrayBuffer);
-          // Process the GeoJSON data as needed for your application
-          console.log('Parsed GeoJSON:', geojson);
-        } catch (error) {
-          console.error('Error parsing shapefile:', error);
-        }
-      };
-      reader.readAsArrayBuffer(file);
-    }
-  };
-
-  const handleFileUpload7 = async (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = async (event) => {
-        try {
-          const arrayBuffer = event.target.result;
-          const parsedGeojson = await shp.parseZip(arrayBuffer);
-          console.log('Original geojson:', parsedGeojson);
-  
-          if (Array.isArray(parsedGeojson)) {
-            // If parsedGeojson is an array, extract features from each FeatureCollection
-            const allFeatures = parsedGeojson.reduce((acc, featureCollection) => {
-              if (featureCollection.type === "FeatureCollection" && featureCollection.features) {
-                return [...acc, ...featureCollection.features];
-              }
-              return acc;
-            }, []);
-  
-            setShapeLayers(allFeatures); // Update the shapeLayers state
-            setGeoJsonData({ type: "FeatureCollection", features: allFeatures }); // Update the geoJsonData state
-          } else {
-            // Handle the case where parsedGeojson is not an array (if necessary)
-            console.error('Parsed data is not in expected format:', parsedGeojson);
-          }
-        } catch (error) {
-          console.error('Error parsing shapefile:', error);
-        }
-      };
-      reader.readAsArrayBuffer(file);
-    }
-  };
-  
-    
-  
-
-  useEffect(() => {
-    if (geoJsonData && featureGroupRef.current) {
-      const geoJsonLayer = L.geoJSON(geoJsonData);
-      geoJsonLayer.addTo(featureGroupRef.current);
-    }
-  }, [geoJsonData]);
-
 
   const createInvertedMask = (rectangleLayer) => {
     const bounds = rectangleLayer.getBounds();
@@ -511,10 +342,7 @@ useEffect(() => {
             }
           };
           features.push(rectangleFeature);
-
-
-
-        } else {
+      } else {
           // For other shapes, use the default toGeoJSON method
           const layerFeature = layer.toGeoJSON();
           features.push(layerFeature);
@@ -543,6 +371,7 @@ useEffect(() => {
       setIsRectangleDrawn(true);
       // ... rest of the logic for rectangle creation ...
     }
+    
 
     updateGeoJson(); // Update GeoJSON when new shape is created
   };
@@ -576,6 +405,58 @@ useEffect(() => {
   };
 
 
+  
+  const handleFileUpload1 = async (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = async (event) => {
+        try {
+          const arrayBuffer = event.target.result;
+          console.log('arrayBuffer: ', arrayBuffer);
+          const geojson = await shp.parseZip(arrayBuffer);
+          console.log('geojson: ', geojson);
+          setShapeLayers(geojson.features);
+        } catch (error) {
+          console.error('Error parsing shapefile:', error);
+        }
+      };
+      reader.readAsArrayBuffer(file);
+    }
+  };
+
+  const handleFileUpload7 = async (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = async (event) => {
+        try {
+          const arrayBuffer = event.target.result;
+          const parsedGeojson = await shp.parseZip(arrayBuffer);
+          console.log('Original geojson:', parsedGeojson);
+  
+          if (Array.isArray(parsedGeojson)) {
+            // If parsedGeojson is an array, extract features from each FeatureCollection
+            const allFeatures = parsedGeojson.reduce((acc, featureCollection) => {
+              if (featureCollection.type === "FeatureCollection" && featureCollection.features) {
+                return [...acc, ...featureCollection.features];
+              }
+              return acc;
+            }, []);
+  
+            setShapeLayers(allFeatures); // Update the shapeLayers state
+            setGeoJsonData({ type: "FeatureCollection", features: allFeatures }); // Update the geoJsonData state
+          } else {
+            // Handle the case where parsedGeojson is not an array (if necessary)
+            console.error('Parsed data is not in expected format:', parsedGeojson);
+          }
+        } catch (error) {
+          console.error('Error parsing shapefile:', error);
+        }
+      };
+      reader.readAsArrayBuffer(file);
+    }
+  };
 
 
   return (
@@ -583,13 +464,9 @@ useEffect(() => {
       <h3>Projektkarta</h3>
       <button className="toggle-form-button" onClick={saveDataToServer}>Spara ritning!</button>
       <span className="save-status">{saveStatus}</span>
-      1<input type="file" onChange={handleFileUpload1} />
-
-      4<input type="file" onChange={handleFileUpload4} />
-      
-      6<input type="file" onChange={handleFileUpload6} />
-      7<input type="file" onChange={handleFileUpload7} />
-
+      Python-1: <input type="file" onChange={handleFileUpload1} />
+      Mjukvara-7: <input type="file" onChange={handleFileUpload7} />
+      GeoJSON: <input type="file" onChange={handleFileUpload} />
       <MapContainer center={position} zoom={zoom} style={{ height: '100vh', width: '100%' }}>
         <LayersControl position="topright">
           <BaseLayer checked name="Informationskarta">
@@ -614,10 +491,11 @@ useEffect(() => {
                   fillOpacity: 0.2
                 },
                 //icon: customRectangleIcon 
-              }
+              },
+              circlemarker: false,
             }}
           />
-          {shapeLayers && shapeLayers.length > 0 && shapeLayers.map((feature, index) => (
+           {shapeLayers.map((feature, index) => (
             <GeoJSON key={index} data={feature} />
           ))}
         </FeatureGroup>
