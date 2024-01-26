@@ -394,6 +394,9 @@ const Map = ({ selectedProjectId, onSave, userID, /*geoJsonData*/ }) => {
   };
 */
 
+
+
+
 const handleFileUploadShape = async (e) => {
   const file = e.target.files[0];
   if (file) {
@@ -402,23 +405,29 @@ const handleFileUploadShape = async (e) => {
       try {
         const arrayBuffer = event.target.result;
         const parsedGeojson = await shp.parseZip(arrayBuffer);
+        let featuresArray;
+
         if (Array.isArray(parsedGeojson)) {
-          const allFeatures = parsedGeojson.reduce((acc, featureCollection) => {
+          featuresArray = parsedGeojson.reduce((acc, featureCollection) => {
             if (featureCollection.type === "FeatureCollection" && featureCollection.features) {
               return [...acc, ...featureCollection.features];
             }
             return acc;
           }, []);
-
-          setShapeLayers(allFeatures);
-          console.log('allFeatures: ', allFeatures);
-          setGeoJsonData({ type: "FeatureCollection", features: allFeatures });
         } else {
-          const geojson = await shp.parseZip(arrayBuffer);
-          setShapeLayers(geojson.features);
-          console.log('geojson: ', geojson);
-          setGeoJsonData({ type: "FeatureCollection", features: geojson.features });
+          featuresArray = parsedGeojson.features;
         }
+
+        const newGeoJsonData = {
+          type: "FeatureCollection",
+          features: featuresArray
+        };
+
+        setShapeLayers(featuresArray);
+        setGeoJsonData(newGeoJsonData); // Set state with new GeoJSON data
+
+        console.log('Parsed Features:', featuresArray);
+        console.log('New GeoJSON Data:', newGeoJsonData);
 
       } catch (error) {
         console.error('Error parsing shapefile:', error);
@@ -427,6 +436,8 @@ const handleFileUploadShape = async (e) => {
     reader.readAsArrayBuffer(file);
   }
 };
+
+
 
 
 //      Import (GeoJSON): <input type="file" onChange={handleFileUploadGeoJSON} />
