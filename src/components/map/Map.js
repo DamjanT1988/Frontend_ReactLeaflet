@@ -7,12 +7,7 @@ import L from 'leaflet';
 import 'leaflet-draw';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-draw/dist/leaflet.draw.css';
-//import cropIcon from '../../media/crop.png'; // Ensure this path is correct
 import shp from 'shpjs';
-import JSZip from "jszip";
-import { read } from 'shapefile';
-//import { Buffer } from 'buffer';
-//window.Buffer = Buffer;
 
 delete L.Icon.Default.prototype._getIconUrl
 L.Icon.Default.mergeOptions({
@@ -93,14 +88,6 @@ L.drawLocal.edit.handlers.remove.tooltip = {
   text: 'Klicka på en funktion för att ta bort',
 };
 
-/*
-// Custom Icon for Rectangle Tool
-const customRectangleIcon = new L.Icon({
-  iconUrl: cropIcon,
-  iconSize: [20, 20] // Adjust as needed
-});
-*/
-
 // Define the Map component
 const Map = ({ selectedProjectId, onSave, userID, /*geoJsonData*/ }) => {
   const featureGroupRef = useRef(null);
@@ -111,19 +98,7 @@ const Map = ({ selectedProjectId, onSave, userID, /*geoJsonData*/ }) => {
   const accessToken = localStorage.getItem('accessToken'); // Get the access token from local storage
   const [isRectangleDrawn, setIsRectangleDrawn] = useState(false);
   const [shapeLayers, setShapeLayers] = useState([]);
-
-
-  /*
-  useEffect(() => {
-    // Customization for Leaflet Draw
-    L.drawLocal.draw.toolbar.buttons.rectangle = 'Crop Map Area'; // Custom tooltip text for rectangle button
-    L.drawLocal.draw.handlers.rectangle = {
-      tooltip: { start: 'Click and drag to draw a rectangle.' },
-      icon: customRectangleIcon // Use the custom icon
-    };
-  }, []);
-*/
-
+//  const [geoJsonLayers, setGeoJsonLayers] = useState([]); // State for GeoJSON layers
 
   useEffect(() => {
     if (featureGroupRef.current) {
@@ -164,22 +139,6 @@ const Map = ({ selectedProjectId, onSave, userID, /*geoJsonData*/ }) => {
     }
   }, [geoJsonData]);
 
-  const handleFileUpload = async (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = async (event) => {
-        try {
-          const arrayBuffer = event.target.result;
-          const geojson = await shp.parseZip(arrayBuffer);
-          setShapeLayers(geojson.features);
-        } catch (error) {
-          console.error('Error parsing shapefile:', error);
-        }
-      };
-      reader.readAsArrayBuffer(file);
-    }
-  };
 
   const createInvertedMask = (rectangleLayer) => {
     const bounds = rectangleLayer.getBounds();
@@ -365,18 +324,13 @@ const Map = ({ selectedProjectId, onSave, userID, /*geoJsonData*/ }) => {
     }
   };
 
-
   const onCreate = (e) => {
     if (e.layer instanceof L.Rectangle) {
       setIsRectangleDrawn(true);
       // ... rest of the logic for rectangle creation ...
     }
-
-
     updateGeoJson(); // Update GeoJSON when new shape is created
   };
-
-
 
   const onEdited = (e) => {
     e.layers.eachLayer((editedLayer) => {
@@ -391,33 +345,27 @@ const Map = ({ selectedProjectId, onSave, userID, /*geoJsonData*/ }) => {
         if (maskToRemove) {
           featureGroupRef.current.removeLayer(maskToRemove);
         }
-
         // Recreate the inverted mask with new coordinates
         createInvertedMask(editedLayer);
       }
     });
 
-    
-  // Clone the current state
-  let updatedFeatures = [...shapeLayers];
+    // Clone the current state
+    let updatedFeatures = [...shapeLayers];
 
-  e.layers.eachLayer((editedLayer) => {
-    // Assuming each feature has a unique id
-    const featureIndex = updatedFeatures.findIndex(f => 
-      f.properties.id === editedLayer.feature.properties.id
-    );
+    e.layers.eachLayer((editedLayer) => {
+      // Assuming each feature has a unique id
+      const featureIndex = updatedFeatures.findIndex(f =>
+        f.properties.id === editedLayer.feature.properties.id
+      );
 
-    if (featureIndex !== -1) {
-      // Update the geometry of the feature
-      updatedFeatures[featureIndex].geometry = editedLayer.toGeoJSON().geometry;
-    }
-  });
-
-  // Update the state
-  setShapeLayers(updatedFeatures);
-
-
-
+      if (featureIndex !== -1) {
+        // Update the geometry of the feature
+        updatedFeatures[featureIndex].geometry = editedLayer.toGeoJSON().geometry;
+      }
+    });
+    // Update the state
+    setShapeLayers(updatedFeatures);
     updateGeoJson(); // Update GeoJSON when shapes are edited
   };
 
@@ -426,95 +374,63 @@ const Map = ({ selectedProjectId, onSave, userID, /*geoJsonData*/ }) => {
   };
 
 
-
-  const handleFileUpload1 = async (e) => {
+/*
+  const handleFileUploadGeoJSON = async (e) => {
     const file = e.target.files[0];
     if (file) {
       const reader = new FileReader();
       reader.onload = async (event) => {
         try {
-          const arrayBuffer = event.target.result;
-          console.log('arrayBuffer: ', arrayBuffer);
-          const geojson = await shp.parseZip(arrayBuffer);
+          const text = event.target.result;
+          const geojson = JSON.parse(text); // Parse the file content as GeoJSON
           console.log('geojson: ', geojson);
+          setGeoJsonLayers(geojson.features); // Update the state
+        } catch (error) {
+          console.error('Error parsing GeoJSON:', error);
+        }
+      };
+      reader.readAsText(file); // Read the file as text
+    }
+  };
+*/
+
+const handleFileUploadShape = async (e) => {
+  const file = e.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = async (event) => {
+      try {
+        const arrayBuffer = event.target.result;
+        const parsedGeojson = await shp.parseZip(arrayBuffer);
+        if (Array.isArray(parsedGeojson)) {
+          const allFeatures = parsedGeojson.reduce((acc, featureCollection) => {
+            if (featureCollection.type === "FeatureCollection" && featureCollection.features) {
+              return [...acc, ...featureCollection.features];
+            }
+            return acc;
+          }, []);
+
+          setShapeLayers(allFeatures);
+          console.log('allFeatures: ', allFeatures);
+          setGeoJsonData({ type: "FeatureCollection", features: allFeatures });
+        } else {
+          const geojson = await shp.parseZip(arrayBuffer);
           setShapeLayers(geojson.features);
-        } catch (error) {
-          console.error('Error parsing shapefile:', error);
+          console.log('geojson: ', geojson);
+          setGeoJsonData({ type: "FeatureCollection", features: geojson.features });
         }
-      };
-      reader.readAsArrayBuffer(file);
-    }
-  };
 
-  const handleFileUpload7 = async (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = async (event) => {
-        try {
-          const arrayBuffer = event.target.result;
-          const parsedGeojson = await shp.parseZip(arrayBuffer);
-          console.log('Original geojson:', parsedGeojson);
-
-          if (Array.isArray(parsedGeojson)) {
-            // If parsedGeojson is an array, extract features from each FeatureCollection
-            const allFeatures = parsedGeojson.reduce((acc, featureCollection) => {
-              if (featureCollection.type === "FeatureCollection" && featureCollection.features) {
-                return [...acc, ...featureCollection.features];
-              }
-              return acc;
-            }, []);
-
-            setShapeLayers(allFeatures); // Update the shapeLayers state
-            setGeoJsonData({ type: "FeatureCollection", features: allFeatures }); // Update the geoJsonData state
-          } else {
-            // Handle the case where parsedGeojson is not an array (if necessary)
-            console.error('Parsed data is not in expected format:', parsedGeojson);
-          }
-        } catch (error) {
-          console.error('Error parsing shapefile:', error);
-        }
-      };
-      reader.readAsArrayBuffer(file);
-    }
-  };
+      } catch (error) {
+        console.error('Error parsing shapefile:', error);
+      }
+    };
+    reader.readAsArrayBuffer(file);
+  }
+};
 
 
-  const handleFileUpload9 = async (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = async (event) => {
-        try {
-          // First, try parsing using handleFileUpload7 logic
-          const arrayBuffer = event.target.result;
-          const parsedGeojson = await shp.parseZip(arrayBuffer);
-          if (Array.isArray(parsedGeojson)) {
-            const allFeatures = parsedGeojson.reduce((acc, featureCollection) => {
-              if (featureCollection.type === "FeatureCollection" && featureCollection.features) {
-                return [...acc, ...featureCollection.features];
-              }
-              return acc;
-            }, []);
-            setShapeLayers(allFeatures);
-            console.log('allFeatures: ', allFeatures);
-            setGeoJsonData({ type: "FeatureCollection", features: allFeatures });
-          } else {
-            // If the first method fails, try the second
-            const geojson = await shp.parseZip(arrayBuffer);
-            setShapeLayers(geojson.features);
-            console.log('geojson: ', geojson);
-            setGeoJsonData({ type: "FeatureCollection", features: geojson.features });
-          }
-        } catch (error) {
-          console.error('Error parsing shapefile:', error);
-        }
-      };
-      reader.readAsArrayBuffer(file);
-    }
-  };
-  
-  
+//      Import (GeoJSON): <input type="file" onChange={handleFileUploadGeoJSON} />
+
 
   return (
     <div>
@@ -522,10 +438,8 @@ const Map = ({ selectedProjectId, onSave, userID, /*geoJsonData*/ }) => {
       <button className="toggle-form-button" onClick={saveDataToServer}>Spara ritning!</button>
       <span className="save-status">{saveStatus}</span>
       <br />
-      Python-1: <input type="file" onChange={handleFileUpload1} />
-      Mjukvara-7: <input type="file" onChange={handleFileUpload7} />
-      GeoJSON: <input type="file" onChange={handleFileUpload} />
-      Kombinerat-9: <input type="file" onChange={handleFileUpload9} />
+
+      Import (shape): <input type="file" onChange={handleFileUploadShape} />
       <MapContainer center={position} zoom={zoom} style={{ height: '100vh', width: '100%' }}>
         <LayersControl position="topright">
           <BaseLayer checked name="Informationskarta">
@@ -554,6 +468,9 @@ const Map = ({ selectedProjectId, onSave, userID, /*geoJsonData*/ }) => {
               circlemarker: false,
             }}
           />
+            {/*geoJsonLayers && geoJsonLayers.map((feature, index) => (
+            <GeoJSON key={index} data={feature} />
+          ))*/}
           {shapeLayers && shapeLayers.map((feature, index) => (
             <GeoJSON key={index} data={feature} />
           ))}
