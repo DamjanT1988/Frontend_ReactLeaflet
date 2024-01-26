@@ -397,6 +397,27 @@ const Map = ({ selectedProjectId, onSave, userID, /*geoJsonData*/ }) => {
       }
     });
 
+    
+  // Clone the current state
+  let updatedFeatures = [...shapeLayers];
+
+  e.layers.eachLayer((editedLayer) => {
+    // Assuming each feature has a unique id
+    const featureIndex = updatedFeatures.findIndex(f => 
+      f.properties.id === editedLayer.feature.properties.id
+    );
+
+    if (featureIndex !== -1) {
+      // Update the geometry of the feature
+      updatedFeatures[featureIndex].geometry = editedLayer.toGeoJSON().geometry;
+    }
+  });
+
+  // Update the state
+  setShapeLayers(updatedFeatures);
+
+
+
     updateGeoJson(); // Update GeoJSON when shapes are edited
   };
 
@@ -476,11 +497,13 @@ const Map = ({ selectedProjectId, onSave, userID, /*geoJsonData*/ }) => {
               return acc;
             }, []);
             setShapeLayers(allFeatures);
+            console.log('allFeatures: ', allFeatures);
             setGeoJsonData({ type: "FeatureCollection", features: allFeatures });
           } else {
             // If the first method fails, try the second
             const geojson = await shp.parseZip(arrayBuffer);
             setShapeLayers(geojson.features);
+            console.log('geojson: ', geojson);
             setGeoJsonData({ type: "FeatureCollection", features: geojson.features });
           }
         } catch (error) {
@@ -498,6 +521,7 @@ const Map = ({ selectedProjectId, onSave, userID, /*geoJsonData*/ }) => {
       <h3>Projektkarta</h3>
       <button className="toggle-form-button" onClick={saveDataToServer}>Spara ritning!</button>
       <span className="save-status">{saveStatus}</span>
+      <br />
       Python-1: <input type="file" onChange={handleFileUpload1} />
       Mjukvara-7: <input type="file" onChange={handleFileUpload7} />
       GeoJSON: <input type="file" onChange={handleFileUpload} />
