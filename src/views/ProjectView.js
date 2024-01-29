@@ -228,8 +228,8 @@ const ProjectView = () => {
       executing_organization_number: formData.get('executingOrganizationNumber'),
       valid_from: formData.get('validFrom'),
       valid_to: formData.get('validTo'),
-      period_start: formData.get('periodStart'),
-      period_end: formData.get('periodEnd')
+      period_start: formData.get('versionStart'),
+      period_end: formData.get('versionEnd')
     };
 
     // Fetch request to the projects API endpoint to create a new project
@@ -268,15 +268,16 @@ const ProjectView = () => {
       description: editedProject.description,
       reason: editedProject.reason,
       mapping_area_description: editedProject.mapping_area_description,
-      ordering_organization: editedProject.ordering_organization,
+      ordering_organization_name: editedProject.ordering_organization_name,
+      ordering_organization_number: editedProject.ordering_organization_number,
       object_version: editedProject.object_version,
-      project_identity: editedProject.project_identity, // manually entered or auto-assigned
-      period_start: editedProject.period_start, // start of the time period
-      period_end: editedProject.period_end, // end of the time period
-      executing_organization: editedProject.executing_organization,
-      version_start: editedProject.version_start, // start of the version validity period
-      version_end: editedProject.version_end, // end of the version validity period
-
+      project_identity: editedProject.project_identity,
+      executing_organization_name: editedProject.executing_organization_name,
+      executing_organization_number: editedProject.executing_organization_number,
+      valid_from: editedProject.valid_from,
+      valid_to: editedProject.valid_to,
+      period_start: editedProject.period_start,
+      period_end: editedProject.period_end
     };
 
     // Fetch request to update the project details
@@ -302,10 +303,23 @@ const ProjectView = () => {
     if (!isEditMode) {
       setEditedProject({
         project_name: selectedProject.project_name,
-        description: selectedProject.description
+        description: selectedProject.description,
+        reason: selectedProject.reason,
+        mapping_area_description: selectedProject.mapping_area_description,
+        ordering_organization_name: selectedProject.ordering_organization_name,
+        ordering_organization_number: selectedProject.ordering_organization_number,
+        object_version: selectedProject.object_version,
+        project_identity: selectedProject.project_identity,
+        executing_organization_name: selectedProject.executing_organization_name,
+        executing_organization_number: selectedProject.executing_organization_number,
+        valid_from: selectedProject.valid_from,
+        valid_to: selectedProject.valid_to,
+        period_start: selectedProject.period_start,
+        period_end: selectedProject.period_end
       });
     }
   };
+  
 
   // Call this function when the "Edit" button is clicked
 
