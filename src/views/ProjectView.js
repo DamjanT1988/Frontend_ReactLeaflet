@@ -312,8 +312,8 @@ const ProjectView = () => {
         project_identity: selectedProject.project_identity,
         executing_organization_name: selectedProject.executing_organization_name,
         executing_organization_number: selectedProject.executing_organization_number,
-        valid_from: selectedProject.valid_from,
-        valid_to: selectedProject.valid_to,
+        version_start: selectedProject.version_start,
+        version_end: selectedProject.version_end,
         period_start: selectedProject.period_start,
         period_end: selectedProject.period_end
       });
