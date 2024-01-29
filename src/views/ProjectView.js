@@ -178,33 +178,6 @@ const ProjectView = () => {
       .then(data => {
         setSelectedProject(data); // Set the selected project state with the fetched data
 
-        // Process GeoJSON data for polygons, lines, and points
-        const processedGeoJsonData = {
-          type: 'FeatureCollection',
-          features: [
-            // Process polygon data
-            ...(data.polygon_data.features || []).map(polygon => ({
-              type: 'Feature',
-              geometry: polygon.geometry,
-              properties: { ...polygon.properties, type: 'Polygon' }
-            })),
-            // Process line data
-            ...(data.line_data.features || []).map(line => ({
-              type: 'Feature',
-              geometry: line.geometry,
-              properties: { ...line.properties, type: 'LineString' }
-            })),
-            // Process point data
-            ...(data.point_data.features || []).map(point => ({
-              type: 'Feature',
-              geometry: point.geometry,
-              properties: { ...point.properties, type: 'Point' }
-            })),
-          ],
-        };
-
-        // Set the geoJsonData state with the processed GeoJSON data
-        setGeoJsonData(processedGeoJsonData);
         setShowForm(false); // Hide the form
       })
       .catch(error => console.error('Error fetching project details:', error)); // Log any errors
