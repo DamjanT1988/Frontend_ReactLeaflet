@@ -27,14 +27,16 @@ const ProjectView = () => {
     description: '',
     reason: '',
     mapping_area_description: '',
-    ordering_organization: '',
+    ordering_organization_name: '', // Updated to include 'name'
+    ordering_organization_number: '', // New field for organization number
+    executing_organization_name: '', // Updated to include 'name'
+    executing_organization_number: '', // New field for organization number
     object_version: '',
-    project_identity: '', // manually entered or auto-assigned
-    period_start: '', // start of the time period
-    period_end: '', // end of the time period
-    executing_organization: '',
-    version_start: '', // start of the version validity period
-    version_end: '', // end of the version validity period
+    project_identity: '',
+    period_start: '',
+    period_end: '',
+    version_start: '',
+    version_end: '',
   });
   const [searchTerm, setSearchTerm] = useState(''); // State for search term
   const [sortOrder, setSortOrder] = useState('desc'); // State for sort order ('asc' or 'desc')
@@ -217,14 +219,17 @@ const ProjectView = () => {
       description: formData.get('description'),
       reason: formData.get('reason'),
       mapping_area_description: formData.get('mappingAreaDescription'),
-      ordering_organization: formData.get('orderingOrganization'),
+      ordering_organization_name: formData.get('orderingOrganizationName'),
+      ordering_organization_number: formData.get('orderingOrganizationNumber'),
+      object_identity: formData.get('objectIdentity'),
       object_version: formData.get('objectVersion'),
-      project_identity: formData.get('projectIdentity'), // manually entered or auto-assigned
-      period_start: formData.get('periodStart'), // start of the time period
-      period_end: formData.get('periodEnd'), // end of the time period
-      executing_organization: formData.get('executingOrganization'),
-      version_start: formData.get('versionStart'), // start of the version validity period
-      version_end: formData.get('versionEnd'), // end of the version validity period
+      project_identity: formData.get('projectIdentity'),
+      executing_organization_name: formData.get('executingOrganizationName'),
+      executing_organization_number: formData.get('executingOrganizationNumber'),
+      valid_from: formData.get('validFrom'),
+      valid_to: formData.get('validTo'),
+      period_start: formData.get('periodStart'),
+      period_end: formData.get('periodEnd')
     };
 
     // Fetch request to the projects API endpoint to create a new project
@@ -306,129 +311,78 @@ const ProjectView = () => {
 
 
   if (selectedProject) {
-    // Display only the selected project
     return (
-      <div className="project-details-container">
-        <h1>Projekt</h1>
-        <button className="project-back" onClick={() => setSelectedProject(null)}>Tillbaka till projektlista!</button>
-        <button className="project-back" onClick={toggleEditMode}>
-          {isEditMode ? "Avbryt" : "Redigera projektinformation!"}
-        </button>
-        {isEditMode && <button className="project-back" onClick={updateProjectInfo}>Spara ändringar</button>}
-        {/* PROJECT INFO. */}
-        {isEditMode ? (
-          <>
-            <label>Projektnamn:</label>
-            <input
-              type="text"
-              className="editable-field"
-              value={editedProject.project_name}
-              onChange={(e) => setEditedProject({ ...editedProject, project_name: e.target.value })}
-            />
+        <div className="project-details-container">
+            <h1>Projekt</h1>
+            <button className="project-back" onClick={() => setSelectedProject(null)}>Tillbaka till projektlista!</button>
+            <button className="project-back" onClick={toggleEditMode}>
+                {isEditMode ? "Avbryt" : "Redigera projektinformation!"}
+            </button>
+            {isEditMode && <button className="project-back" onClick={updateProjectInfo}>Spara ändringar</button>}
 
-            <label>Projektidentitet:</label>
-            <input
-              type="text"
-              className="editable-field"
-              value={editedProject.project_identity}
-              onChange={(e) => setEditedProject({ ...editedProject, project_identity: e.target.value })}
-            />
+            {isEditMode ? (
+                <>
+                    {/* Input fields for editable project information */}
+                    <label>Projektnamn:</label>
+                    <input type="text" className="editable-field" value={editedProject.project_name} onChange={(e) => setEditedProject({ ...editedProject, project_name: e.target.value })} />
 
-            <label>Objektversion:</label>
-            <input
-              type="text"
-              className="editable-field"
-              value={editedProject.object_version}
-              onChange={(e) => setEditedProject({ ...editedProject, object_version: e.target.value })}
-            />
+                    <label>Projektidentitet:</label>
+                    <input type="text" className="editable-field" value={editedProject.project_identity} onChange={(e) => setEditedProject({ ...editedProject, project_identity: e.target.value })} />
 
+                    <label>Objektversion:</label>
+                    <input type="number" className="editable-field" value={editedProject.object_version} onChange={(e) => setEditedProject({ ...editedProject, object_version: e.target.value })} />
 
-            <label>Beskrivning och anteckningar:</label>
-            <textarea
-              className="project-textarea"
-              value={editedProject.description}
-              onChange={(e) => setEditedProject({ ...editedProject, description: e.target.value })}
-            />
+                    <label>Beskrivning och anteckningar:</label>
+                    <textarea className="project-textarea" value={editedProject.description} onChange={(e) => setEditedProject({ ...editedProject, description: e.target.value })} />
 
-            <label>Anledning:</label>
-            <input
-              type="text"
-              className="editable-field"
-              value={editedProject.reason}
-              onChange={(e) => setEditedProject({ ...editedProject, reason: e.target.value })}
-            />
+                    <label>Anledning:</label>
+                    <input type="text" className="editable-field" value={editedProject.reason} onChange={(e) => setEditedProject({ ...editedProject, reason: e.target.value })} />
 
-            <label>Kartläggningsområdesbeskrivning:</label>
-            <textarea
-              className="project-textarea"
-              value={editedProject.mapping_area_description}
-              onChange={(e) => setEditedProject({ ...editedProject, mapping_area_description: e.target.value })}
-            />
+                    <label>Kartläggningsområdesbeskrivning:</label>
+                    <textarea className="project-textarea" value={editedProject.mapping_area_description} onChange={(e) => setEditedProject({ ...editedProject, mapping_area_description: e.target.value })} />
 
-            <label>Beställande organisation:</label>
-            <input
-              type="text"
-              className="editable-field"
-              value={editedProject.ordering_organization}
-              onChange={(e) => setEditedProject({ ...editedProject, ordering_organization: e.target.value })}
-            />
+                    <label>Beställande organisation namn:</label>
+                    <input type="text" className="editable-field" value={editedProject.ordering_organization_name} onChange={(e) => setEditedProject({ ...editedProject, ordering_organization_name: e.target.value })} />
 
-            <label>Utförande organisation:</label>
-            <input
-              type="text"
-              className="editable-field"
-              value={editedProject.executing_organization}
-              onChange={(e) => setEditedProject({ ...editedProject, executing_organization: e.target.value })}
-            />
+                    <label>Beställande organisation nummer:</label>
+                    <input type="text" className="editable-field" value={editedProject.ordering_organization_number} onChange={(e) => setEditedProject({ ...editedProject, ordering_organization_number: e.target.value })} />
 
-            <label>Projektperiod Start:</label>
-            <input
-              type="date"
-              className="editable-field"
-              value={editedProject.period_start}
-              onChange={(e) => setEditedProject({ ...editedProject, period_start: e.target.value })}
-            />
+                    <label>Utförande organisation namn:</label>
+                    <input type="text" className="editable-field" value={editedProject.executing_organization_name} onChange={(e) => setEditedProject({ ...editedProject, executing_organization_name: e.target.value })} />
 
-            <label>Projektperiod Slut:</label>
-            <input
-              type="date"
-              className="editable-field"
-              value={editedProject.period_end}
-              onChange={(e) => setEditedProject({ ...editedProject, period_end: e.target.value })}
-            />
+                    <label>Utförande organisation nummer:</label>
+                    <input type="text" className="editable-field" value={editedProject.executing_organization_number} onChange={(e) => setEditedProject({ ...editedProject, executing_organization_number: e.target.value })} />
 
-            <label>Versionsgiltighetsperiod Start:</label>
-            <input
-              type="date"
-              className="editable-field"
-              value={editedProject.version_start}
-              onChange={(e) => setEditedProject({ ...editedProject, version_start: e.target.value })}
-            />
+                    <label>Projektperiod Start:</label>
+                    <input type="date" className="editable-field" value={editedProject.period_start} onChange={(e) => setEditedProject({ ...editedProject, period_start: e.target.value })} />
 
-            <label>Versionsgiltighetsperiod Slut:</label>
-            <input
-              type="date"
-              className="editable-field"
-              value={editedProject.version_end}
-              onChange={(e) => setEditedProject({ ...editedProject, version_end: e.target.value })}
-            />
-          </>
-        ) : (
-          <>
-            <p><strong>Projektnamn:</strong> {selectedProject.project_name}</p>
-            <p><strong>Projektidentitet:</strong> {selectedProject.project_identity}</p>
-            <p><strong>Objektversion:</strong> {selectedProject.object_version}</p>
-            <p><strong>Beskrivning och anteckningar:</strong></p>
-            <textarea readOnly value={selectedProject.description} className="project-textarea" />
-            <p><strong>Anledning:</strong> {selectedProject.reason}</p>
-            <p><strong>Kartläggningsområdesbeskrivning:</strong> </p>
-            <textarea readOnly value={selectedProject.mapping_area_description} className="project-textarea" />
-            <p><strong>Beställande organisation:</strong> {selectedProject.ordering_organization}</p>
-            <p><strong>Utförande organisation:</strong> {selectedProject.executing_organization}</p>
-            <p><strong>Projektperiod Start:</strong> {selectedProject.period_start}</p>
-            <p><strong>Projektperiod Slut:</strong> {selectedProject.period_end}</p>
-            <p><strong>Versionsgiltighetsperiod Start:</strong> {selectedProject.version_start}</p>
-            <p><strong>Versionsgiltighetsperiod Slut:</strong> {selectedProject.version_end}</p>          </>
+                    <label>Projektperiod Slut:</label>
+                    <input type="date" className="editable-field" value={editedProject.period_end} onChange={(e) => setEditedProject({ ...editedProject, period_end: e.target.value })} />
+
+                    <label>Versionsgiltighetsperiod Start:</label>
+                    <input type="date" className="editable-field" value={editedProject.version_start} onChange={(e) => setEditedProject({ ...editedProject, version_start: e.target.value })} />
+
+                    <label>Versionsgiltighetsperiod Slut:</label>
+                    <input type="date" className="editable-field" value={editedProject.version_end} onChange={(e) => setEditedProject({ ...editedProject, version_end: e.target.value })} />
+                </>
+            ) : (
+                <>
+                    {/* Displaying project information in read-only mode */}
+                    <p><strong>Projektnamn:</strong> {selectedProject.project_name}</p>
+                    <p><strong>Projektidentitet:</strong> {selectedProject.project_identity}</p>
+                    <p><strong>Objektversion:</strong> {selectedProject.object_version}</p>
+                    <textarea readOnly className="project-textarea" value={selectedProject.description} />
+                    <p><strong>Anledning:</strong> {selectedProject.reason}</p>
+                    <textarea readOnly className="project-textarea" value={selectedProject.mapping_area_description} />
+                    <p><strong>Beställande organisation namn:</strong> {selectedProject.ordering_organization_name}</p>
+                    <p><strong>Beställande organisation nummer:</strong> {selectedProject.ordering_organization_number}</p>
+                    <p><strong>Utförande organisation namn:</strong> {selectedProject.executing_organization_name}</p>
+                    <p><strong>Utförande organisation nummer:</strong> {selectedProject.executing_organization_number}</p>
+                    <p><strong>Projektperiod Start:</strong> {selectedProject.period_start}</p>
+                    <p><strong>Projektperiod Slut:</strong> {selectedProject.period_end}</p>
+                    <p><strong>Versionsgiltighetsperiod Start:</strong> {selectedProject.version_start}</p>
+                    <p><strong>Versionsgiltighetsperiod Slut:</strong> {selectedProject.version_end}</p>
+                </>
         )}
 
         {/* SURVEY */}
@@ -474,14 +428,20 @@ const ProjectView = () => {
           <label htmlFor="mappingAreaDescription">Beskrivning av kartläggningsområde:</label>
           <textarea id="mappingAreaDescription" name="mappingAreaDescription"></textarea>
 
-          <label htmlFor="orderingOrganization">Beställande organisation:</label>
-          <input type="text" id="orderingOrganization" name="orderingOrganization" />
+          <label htmlFor="orderingOrganizationName">Beställande organisation namn:</label>
+          <input type="text" id="orderingOrganizationName" name="orderingOrganizationName" required />
 
-          <label htmlFor="executingOrganization">Utförande organisation:</label>
-          <input type="text" id="executingOrganization" name="executingOrganization" />
+          <label htmlFor="orderingOrganizationNumber">Beställande organisation nummer:</label>
+          <input type="text" id="orderingOrganizationNumber" name="orderingOrganizationNumber" required />
+
+          <label htmlFor="executingOrganizationName">Utförande organisation namn:</label>
+          <input type="text" id="executingOrganizationName" name="executingOrganizationName" required />
+          
+          <label htmlFor="executingOrganizationNumber">Utförande organisation nummer:</label>
+          <input type="text" id="executingOrganizationNumber" name="executingOrganizationNumber" required />
 
           <label htmlFor="objectVersion">Objektversion:</label>
-          <input type="text" id="objectVersion" name="objectVersion" />
+          <input type="number" id="objectVersion" name="objectVersion" />
 
           <label htmlFor="periodStart">Projektperiod Start:</label>
           <input type="date" id="periodStart" name="periodStart" required />
