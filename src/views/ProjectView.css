@@ -65,6 +65,16 @@ h3 {
     padding: 6px;
 }
 
+
+.project-import-button {
+    background-color: #30A875; /* Green color for the back link */
+    color: white; /* White text for the back link */
+    text-decoration: none; /* Remove link underlines */
+    margin-right: 20px; /* Space after the back link */
+    display: flex;
+    padding: 6px;
+}
+
 /* Style for the 'View Details' button */
 .project > button {
     background-color: #30A875; /* Green background for consistency */
@@ -75,6 +85,25 @@ h3 {
     display: inline-block; /* So it doesn't take the full width */
     margin-bottom: 10px; /* Space after the button */
 }
+
+.custom-file-upload {
+    display: inline-block;
+    padding: 6px 12px; /* Similar to button padding */
+    cursor: pointer;
+    background-color: #30A875; /* Button color */
+    color: white; /* Text color */
+    border: 1px solid transparent;
+    border-radius: 4px; /* Button border-radius */
+    font-size: 16px; /* Text size */
+    font-weight: bold; /* Text weight */
+    text-align: center;
+    margin: 4px 2px; /* Adjust spacing around the button */
+    transition: all 0.3s; /* Smooth transition for hover effect */
+  }
+  
+  .custom-file-upload:hover {
+    background-color: #45a049; /* Darker shade for hover effect */
+  }
 
 /* ProjectView.css */
 

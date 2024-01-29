@@ -396,7 +396,6 @@ const Map = ({ selectedProjectId, onSave, userID, /*geoJsonData*/ }) => {
 
 
 
-
 const handleFileUploadShape = async (e) => {
   const file = e.target.files[0];
   if (file) {
@@ -423,8 +422,15 @@ const handleFileUploadShape = async (e) => {
           features: featuresArray
         };
 
-        setShapeLayers(featuresArray);
-        setGeoJsonData(newGeoJsonData); // Set state with new GeoJSON data
+        // Clear existing layers
+        featureGroupRef.current.clearLayers();
+
+        // Add the new GeoJSON data to the feature group
+        L.geoJSON(newGeoJsonData, {
+          onEachFeature: (feature, layer) => {
+            layer.addTo(featureGroupRef.current);
+          }
+        });
 
         console.log('Parsed Features:', featuresArray);
         console.log('New GeoJSON Data:', newGeoJsonData);
@@ -450,7 +456,12 @@ const handleFileUploadShape = async (e) => {
       <span className="save-status">{saveStatus}</span>
       <br />
 
-      Import (shape): <input type="file" onChange={handleFileUploadShape} />
+
+      <label htmlFor="file-upload" className="custom-file-upload">
+      Importera shapefil
+    </label>
+    <input id="file-upload" className="project-import-input" type="file" onChange={handleFileUploadShape} style={{ display: 'none' }} />
+    
       <MapContainer center={position} zoom={zoom} style={{ height: '100vh', width: '100%' }}>
         <LayersControl position="topright">
           <BaseLayer checked name="Informationskarta">

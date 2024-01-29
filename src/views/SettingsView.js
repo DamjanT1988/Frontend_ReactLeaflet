@@ -128,13 +128,13 @@ const SettingsView = () => {
           setIsExistingPasswordConfirmed(true);
           setShowPasswordUpdate(true);
         } else {
-          alert("Existing password is incorrect.");
+          setStatusMessageUser("Existing password is incorrect.");
           setIsExistingPasswordConfirmed(false);
           setShowPasswordUpdate(false);
         }
       })
       .catch(error => {
-        alert("Error: " + error);
+        setStatusMessageUser("Error: " + error);
         setIsExistingPasswordConfirmed(false);
         setShowPasswordUpdate(false);
       });
