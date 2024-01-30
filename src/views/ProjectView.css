@@ -71,6 +71,7 @@ h3 {
     color: white; /* White text for the back link */
     text-decoration: none; /* Remove link underlines */
     margin-right: 20px; /* Space after the back link */
+    float: right;
     display: flex;
     padding: 6px;
 }
@@ -87,7 +88,8 @@ h3 {
 }
 
 .custom-file-upload {
-    display: inline-block;
+    display: flex;
+    float: right;
     padding: 6px 12px; /* Similar to button padding */
     cursor: pointer;
     background-color: #30A875; /* Button color */
