@@ -38,6 +38,11 @@
     margin-bottom: 15px; /* Space between projects */
 }
 
+.project > p {
+    overflow-x: auto;
+    height: 100px;
+}
+
 .map-container {
     width: 768px;
     margin: 50px auto; /* Center the container */
