@@ -282,14 +282,14 @@ const Map = ({ selectedProjectId, onSave, userID, /*geoJsonData*/ }) => {
         if (layer.isMask) {
           return;
         }
-        
+
         if (layer instanceof L.Circle) {
           const circleFeature = {
             type: 'Feature',
             properties: {
               isCircle: true,
               radius: layer.getRadius(),
-              id: uuidv4	(),
+              id: uuidv4(),
               attributes: {
                 inventoryLevel: ' ',
                 natureValueClass: ' ',
@@ -339,7 +339,7 @@ const Map = ({ selectedProjectId, onSave, userID, /*geoJsonData*/ }) => {
         } else {
           // For other shapes, use the default toGeoJSON method
           const layerFeature = layer.toGeoJSON();
-          const UUID = uuidv4	();
+          const UUID = uuidv4();
           layerFeature.properties.id = UUID;
           layerFeature.properties.attributes = {
             inventoryLevel: ' ',
@@ -399,7 +399,7 @@ const Map = ({ selectedProjectId, onSave, userID, /*geoJsonData*/ }) => {
     if (newLayer instanceof L.Rectangle) {
       setIsRectangleDrawn(true);
     }
-  
+
     updateGeoJson();
   };
 
@@ -445,221 +445,223 @@ const Map = ({ selectedProjectId, onSave, userID, /*geoJsonData*/ }) => {
   };
 
 
-/*
-  const handleFileUploadGeoJSON = async (e) => {
+  /*
+    const handleFileUploadGeoJSON = async (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = async (event) => {
+          try {
+            const text = event.target.result;
+            const geojson = JSON.parse(text); // Parse the file content as GeoJSON
+            console.log('geojson: ', geojson);
+            setGeoJsonLayers(geojson.features); // Update the state
+          } catch (error) {
+            console.error('Error parsing GeoJSON:', error);
+          }
+        };
+        reader.readAsText(file); // Read the file as text
+      }
+    };
+  */
+
+
+
+  const handleFileUploadShape = async (e) => {
     const file = e.target.files[0];
     if (file) {
       const reader = new FileReader();
       reader.onload = async (event) => {
         try {
-          const text = event.target.result;
-          const geojson = JSON.parse(text); // Parse the file content as GeoJSON
-          console.log('geojson: ', geojson);
-          setGeoJsonLayers(geojson.features); // Update the state
+          const arrayBuffer = event.target.result;
+          const parsedGeojson = await shp.parseZip(arrayBuffer);
+          let featuresArray;
+
+          if (Array.isArray(parsedGeojson)) {
+            featuresArray = parsedGeojson.reduce((acc, featureCollection) => {
+              if (featureCollection.type === "FeatureCollection" && featureCollection.features) {
+                return [...acc, ...featureCollection.features];
+              }
+              return acc;
+            }, []);
+          } else {
+            featuresArray = parsedGeojson.features;
+          }
+
+          const newGeoJsonData = {
+            type: "FeatureCollection",
+            features: featuresArray
+          };
+
+          // Clear existing layers
+          featureGroupRef.current.clearLayers();
+
+          // Add the new GeoJSON data to the feature group
+          L.geoJSON(newGeoJsonData, {
+            onEachFeature: (feature, layer) => {
+              layer.addTo(featureGroupRef.current);
+              layer.on('click', () => {
+                if (feature.properties && feature.properties.id || feature.properties.attributes) {
+                  setSelectedId(feature.properties.id);
+                  setAttributesObject(feature.properties.attributes);
+                }
+              });
+            }
+          });
+
+          console.log('Parsed Features:', featuresArray);
+          console.log('New GeoJSON Data:', newGeoJsonData);
+
         } catch (error) {
-          console.error('Error parsing GeoJSON:', error);
+          console.error('Error parsing shapefile:', error);
         }
       };
-      reader.readAsText(file); // Read the file as text
+      reader.readAsArrayBuffer(file);
     }
   };
-*/
 
-
-
-const handleFileUploadShape = async (e) => {
-  const file = e.target.files[0];
-  if (file) {
-    const reader = new FileReader();
-    reader.onload = async (event) => {
-      try {
-        const arrayBuffer = event.target.result;
-        const parsedGeojson = await shp.parseZip(arrayBuffer);
-        let featuresArray;
-
-        if (Array.isArray(parsedGeojson)) {
-          featuresArray = parsedGeojson.reduce((acc, featureCollection) => {
-            if (featureCollection.type === "FeatureCollection" && featureCollection.features) {
-              return [...acc, ...featureCollection.features];
-            }
-            return acc;
-          }, []);
-        } else {
-          featuresArray = parsedGeojson.features;
-        }
-
-        const newGeoJsonData = {
-          type: "FeatureCollection",
-          features: featuresArray
+  const saveAttributes = () => {
+    const updatedFeatures = geoJsonData.features.map((feature) => {
+      if (feature.properties.id === selectedId) {
+        return {
+          ...feature,
+          properties: {
+            ...feature.properties,
+            attributes: { ...attributesObject },
+          },
         };
-
-        // Clear existing layers
-        featureGroupRef.current.clearLayers();
-
-        // Add the new GeoJSON data to the feature group
-        L.geoJSON(newGeoJsonData, {
-          onEachFeature: (feature, layer) => {
-            layer.addTo(featureGroupRef.current);
-            layer.on('click', () => {
-              if (feature.properties && feature.properties.id || feature.properties.attributes) {
-                setSelectedId(feature.properties.id);
-                setAttributesObject(feature.properties.attributes);
-              }
-            });
-          }
-        });
-
-        console.log('Parsed Features:', featuresArray);
-        console.log('New GeoJSON Data:', newGeoJsonData);
-
-      } catch (error) {
-        console.error('Error parsing shapefile:', error);
       }
-    };
-    reader.readAsArrayBuffer(file);
-  }
-};
+      return feature;
+    });
 
-const saveAttributes = () => {
-  const updatedFeatures = geoJsonData.features.map((feature) => {
-    if (feature.properties.id === selectedId) {
-      return {
-        ...feature,
-        properties: {
-          ...feature.properties,
-          attributes: { ...attributesObject },
-        },
-      };
-    }
-    return feature;
-  });
-
-  setGeoJsonData({ ...geoJsonData, features: updatedFeatures });
-};
+    setGeoJsonData({ ...geoJsonData, features: updatedFeatures });
+  };
 
 
-//      Import (GeoJSON): <input type="file" onChange={handleFileUploadGeoJSON} />
+  //      Import (GeoJSON): <input type="file" onChange={handleFileUploadGeoJSON} />
 
 
   return (
     <div>
+    <div className='map-container'>
       <h3>Projektkarta</h3>
       <button className="toggle-form-button" onClick={saveDataToServer}>Spara ritning!</button>
       <span className="save-status">{saveStatus}</span>
 
-{selectedId && attributesObject && (
-  <div className="attributes-container">
-    <h3>Objektattribut</h3>
-    <label>
-      Objekt-ID:
-      <input
-        type="text"
-        value={selectedId || ''}
-        readOnly // Object ID is not editable
-      />
-    </label>
-    <label>
-      Inventeringsnivå:
-      <input
-        type="text"
-        value={attributesObject.inventoryLevel || ''}
-        onChange={(e) => setAttributesObject({ ...attributesObject, inventoryLevel: e.target.value })}
-      />
-    </label>
-    <label>
-      Naturvärdesklass:
-      <input
-        type="text"
-        value={attributesObject.natureValueClass || ''}
-        onChange={(e) => setAttributesObject({ ...attributesObject, natureValueClass: e.target.value })}
-      />
-    </label>
-    <label>
-      Preliminär bedömning:
-      <input
-        type="text"
-        value={attributesObject.preliminaryAssessment || ''}
-        onChange={(e) => setAttributesObject({ ...attributesObject, preliminaryAssessment: e.target.value })}
-      />
-    </label>
-    <label>
-      Motivering:
-      <input
-        type="text"
-        value={attributesObject.reason || ''}
-        onChange={(e) => setAttributesObject({ ...attributesObject, reason: e.target.value })}
-      />
-    </label>
-    <label>
-      Naturtyp:
-      <input
-        type="text"
-        value={attributesObject.natureType || ''}
-        onChange={(e) => setAttributesObject({ ...attributesObject, natureType: e.target.value })}
-      />
-    </label>
-    <label>
-      Biotop:
-      <input
-        type="text"
-        value={attributesObject.habitat || ''}
-        onChange={(e) => setAttributesObject({ ...attributesObject, habitat: e.target.value })}
-      />
-    </label>
-    <label>
-      Datum:
-      <input
-        type="date"
-        value={attributesObject.date || ''}
-        onChange={(e) => setAttributesObject({ ...attributesObject, date: e.target.value })}
-      />
-    </label>
-    <label>
-      Utförare:
-      <input
-        type="text"
-        value={attributesObject.executor || ''}
-        onChange={(e) => setAttributesObject({ ...attributesObject, executor: e.target.value })}
-      />
-    </label>
-    <label>
-      Organisation:
-      <input
-        type="text"
-        value={attributesObject.organization || ''}
-        onChange={(e) => setAttributesObject({ ...attributesObject, organization: e.target.value })}
-      />
-    </label>
-    <label>
-      Projektnamn:
-      <input
-        type="text"
-        value={attributesObject.projectName || ''}
-        onChange={(e) => setAttributesObject({ ...attributesObject, projectName: e.target.value })}
-      />
-    </label>
-    <label>
-      Area:
-      <input
-        type="number"
-        value={attributesObject.area || ''}
-        onChange={(e) => setAttributesObject({ ...attributesObject, area: e.target.value })}
-      />
-    </label>
-    {/* Additional attributes like Species, Habitat Qualities, Value Elements can be added similarly */}
-    <button className="save-attributes-btn" onClick={saveAttributes}>Save</button>
-    <button className="cancel-btn" onClick={() => setSelectedId(null)}>Cancel</button>
-  </div>
-)}
+      {selectedId && attributesObject && (
+        <div className="attributes-container">
+          <h3>Objektattribut</h3>
+          <label>
+            Objekt-ID:
+            <input
+              type="text"
+              value={selectedId || ''}
+              readOnly // Object ID is not editable
+            />
+          </label>
+          <label>
+            Inventeringsnivå:
+            <input
+              type="text"
+              value={attributesObject.inventoryLevel || ''}
+              onChange={(e) => setAttributesObject({ ...attributesObject, inventoryLevel: e.target.value })}
+            />
+          </label>
+          <label>
+            Naturvärdesklass:
+            <input
+              type="text"
+              value={attributesObject.natureValueClass || ''}
+              onChange={(e) => setAttributesObject({ ...attributesObject, natureValueClass: e.target.value })}
+            />
+          </label>
+          <label>
+            Preliminär bedömning:
+            <input
+              type="text"
+              value={attributesObject.preliminaryAssessment || ''}
+              onChange={(e) => setAttributesObject({ ...attributesObject, preliminaryAssessment: e.target.value })}
+            />
+          </label>
+          <label>
+            Motivering:
+            <input
+              type="text"
+              value={attributesObject.reason || ''}
+              onChange={(e) => setAttributesObject({ ...attributesObject, reason: e.target.value })}
+            />
+          </label>
+          <label>
+            Naturtyp:
+            <input
+              type="text"
+              value={attributesObject.natureType || ''}
+              onChange={(e) => setAttributesObject({ ...attributesObject, natureType: e.target.value })}
+            />
+          </label>
+          <label>
+            Biotop:
+            <input
+              type="text"
+              value={attributesObject.habitat || ''}
+              onChange={(e) => setAttributesObject({ ...attributesObject, habitat: e.target.value })}
+            />
+          </label>
+          <label>
+            Datum:
+            <input
+              type="date"
+              value={attributesObject.date || ''}
+              onChange={(e) => setAttributesObject({ ...attributesObject, date: e.target.value })}
+            />
+          </label>
+          <label>
+            Utförare:
+            <input
+              type="text"
+              value={attributesObject.executor || ''}
+              onChange={(e) => setAttributesObject({ ...attributesObject, executor: e.target.value })}
+            />
+          </label>
+          <label>
+            Organisation:
+            <input
+              type="text"
+              value={attributesObject.organization || ''}
+              onChange={(e) => setAttributesObject({ ...attributesObject, organization: e.target.value })}
+            />
+          </label>
+          <label>
+            Projektnamn:
+            <input
+              type="text"
+              value={attributesObject.projectName || ''}
+              onChange={(e) => setAttributesObject({ ...attributesObject, projectName: e.target.value })}
+            />
+          </label>
+          <label>
+            Area:
+            <input
+              type="number"
+              value={attributesObject.area || ''}
+              onChange={(e) => setAttributesObject({ ...attributesObject, area: e.target.value })}
+            />
+          </label>
+          {/* Additional attributes like Species, Habitat Qualities, Value Elements can be added similarly */}
+          <button className="save-attributes-btn" onClick={saveAttributes}>Save</button>
+          <button className="cancel-btn" onClick={() => setSelectedId(null)}>Cancel</button>
+        </div>
+      )}
 
 
 
       <label htmlFor="file-upload" className="custom-file-upload">
-      Importera shapefil
-    </label>
-    <input id="file-upload" className="project-import-input" type="file" onChange={handleFileUploadShape} style={{ display: 'none' }} />
-    
-      <MapContainer center={position} zoom={zoom} style={{ height: '100vh', width: '100%' }}>
+        Importera shapefil
+      </label>
+      <input id="file-upload" className="project-import-input" type="file" onChange={handleFileUploadShape} style={{ display: 'none' }} />
+
+    </div>
+    <MapContainer center={position} zoom={zoom} style={{ height: '100vh', width: '100%' }} className="full-width-map">
         <LayersControl position="topright">
           <BaseLayer checked name="Informationskarta">
             <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
@@ -687,7 +689,7 @@ const saveAttributes = () => {
               circlemarker: false,
             }}
           />
-            {/*geoJsonLayers && geoJsonLayers.map((feature, index) => (
+          {/*geoJsonLayers && geoJsonLayers.map((feature, index) => (
             <GeoJSON key={index} data={feature} />
           ))*/}
           {shapeLayers && shapeLayers.map((feature, index) => (

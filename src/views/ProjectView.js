@@ -299,6 +299,7 @@ const ProjectView = () => {
 
   if (selectedProject) {
     return (
+      <div>
         <div className="project-details-container">
             <h1>Projekt</h1>
             <button className="project-back" onClick={() => setSelectedProject(null)}>Tillbaka till projektlista!</button>
@@ -372,6 +373,7 @@ const ProjectView = () => {
                 </>
         )}
 
+      </div>
         {/* SURVEY */}
         <Survey />
 
