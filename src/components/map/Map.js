@@ -129,6 +129,7 @@ const Map = ({ selectedProjectId, onSave, userID }) => {
 const generatePopupContent = (properties) => {
   // Define a mapping from attribute keys to Swedish names
   const attributeNames = {
+    objectNumber: 'Objektnummer',
     inventoryLevel: 'Inventeringsnivå',
     natureValueClass: 'Naturvärdesklass',
     preliminaryAssessment: 'Preliminär bedömning',
@@ -225,7 +226,9 @@ useEffect(() => {
             color: 'red',
             weight: 10,
             fillOpacity: 0
+            
           });
+          layer.bringToBack();
           // Create an inverted mask
           createInvertedMask(layer);
         }
@@ -233,7 +236,9 @@ useEffect(() => {
 
       featureGroupRef.current.eachLayer(layer => {
         if (layer.feature && layer.feature.properties.shape === "rectangleCrop") {
+          layer.bringToBack();
           setIsRectangleDrawn(true);
+          
         }
       });
 
@@ -379,6 +384,7 @@ const updateGeoJson = () => {
             radius: layer.getRadius(),
             id: uuidv4(),
             attributes: {
+              objectNumber: ' ',
               inventoryLevel: ' ',
               natureValueClass: ' ',
               preliminaryAssesment: ' ',
@@ -430,6 +436,7 @@ const updateGeoJson = () => {
         const UUID = uuidv4();
         layerFeature.properties.id = UUID;
         layerFeature.properties.attributes = {
+          objectNumber: ' ',
           inventoryLevel: ' ',
           natureValueClass: ' ',
           preliminaryAssesment: ' ',
@@ -486,8 +493,7 @@ const onCreate = (e) => {
   // Check if the layer is a rectangle and update the state accordingly
   if (newLayer instanceof L.Rectangle) {
     setIsRectangleDrawn(true);
-  }
-
+  } 
   updateGeoJson();
 };
 
@@ -639,11 +645,11 @@ return (
         <div className="attributes-container">
           <h3>Objektattribut</h3>
           <label>
-            Objekt-ID:
+            Objektnummer:
             <input
               type="text"
-              value={selectedId || ''}
-              readOnly // Object ID is not editable
+              value={attributesObject.objectNumber || ''}
+              onChange={(e) => setAttributesObject({ ...attributesObject, objectNumber: e.target.value })}
             />
           </label>
           <label>
