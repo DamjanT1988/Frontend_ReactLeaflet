@@ -199,10 +199,10 @@ const ProjectView = () => {
       project_identity: formData.get('projectIdentity'),
       executing_organization_name: formData.get('executingOrganizationName'),
       executing_organization_number: formData.get('executingOrganizationNumber'),
-      valid_from: formData.get('validFrom'),
-      valid_to: formData.get('validTo'),
-      period_start: formData.get('versionStart'),
-      period_end: formData.get('versionEnd')
+      period_start: formData.get('periodStart'),
+      period_end: formData.get('periodEnd'),
+      version_start: formData.get('versionStart'),
+      version_end: formData.get('versionEnd')
     };
 
     // Fetch request to the projects API endpoint to create a new project

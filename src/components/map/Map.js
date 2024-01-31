@@ -8,6 +8,7 @@ import 'leaflet-draw';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-draw/dist/leaflet.draw.css';
 import shp from 'shpjs';
+import { v4 as uuidv4 } from 'uuid';
 
 delete L.Icon.Default.prototype._getIconUrl
 L.Icon.Default.mergeOptions({
@@ -98,7 +99,7 @@ const Map = ({ selectedProjectId, onSave, userID, /*geoJsonData*/ }) => {
   const accessToken = localStorage.getItem('accessToken'); // Get the access token from local storage
   const [isRectangleDrawn, setIsRectangleDrawn] = useState(false);
   const [shapeLayers, setShapeLayers] = useState([]);
-//  const [geoJsonLayers, setGeoJsonLayers] = useState([]); // State for GeoJSON layers
+  const [selectedId, setSelectedId] = useState(null);
 
   useEffect(() => {
     if (featureGroupRef.current) {
@@ -106,6 +107,12 @@ const Map = ({ selectedProjectId, onSave, userID, /*geoJsonData*/ }) => {
       if (geoJsonData) {
         L.geoJSON(geoJsonData, {
           onEachFeature: (feature, layer) => {
+            layer.on('click', () => {
+              if (feature.properties && feature.properties.id) {
+                setSelectedId(feature.properties.id);
+              }
+            });
+            
             if (feature.properties && feature.properties.isCircle) {
               // If the feature is a circle, recreate it
               const center = L.latLng(feature.geometry.coordinates[1], feature.geometry.coordinates[0]);
@@ -265,12 +272,14 @@ const Map = ({ selectedProjectId, onSave, userID, /*geoJsonData*/ }) => {
         if (layer.isMask) {
           return;
         }
+        
         if (layer instanceof L.Circle) {
           const circleFeature = {
             type: 'Feature',
             properties: {
               isCircle: true,
-              radius: layer.getRadius()
+              radius: layer.getRadius(),
+              id: uuidv4	()
             },
             geometry: {
               type: 'Point',
@@ -304,6 +313,8 @@ const Map = ({ selectedProjectId, onSave, userID, /*geoJsonData*/ }) => {
         } else {
           // For other shapes, use the default toGeoJSON method
           const layerFeature = layer.toGeoJSON();
+          const UUID = uuidv4	();
+          layerFeature.properties.id = UUID;
           features.push(layerFeature);
           setIsRectangleDrawn(false);
         }
@@ -319,17 +330,35 @@ const Map = ({ selectedProjectId, onSave, userID, /*geoJsonData*/ }) => {
         features: features
       };
 
-      console.log('geojson: ', geoJson);
+
       setGeoJsonData(geoJson);
+
+      /*
+      if (geoJson.features.properties == null || geoJson.features.properties == undefined || geoJson.features.properties.id == null || geoJson.features.properties.id == undefined || geoJson.features.properties.id == '') {
+        const feature = {
+          type: 'Feature',
+          properties: {
+            id: uuidv4	(),
+          }
+        };
+        features.push(feature);
+      }
+      */
+
+      console.log('geojson: ', geoJson);
+
     }
   };
 
   const onCreate = (e) => {
-    if (e.layer instanceof L.Rectangle) {
+    const newLayer = e.layer;
+
+    // Check if the layer is a rectangle and update the state accordingly
+    if (newLayer instanceof L.Rectangle) {
       setIsRectangleDrawn(true);
-      // ... rest of the logic for rectangle creation ...
     }
-    updateGeoJson(); // Update GeoJSON when new shape is created
+  
+    updateGeoJson();
   };
 
   const onEdited = (e) => {
