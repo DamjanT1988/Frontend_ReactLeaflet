@@ -83,6 +83,8 @@ h3 {
     font-style: italic;
 }
 
+
+
 /* Style for project descriptions */
 .project > p {
     margin-bottom: 10px; /* Space after the project description */
@@ -121,11 +123,11 @@ h3 {
     margin-bottom: 10px; /* Space after the button */
 }
 
-.custom-file-upload {
+.custom-file-upload, .show-attribute-btn {
     display: block;
     padding: 6px 12px; /* Similar to button padding */
     cursor: pointer;
-    width: 175px; /* Full width */
+    width: 250px; /* Full width */
     background-color: #30A875; /* Button color */
     color: white; /* Text color */
     border: 1px solid transparent;
