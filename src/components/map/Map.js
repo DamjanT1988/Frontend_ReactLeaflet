@@ -779,8 +779,8 @@ return (
           )}
 
           {/* Additional attributes like Species, Habitat Qualities, Value Elements can be added similarly */}
-          <button className="save-attributes-btn" onClick={saveAttributes}>Save</button>
-          <button className="cancel-btn" onClick={() => setSelectedId(null)}>Cancel</button>
+          <button className="save-attributes-btn" onClick={saveAttributes}>Spara</button>
+          <button className="cancel-btn" onClick={() => setSelectedId(null)}>Avbryt</button>
         </div>
       )}
 

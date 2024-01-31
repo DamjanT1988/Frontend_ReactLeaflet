@@ -124,10 +124,10 @@ h3 {
 }
 
 .custom-file-upload, .show-attribute-btn {
-    display: block;
+    display: flex;
     padding: 6px 12px; /* Similar to button padding */
     cursor: pointer;
-    width: 250px; /* Full width */
+    width: 160px; /* Full width */
     background-color: #30A875; /* Button color */
     color: white; /* Text color */
     border: 1px solid transparent;
@@ -135,7 +135,7 @@ h3 {
     font-size: 16px; /* Text size */
     font-weight: bold; /* Text weight */
     text-align: center;
-    margin: 4px 2px; /* Adjust spacing around the button */
+    margin: auto; /* Adjust spacing around the button */
     transition: all 0.3s; /* Smooth transition for hover effect */
   }
   
@@ -558,9 +558,8 @@ h3 {
 /* Container for the attribute information window */
 .attributes-container {
     position: relative;
-    top: 0%;
-    left: 10%;
     width: auto;
+    margin: auto;
     max-width: 80%;
     background-color: #fff;
     padding: 20px;
