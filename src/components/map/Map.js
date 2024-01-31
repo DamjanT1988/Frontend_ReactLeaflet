@@ -100,6 +100,7 @@ const Map = ({ selectedProjectId, onSave, userID, /*geoJsonData*/ }) => {
   const [isRectangleDrawn, setIsRectangleDrawn] = useState(false);
   const [shapeLayers, setShapeLayers] = useState([]);
   const [selectedId, setSelectedId] = useState(null);
+  const [attributesObject, setAttributesObject] = useState(null);
 
   useEffect(() => {
     if (featureGroupRef.current) {
@@ -108,17 +109,26 @@ const Map = ({ selectedProjectId, onSave, userID, /*geoJsonData*/ }) => {
         L.geoJSON(geoJsonData, {
           onEachFeature: (feature, layer) => {
             layer.on('click', () => {
-              if (feature.properties && feature.properties.id) {
+              if (feature.properties && feature.properties.id || feature.properties.attributes) {
                 setSelectedId(feature.properties.id);
+                setAttributesObject(feature.properties.attributes);
               }
             });
-            
+
             if (feature.properties && feature.properties.isCircle) {
               // If the feature is a circle, recreate it
               const center = L.latLng(feature.geometry.coordinates[1], feature.geometry.coordinates[0]);
               const circle = L.circle(center, { radius: feature.properties.radius });
+              circle.on('click', () => {
+                setSelectedId(feature.properties.id);
+                setAttributesObject(feature.properties.attributes);
+              });
               circle.addTo(featureGroupRef.current);
             } else {
+              layer.on('click', () => {
+                setSelectedId(feature.properties.id);
+                setAttributesObject(feature.properties.attributes);
+              });
               // Add other shapes directly
               layer.addTo(featureGroupRef.current);
             }
@@ -279,7 +289,23 @@ const Map = ({ selectedProjectId, onSave, userID, /*geoJsonData*/ }) => {
             properties: {
               isCircle: true,
               radius: layer.getRadius(),
-              id: uuidv4	()
+              id: uuidv4	(),
+              attributes: {
+                inventoryLevel: ' ',
+                natureValueClass: ' ',
+                preliminaryAssesment: ' ',
+                reason: ' ',
+                natureType: ' ',
+                habitat: ' ',
+                date: ' ',
+                executer: ' ',
+                organsation: ' ',
+                projectName: ' ',
+                area: ' ',
+                species: ' ',
+                habitatQualities: ' ',
+                valueElements: ' ',
+              }
             },
             geometry: {
               type: 'Point',
@@ -315,6 +341,22 @@ const Map = ({ selectedProjectId, onSave, userID, /*geoJsonData*/ }) => {
           const layerFeature = layer.toGeoJSON();
           const UUID = uuidv4	();
           layerFeature.properties.id = UUID;
+          layerFeature.properties.attributes = {
+            inventoryLevel: ' ',
+            natureValueClass: ' ',
+            preliminaryAssesment: ' ',
+            reason: ' ',
+            natureType: ' ',
+            habitat: ' ',
+            date: ' ',
+            executer: ' ',
+            organsation: ' ',
+            projectName: ' ',
+            area: ' ',
+            species: ' ',
+            habitatQualities: ' ',
+            valueElements: ' ',
+          };
           features.push(layerFeature);
           setIsRectangleDrawn(false);
         }
@@ -458,6 +500,12 @@ const handleFileUploadShape = async (e) => {
         L.geoJSON(newGeoJsonData, {
           onEachFeature: (feature, layer) => {
             layer.addTo(featureGroupRef.current);
+            layer.on('click', () => {
+              if (feature.properties && feature.properties.id || feature.properties.attributes) {
+                setSelectedId(feature.properties.id);
+                setAttributesObject(feature.properties.attributes);
+              }
+            });
           }
         });
 
@@ -472,7 +520,22 @@ const handleFileUploadShape = async (e) => {
   }
 };
 
+const saveAttributes = () => {
+  const updatedFeatures = geoJsonData.features.map((feature) => {
+    if (feature.properties.id === selectedId) {
+      return {
+        ...feature,
+        properties: {
+          ...feature.properties,
+          attributes: { ...attributesObject },
+        },
+      };
+    }
+    return feature;
+  });
 
+  setGeoJsonData({ ...geoJsonData, features: updatedFeatures });
+};
 
 
 //      Import (GeoJSON): <input type="file" onChange={handleFileUploadGeoJSON} />
@@ -483,7 +546,112 @@ const handleFileUploadShape = async (e) => {
       <h3>Projektkarta</h3>
       <button className="toggle-form-button" onClick={saveDataToServer}>Spara ritning!</button>
       <span className="save-status">{saveStatus}</span>
-      <br />
+
+{selectedId && attributesObject && (
+  <div className="attributes-container">
+    <h3>Objektattribut</h3>
+    <label>
+      Objekt-ID:
+      <input
+        type="text"
+        value={selectedId || ''}
+        readOnly // Object ID is not editable
+      />
+    </label>
+    <label>
+      Inventeringsnivå:
+      <input
+        type="text"
+        value={attributesObject.inventoryLevel || ''}
+        onChange={(e) => setAttributesObject({ ...attributesObject, inventoryLevel: e.target.value })}
+      />
+    </label>
+    <label>
+      Naturvärdesklass:
+      <input
+        type="text"
+        value={attributesObject.natureValueClass || ''}
+        onChange={(e) => setAttributesObject({ ...attributesObject, natureValueClass: e.target.value })}
+      />
+    </label>
+    <label>
+      Preliminär bedömning:
+      <input
+        type="text"
+        value={attributesObject.preliminaryAssessment || ''}
+        onChange={(e) => setAttributesObject({ ...attributesObject, preliminaryAssessment: e.target.value })}
+      />
+    </label>
+    <label>
+      Motivering:
+      <input
+        type="text"
+        value={attributesObject.reason || ''}
+        onChange={(e) => setAttributesObject({ ...attributesObject, reason: e.target.value })}
+      />
+    </label>
+    <label>
+      Naturtyp:
+      <input
+        type="text"
+        value={attributesObject.natureType || ''}
+        onChange={(e) => setAttributesObject({ ...attributesObject, natureType: e.target.value })}
+      />
+    </label>
+    <label>
+      Biotop:
+      <input
+        type="text"
+        value={attributesObject.habitat || ''}
+        onChange={(e) => setAttributesObject({ ...attributesObject, habitat: e.target.value })}
+      />
+    </label>
+    <label>
+      Datum:
+      <input
+        type="date"
+        value={attributesObject.date || ''}
+        onChange={(e) => setAttributesObject({ ...attributesObject, date: e.target.value })}
+      />
+    </label>
+    <label>
+      Utförare:
+      <input
+        type="text"
+        value={attributesObject.executor || ''}
+        onChange={(e) => setAttributesObject({ ...attributesObject, executor: e.target.value })}
+      />
+    </label>
+    <label>
+      Organisation:
+      <input
+        type="text"
+        value={attributesObject.organization || ''}
+        onChange={(e) => setAttributesObject({ ...attributesObject, organization: e.target.value })}
+      />
+    </label>
+    <label>
+      Projektnamn:
+      <input
+        type="text"
+        value={attributesObject.projectName || ''}
+        onChange={(e) => setAttributesObject({ ...attributesObject, projectName: e.target.value })}
+      />
+    </label>
+    <label>
+      Area:
+      <input
+        type="number"
+        value={attributesObject.area || ''}
+        onChange={(e) => setAttributesObject({ ...attributesObject, area: e.target.value })}
+      />
+    </label>
+    {/* Additional attributes like Species, Habitat Qualities, Value Elements can be added similarly */}
+    <button className="save-attributes-btn" onClick={saveAttributes}>Save</button>
+    <button className="cancel-btn" onClick={() => setSelectedId(null)}>Cancel</button>
+  </div>
+)}
+
 
 
       <label htmlFor="file-upload" className="custom-file-upload">

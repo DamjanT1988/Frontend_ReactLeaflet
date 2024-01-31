@@ -499,11 +499,88 @@ h3 {
     }
 }
 
-/* Custom style for rectangle draw button */
-.leaflet-draw-draw-rectangle {
-    background-image: url('../media/crop.png');
 
-    background-size: 20px 20px; /* Adjust as needed */
-    /* Add any additional styles */
-  }
-  
+/* Container for the attribute information window */
+.attributes-container {
+    position: relative;
+    top: 0%;
+    left: 10%;
+    width: auto;
+    max-width: 80%;
+    background-color: #fff;
+    padding: 20px;
+    padding-top: 0px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    z-index: 1000; /* Ensure it appears above the map */
+}
+
+/* Style for the title of the attribute window */
+.attributes-container h3 {
+    margin-bottom: 15px;
+    color: #30A875;
+    text-align: center;
+}
+
+/* Style for attribute labels */
+.attributes-container label {
+    display: block;
+    margin-top: 10px;
+    color: #666;
+}
+
+/* Style for input fields for editing attributes */
+.attributes-container input[type="text"],
+.attributes-container input[type="date"],
+.attributes-container textarea,
+.attributes-container select {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+/* Style for the 'Save' button */
+.attributes-container .save-attributes-btn {
+    display: inline-block;
+    background-color: #30A875;
+    color: #fff;
+    padding: 10px 20px;
+    margin-top: 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.attributes-container .save-attributes-btn:hover {
+    background-color: #26724d;
+}
+
+/* Style for a 'Cancel' or 'Close' button if needed */
+.attributes-container .cancel-btn {
+    display: inline-block;
+    background-color: #bbb;
+    color: #fff;
+    padding: 10px 20px;
+    margin-top: 20px;
+    margin-left: 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.attributes-container .cancel-btn:hover {
+    background-color: #999;
+}
+
+/* Ensure the container is responsive and looks good on smaller screens */
+@media (max-width: 768px) {
+    .attributes-container {
+        top: 5%;
+        left: 5%;
+        width: 90%;
+    }
+}
