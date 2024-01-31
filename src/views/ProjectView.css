@@ -91,6 +91,7 @@ h3 {
     float: right;
     display: flex;
     padding: 6px;
+    border-radius: 50px;
 }
 
 
@@ -208,6 +209,23 @@ h3 {
     margin-top: 10px; /* Space from the last input field */
 }
 
+.toggle-additional-fields {
+    background-color: #309a75; /* Adjust the background color to fit your design */
+    color: #fff; /* White text color */
+    padding: 8px 15px; /* Padding around the text */
+    margin-top: 10px; /* Margin from the top to separate it from other elements */
+    border: none; /* No border for a cleaner look */
+    border-radius: 4px; /* Rounded corners */
+    cursor: pointer; /* Cursor changes to a pointer to indicate it's clickable */
+    font-size: 14px; /* Font size, adjust as needed */
+    transition: background-color 0.3s; /* Smooth transition for hover effect */
+    float: right; /* Float to the right to align it with other elements */
+  }
+  
+  .toggle-additional-fields:hover {
+    background-color: #26724d; /* Darker shade on hover for interaction feedback */
+  }
+
 /* Responsive adjustments for smaller screens */
 @media (max-width: 768px) {
     .project-container,
@@ -283,18 +301,20 @@ h3 {
 
 /* Container for the entire user species view, similar to project-container */
 .user-species-container {
-    background-color: #d3d3d3; /* Medium grey background */
-    color: #666; /* Dark grey text */
-    width: 768px; /* Consistent width */
-    margin: 50px auto; /* Center the container */
-    padding: 20px; /* Padding for the container */
+    color: black; /* Dark grey text */
+    margin: 25px auto; /* Center the container */
+    padding: 10px; /* Padding for the container */
     box-sizing: border-box;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
 }
 
 /* Style for the main title, similar to project-container > h1 */
-.user-species-container > h1 {
+.user-species-container > h3 {
     color: #30A875; /* Green color for main heading */
     margin-bottom: 20px; /* Space after the main title */
+    text-align: center; /* Center the main title */
+    margin-top: 0px;
 }
 
 /* Style for each species item in the list */
@@ -499,7 +519,7 @@ h3 {
 }
 
 .project-textarea {
-    width: 35%; /* Sets the width to occupy the full width of its container */
+    width: 50%; /* Sets the width to occupy the full width of its container */
     min-height: 50px; /* Sets a minimum height */
     max-height: 200px; /* Sets a maximum height */
     resize: none; /* Disables resizing of the textarea */

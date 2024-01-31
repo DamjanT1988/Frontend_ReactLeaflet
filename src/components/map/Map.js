@@ -101,6 +101,20 @@ const Map = ({ selectedProjectId, onSave, userID, /*geoJsonData*/ }) => {
   const [shapeLayers, setShapeLayers] = useState([]);
   const [selectedId, setSelectedId] = useState(null);
   const [attributesObject, setAttributesObject] = useState(null);
+  const [showAdditionalFields, setShowAdditionalFields] = useState(false);
+
+  const onEachFeature = (feature, layer) => {
+    if (feature.properties) {
+      // Construct the HTML content for the popup
+      const popupContent = Object.keys(feature.properties).reduce((acc, key) => {
+        acc += `<strong>${key}:</strong> ${feature.properties[key]}<br>`;
+        return acc;
+      }, '');
+
+      layer.bindPopup(popupContent);
+    }
+  };
+
 
   useEffect(() => {
     if (featureGroupRef.current) {
@@ -155,6 +169,8 @@ const Map = ({ selectedProjectId, onSave, userID, /*geoJsonData*/ }) => {
       }
     }
   }, [geoJsonData]);
+
+
 
 
   const createInvertedMask = (rectangleLayer) => {
@@ -538,9 +554,8 @@ const Map = ({ selectedProjectId, onSave, userID, /*geoJsonData*/ }) => {
   };
 
 
+
   //      Import (GeoJSON): <input type="file" onChange={handleFileUploadGeoJSON} />
-
-
   return (
     <div>
     <div className='map-container'>
@@ -647,6 +662,44 @@ const Map = ({ selectedProjectId, onSave, userID, /*geoJsonData*/ }) => {
               onChange={(e) => setAttributesObject({ ...attributesObject, area: e.target.value })}
             />
           </label>
+
+           
+    <button 
+      className="toggle-additional-fields" 
+      onClick={() => setShowAdditionalFields(!showAdditionalFields)}
+    >
+      Tillägg
+    </button>
+
+    {showAdditionalFields && (
+      <>
+        <label>
+          Arter:
+          <input
+            type="text"
+            value={attributesObject.species || ''}
+            onChange={(e) => setAttributesObject({ ...attributesObject, species: e.target.value })}
+          />
+        </label>
+        <label>
+          Habitatkvaliteter:
+          <input
+            type="text"
+            value={attributesObject.habitatQualities || ''}
+            onChange={(e) => setAttributesObject({ ...attributesObject, habitatQualities: e.target.value })}
+          />
+        </label>
+        <label>
+          Värdeelement:
+          <input
+            type="text"
+            value={attributesObject.valueElements || ''}
+            onChange={(e) => setAttributesObject({ ...attributesObject, valueElements: e.target.value })}
+          />
+        </label>
+      </>
+    )}
+
           {/* Additional attributes like Species, Habitat Qualities, Value Elements can be added similarly */}
           <button className="save-attributes-btn" onClick={saveAttributes}>Save</button>
           <button className="cancel-btn" onClick={() => setSelectedId(null)}>Cancel</button>
@@ -695,7 +748,9 @@ const Map = ({ selectedProjectId, onSave, userID, /*geoJsonData*/ }) => {
           {shapeLayers && shapeLayers.map((feature, index) => (
             <GeoJSON key={index} data={feature} />
           ))}
-
+          {geoJsonData && (
+            <GeoJSON data={geoJsonData} onEachFeature={onEachFeature} />
+          )}
         </FeatureGroup>
       </MapContainer>
     </div>

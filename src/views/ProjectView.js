@@ -304,7 +304,7 @@ const ProjectView = () => {
             <h1>Projekt</h1>
             <button className="project-back" onClick={() => setSelectedProject(null)}>Tillbaka till projektlista!</button>
             <button className="project-back" onClick={toggleEditMode}>
-                {isEditMode ? "Avbryt" : "Redigera projektinformation!"}
+                {isEditMode ? "Avbryt" : "Redigera information!"}
             </button>
             {isEditMode && <button className="project-back" onClick={updateProjectInfo}>Spara ändringar</button>}
 
@@ -359,9 +359,9 @@ const ProjectView = () => {
                     <p><strong>Projektnamn:</strong> {selectedProject.project_name}</p>
                     <p><strong>Projektidentitet:</strong> {selectedProject.project_identity}</p>
                     <p><strong>Objektversion:</strong> {selectedProject.object_version}</p>
-                    <textarea readOnly className="project-textarea" value={selectedProject.description} />
+                    <p><strong>Projektbeskrivning:</strong></p><textarea readOnly className="project-textarea" value={selectedProject.description} />
                     <p><strong>Anledning:</strong> {selectedProject.reason}</p>
-                    <textarea readOnly className="project-textarea" value={selectedProject.mapping_area_description} />
+                    <p><strong>Kartläggningsområdesbeskrivning:</strong></p><textarea readOnly className="project-textarea" value={selectedProject.mapping_area_description} />
                     <p><strong>Beställande organisation namn:</strong> {selectedProject.ordering_organization_name}</p>
                     <p><strong>Beställande organisation nummer:</strong> {selectedProject.ordering_organization_number}</p>
                     <p><strong>Utförande organisation namn:</strong> {selectedProject.executing_organization_name}</p>

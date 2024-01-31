@@ -230,12 +230,10 @@ const UserAddSpecies = (props) => {
     };
 
 
-
     return (
         <div className="user-species-container">
-            
-            <h1>Lägg till din egen art</h1>
-            
+            <h3>Lägg till egen art</h3>
+
             <form onSubmit={handleSubmit}>
                 <input
                     type="text"
