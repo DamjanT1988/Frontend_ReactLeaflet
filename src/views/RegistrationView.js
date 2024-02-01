@@ -113,7 +113,7 @@ const RegistrationView = () => {
 
         {/* Organization Number */}
         <label htmlFor="organization_number">Organisationsnummer:</label>
-        <p>Endast siffror.</p>
+        <p>Endast siffror. Ingen bindestreck.</p>
         <input type="text" id="organization_number" name="user_additional.organization_number" onChange={handleInputChange} />
 
         {/* Password */}
