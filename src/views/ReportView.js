@@ -125,7 +125,7 @@ const Map = ({ selectedProjectId, onSave, userID }) => {
   }, []);
 
 
-  
+
   useEffect(() => {
     if (featureGroupRef.current) {
       featureGroupRef.current.clearLayers(); // Clear existing layers first
@@ -133,7 +133,7 @@ const Map = ({ selectedProjectId, onSave, userID }) => {
         L.geoJSON(geoJsonData, {
           onEachFeature: (feature, layer) => {
 
-            
+
             // Generate popup content based on feature properties
             const popupContent = generatePopupContent(feature.properties);
 
@@ -149,10 +149,14 @@ const Map = ({ selectedProjectId, onSave, userID }) => {
             });
             */
 
+            if (feature.properties.attributes) {
+              layer.options.attributes = feature.properties.attributes;
+            }
+
             if (feature.properties && feature.properties.isCircle) {
               // If the feature is a circle, recreate it
               const center = L.latLng(feature.geometry.coordinates[1], feature.geometry.coordinates[0]);
-              const circle = L.circle(center, { radius: feature.properties.radius, id: feature.properties.id});
+              const circle = L.circle(center, { radius: feature.properties.radius, id: feature.properties.id });
 
               circle.on('click', () => {
                 circle.bindPopup(popupContent); // Bind popup to circle
@@ -206,54 +210,54 @@ const Map = ({ selectedProjectId, onSave, userID }) => {
   }, [geoJsonData]);
 
 
-// Function to generate popup content from feature properties
-const generatePopupContent = (properties) => {
-  // Check if the feature is a rectangle and return null or empty content
-  if (properties.shape === "rectangleCrop") {
-    return 'Tillfällig markering'; // Return an empty string to avoid popup content for rectangles
-  }
+  // Function to generate popup content from feature properties
+  const generatePopupContent = (properties) => {
+    // Check if the feature is a rectangle and return null or empty content
+    if (properties.shape === "rectangleCrop") {
+      return 'Tillfällig markering'; // Return an empty string to avoid popup content for rectangles
+    }
 
-  // Define a mapping from attribute keys to Swedish names
-  const attributeNames = {
-    objectNumber: 'Objektnummer',
-    inventoryLevel: 'Inventeringsnivå',
-    natureValueClass: 'Naturvärdesklass',
-    preliminaryAssessment: 'Preliminär bedömning',
-    reason: 'Motivering',
-    natureType: 'Naturtyp',
-    habitat: 'Biotop',
-    date: 'Datum',
-    executor: 'Utförare',
-    organization: 'Organisation',
-    projectName: 'Projektnamn',
-    area: 'Area',
-    species: 'Arter',
-    habitatQualities: 'Habitatkvaliteter',
-    valueElements: 'Värdeelement',
-    // Add more mappings as needed
+    // Define a mapping from attribute keys to Swedish names
+    const attributeNames = {
+      objectNumber: 'Objektnummer',
+      inventoryLevel: 'Inventeringsnivå',
+      natureValueClass: 'Naturvärdesklass',
+      preliminaryAssessment: 'Preliminär bedömning',
+      reason: 'Motivering',
+      natureType: 'Naturtyp',
+      habitat: 'Biotop',
+      date: 'Datum',
+      executor: 'Utförare',
+      organization: 'Organisation',
+      projectName: 'Projektnamn',
+      area: 'Area',
+      species: 'Arter',
+      habitatQualities: 'Habitatkvaliteter',
+      valueElements: 'Värdeelement',
+      // Add more mappings as needed
+    };
+
+    // Start the popup content with a div wrapper
+    let content = '<div class="popup-content">';
+
+    // Loop through each attribute in the properties.attributes object
+    if (properties.attributes) {
+      Object.entries(properties.attributes).forEach(([key, value]) => {
+        // Check if the key has a Swedish name mapping and is not 'Objekt-ID'
+        if (attributeNames[key] && key !== 'id') {
+          content += `<p><strong>${attributeNames[key]}:</strong> ${value}</p>`;
+        }
+      });
+    }
+
+    // Generate content based on properties...
+    const id = properties.id; // Assume each feature has a unique ID
+    const attributesJson = JSON.stringify(properties.attributes); // Convert attributes to a JSON string for passing in the onclick handler
+
+    content += `<button className='primary-btn' onclick='window.toggleAttributeContainer("${id}", ${attributesJson})'>Redigera objektattribut</button>`;
+    content += '</div>';
+    return content;
   };
-
-  // Start the popup content with a div wrapper
-  let content = '<div class="popup-content">';
-
-  // Loop through each attribute in the properties.attributes object
-  if (properties.attributes) {
-    Object.entries(properties.attributes).forEach(([key, value]) => {
-      // Check if the key has a Swedish name mapping and is not 'Objekt-ID'
-      if (attributeNames[key] && key !== 'id') {
-        content += `<p><strong>${attributeNames[key]}:</strong> ${value}</p>`;
-      }
-    });
-  }
-
-  // Generate content based on properties...
-  const id = properties.id; // Assume each feature has a unique ID
-  const attributesJson = JSON.stringify(properties.attributes); // Convert attributes to a JSON string for passing in the onclick handler
-
-  content += `<button className='primary-btn' onclick='window.toggleAttributeContainer("${id}", ${attributesJson})'>Redigera objektattribut</button>`;
-  content += '</div>';
-  return content;
-};
 
 
   const createInvertedMask = (rectangleLayer) => {
@@ -382,42 +386,46 @@ const generatePopupContent = (properties) => {
           return;
         }
 
-        console.log('layer: ', layer);
-        console.log('id: ', layer.options.id);
 
         if (layer instanceof L.Circle) {
           if (layer.options.id === undefined) {
-          const circleFeature = {
-            type: 'Feature',
-            geometry: {
-              type: 'Point',
-              coordinates: [layer.getLatLng().lng, layer.getLatLng().lat]
-            },
-            properties: {
-              isCircle: true,
-              radius: layer.getRadius(),
-              id: uuidv4(),
-              attributes: {
-                objectNumber: ' ',
-                inventoryLevel: ' ',
-                natureValueClass: ' ',
-                preliminaryAssesment: ' ',
-                reason: ' ',
-                natureType: ' ',
-                habitat: ' ',
-                date: ' ',
-                executer: ' ',
-                organsation: ' ',
-                projectName: ' ',
-                area: ' ',
-                species: ' ',
-                habitatQualities: ' ',
-                valueElements: ' ',
+            console.log('feature: ', layer.options);
+            const circleFeature = {
+              type: 'Feature',
+              geometry: {
+                type: 'Point',
+                coordinates: [layer.getLatLng().lng, layer.getLatLng().lat]
+              },
+              properties: {
+                isCircle: true,
+                radius: layer.getRadius(),
+                id: layer.options.customId,
+                attributes: {
+                  objectNumber: ' ',
+                  inventoryLevel: ' ',
+                  natureValueClass: ' ',
+                  preliminaryAssesment: ' ',
+                  reason: ' ',
+                  natureType: ' ',
+                  habitat: ' ',
+                  date: ' ',
+                  executer: ' ',
+                  organsation: ' ',
+                  projectName: ' ',
+                  area: ' ',
+                  species: ' ',
+                  habitatQualities: ' ',
+                  valueElements: ' ',
+                }
               }
-            }
-          };
-          features.push(circleFeature);
-          } else {
+            };
+            features.push(circleFeature);
+
+          } else if (layer.options.id !== undefined) {
+            console.log('layer: ', layer);
+            console.log('id: ', layer.options.id);
+            console.log('feature: ', layer.options);
+
             const circleFeature = {
               type: 'Feature',
               geometry: {
@@ -534,6 +542,30 @@ const generatePopupContent = (properties) => {
   const onCreate = (e) => {
     const newLayer = e.layer;
 
+    // Assign custom properties to the layer's options
+    newLayer.options.customId = uuidv4();
+    newLayer.options.attributes = {
+      objectNumber: ' ',
+      inventoryLevel: ' ',
+      natureValueClass: ' ',
+      preliminaryAssesment: ' ',
+      reason: ' ',
+      natureType: ' ',
+      habitat: ' ',
+      date: ' ',
+      executer: ' ',
+      organsation: ' ',
+      projectName: ' ',
+      area: ' ',
+      species: ' ',
+      habitatQualities: ' ',
+      valueElements: ' ',
+    }
+
+    if (newLayer instanceof L.Circle) {
+      // Additional properties for a circle
+      newLayer.options.radius = newLayer.getRadius();
+    }
     // Check if the layer is a rectangle and update the state accordingly
     if (newLayer instanceof L.Rectangle) {
       setIsRectangleDrawn(true);

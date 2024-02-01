@@ -149,10 +149,14 @@ const Map = ({ selectedProjectId, onSave, userID }) => {
             });
             */
 
+            if (feature.properties.attributes) {
+              layer.options.attributes = feature.properties.attributes;
+            }
+
             if (feature.properties && feature.properties.isCircle) {
               // If the feature is a circle, recreate it
               const center = L.latLng(feature.geometry.coordinates[1], feature.geometry.coordinates[0]);
-              const circle = L.circle(center, { radius: feature.properties.radius });
+              const circle = L.circle(center, { radius: feature.properties.radius, id: feature.properties.id });
 
               circle.on('click', () => {
                 circle.bindPopup(popupContent); // Bind popup to circle
@@ -382,8 +386,10 @@ const Map = ({ selectedProjectId, onSave, userID }) => {
           return;
         }
 
+
         if (layer instanceof L.Circle) {
           if (layer.options.id === undefined) {
+            console.log('feature: ', layer.options);
             const circleFeature = {
               type: 'Feature',
               geometry: {
@@ -393,7 +399,7 @@ const Map = ({ selectedProjectId, onSave, userID }) => {
               properties: {
                 isCircle: true,
                 radius: layer.getRadius(),
-                id: uuidv4(),
+                id: layer.options.customId,
                 attributes: {
                   objectNumber: ' ',
                   inventoryLevel: ' ',
@@ -414,7 +420,12 @@ const Map = ({ selectedProjectId, onSave, userID }) => {
               }
             };
             features.push(circleFeature);
-          } else {
+
+          } else if (layer.options.id !== undefined) {
+            console.log('layer: ', layer);
+            console.log('id: ', layer.options.id);
+            console.log('feature: ', layer.options);
+
             const circleFeature = {
               type: 'Feature',
               geometry: {
@@ -531,6 +542,30 @@ const Map = ({ selectedProjectId, onSave, userID }) => {
   const onCreate = (e) => {
     const newLayer = e.layer;
 
+    // Assign custom properties to the layer's options
+    newLayer.options.customId = uuidv4();
+    newLayer.options.attributes = {
+      objectNumber: ' ',
+      inventoryLevel: ' ',
+      natureValueClass: ' ',
+      preliminaryAssesment: ' ',
+      reason: ' ',
+      natureType: ' ',
+      habitat: ' ',
+      date: ' ',
+      executer: ' ',
+      organsation: ' ',
+      projectName: ' ',
+      area: ' ',
+      species: ' ',
+      habitatQualities: ' ',
+      valueElements: ' ',
+    }
+
+    if (newLayer instanceof L.Circle) {
+      // Additional properties for a circle
+      newLayer.options.radius = newLayer.getRadius();
+    }
     // Check if the layer is a rectangle and update the state accordingly
     if (newLayer instanceof L.Rectangle) {
       setIsRectangleDrawn(true);
