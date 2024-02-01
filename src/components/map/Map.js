@@ -625,6 +625,7 @@ const saveAttributes = () => {
         },
       };
     }
+    setSelectedId(null)
     return feature;
   });
 
@@ -640,7 +641,7 @@ return (
       <h3>Projektkarta</h3>
       <button className="toggle-form-button" onClick={saveDataToServer}>Spara ritning!</button>
       <span className="save-status">{saveStatus}</span>
-
+<p>Tryck på kartobjekt för att se attribut.</p>
       {selectedId && attributesObject && showAttributeTable && (
         <div className="attributes-container">
           <h3>Objektattribut</h3>
