@@ -641,7 +641,7 @@ h3 {
 
 /* Media query for screens wider than 1250 pixels */
 @media (min-width: 1250px) {
-    .project-container, .project-details-container, .survey-container, .user-species-container {
+    .project-details-container, .survey-container, .user-species-container {
         float: left; /* Aligns the project container to the left */
         width: calc(50% - 100px); /* Adjusts the width to take half of the screen width minus some margin */
         margin: 50px 25px 50px 50px; /* Adjusts the margin to space out the containers */
