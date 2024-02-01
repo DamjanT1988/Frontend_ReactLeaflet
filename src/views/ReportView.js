@@ -97,7 +97,7 @@ window.toggleAttributeContainer = (id, attributes) => {
 
 
 // Define the Map component
-const ReportView = ({ selectedProjectId, onSave, userID }) => {
+const Map = ({ selectedProjectId, onSave, userID }) => {
   const featureGroupRef = useRef(null);
   const position = [51.505, -0.09];
   const zoom = 12;
@@ -152,7 +152,7 @@ const ReportView = ({ selectedProjectId, onSave, userID }) => {
             if (feature.properties && feature.properties.isCircle) {
               // If the feature is a circle, recreate it
               const center = L.latLng(feature.geometry.coordinates[1], feature.geometry.coordinates[0]);
-              const circle = L.circle(center, { radius: feature.properties.radius });
+              const circle = L.circle(center, { radius: feature.properties.radius, id: feature.properties.id});
 
               circle.on('click', () => {
                 circle.bindPopup(popupContent); // Bind popup to circle
@@ -177,7 +177,7 @@ const ReportView = ({ selectedProjectId, onSave, userID }) => {
           }
         });
 
-        
+
         featureGroupRef.current.eachLayer(layer => {
           if (layer.feature && layer.feature.properties.shape === "rectangleCrop") {
             layer.setStyle({
@@ -210,7 +210,7 @@ const ReportView = ({ selectedProjectId, onSave, userID }) => {
 const generatePopupContent = (properties) => {
   // Check if the feature is a rectangle and return null or empty content
   if (properties.shape === "rectangleCrop") {
-    return 'Markering på karta'; // Return an empty string to avoid popup content for rectangles
+    return 'Tillfällig markering'; // Return an empty string to avoid popup content for rectangles
   }
 
   // Define a mapping from attribute keys to Swedish names
@@ -382,9 +382,17 @@ const generatePopupContent = (properties) => {
           return;
         }
 
+        console.log('layer: ', layer);
+        console.log('id: ', layer.options.id);
+
         if (layer instanceof L.Circle) {
+          if (layer.options.id === undefined) {
           const circleFeature = {
             type: 'Feature',
+            geometry: {
+              type: 'Point',
+              coordinates: [layer.getLatLng().lng, layer.getLatLng().lat]
+            },
             properties: {
               isCircle: true,
               radius: layer.getRadius(),
@@ -406,13 +414,41 @@ const generatePopupContent = (properties) => {
                 habitatQualities: ' ',
                 valueElements: ' ',
               }
-            },
-            geometry: {
-              type: 'Point',
-              coordinates: [layer.getLatLng().lng, layer.getLatLng().lat]
             }
           };
           features.push(circleFeature);
+          } else {
+            const circleFeature = {
+              type: 'Feature',
+              geometry: {
+                type: 'Point',
+                coordinates: [layer.getLatLng().lng, layer.getLatLng().lat]
+              },
+              properties: {
+                isCircle: true,
+                radius: layer.getRadius(),
+                id: layer.options.id,
+                attributes: {
+                  objectNumber: ' ',
+                  inventoryLevel: ' ',
+                  natureValueClass: ' ',
+                  preliminaryAssesment: ' ',
+                  reason: ' ',
+                  natureType: ' ',
+                  habitat: ' ',
+                  date: ' ',
+                  executer: ' ',
+                  organsation: ' ',
+                  projectName: ' ',
+                  area: ' ',
+                  species: ' ',
+                  habitatQualities: ' ',
+                  valueElements: ' ',
+                }
+              }
+            };
+            features.push(circleFeature);
+          }
         } else if (layer instanceof L.Rectangle) {
 
           // Handle rectangle layer
@@ -427,12 +463,13 @@ const generatePopupContent = (properties) => {
 
           const rectangleFeature = {
             type: "Feature",
-            properties: {
-              shape: "rectangleCrop"
-            },
             geometry: {
               type: "Polygon",
               coordinates: [rectangleCoordinates]
+            },
+            properties: {
+              shape: "rectangleCrop",
+              id: uuidv4(),
             }
           };
           features.push(rectangleFeature);
@@ -458,6 +495,7 @@ const generatePopupContent = (properties) => {
             habitatQualities: ' ',
             valueElements: ' ',
           };
+
           features.push(layerFeature);
           setIsRectangleDrawn(false);
         }
@@ -608,7 +646,7 @@ const generatePopupContent = (properties) => {
               });
             }
           });
-
+          updateGeoJson();
           console.log('Parsed Features:', featuresArray);
           console.log('New GeoJSON Data:', newGeoJsonData);
 
@@ -836,34 +874,4 @@ const generatePopupContent = (properties) => {
   );
 };
 // Export the Map component
-export default ReportView;
-
-/*
-import React, { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom'; // Import the useNavigate hook from react-router-dom for navigation
-import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
-import 'leaflet-draw/dist/leaflet.draw.css';
-
-const ReportView = () => {
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    // Check if the access token exists in localStorage
-    const accessToken = localStorage.getItem('accessToken');
-
-    // If the access token doesn't exist, redirect to LoginView
-    if (!accessToken) {
-      navigate('/login');
-    }
-  }, []); // Empty dependency array ensures effect runs once after initial render
-
-  return (
-      <div>
-      </div>
-  );
-};
-
-
-export default ReportView;
-*/
+export default Map;
