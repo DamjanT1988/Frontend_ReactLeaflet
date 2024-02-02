@@ -131,7 +131,7 @@ const Map = ({ selectedProjectId, onSave, userID }) => {
       const onRectangleCreated = (e) => {
         const { layer } = e;
         const rectangleBounds = layer.getBounds();
-        const rectangle = {
+        const newRectangle = {
           type: 'Feature',
           properties: {
             shape: "rectangleCrop",
@@ -148,16 +148,20 @@ const Map = ({ selectedProjectId, onSave, userID }) => {
           }
         };
   
+
+        console.log('custom rectangle: ', newRectangle);
         // Update GeoJSON data with the new rectangle
         setGeoJsonData(prevData => ({
           ...prevData,
-          features: [...prevData.features, rectangle]
+          features: [...prevData.features, newRectangle]
         }));
-  
+
         layer.addTo(map); // Add the drawn rectangle to the map
-        drawControl.disable(); // Disable the draw control after drawing
+        removeDuplicateRectangles(); // Call function to remove duplicates
+        drawControl.disable(); // Disable the draw control after drawing  
         setShowRectangleButton(false);
-  
+
+
         // Remove the event listener to prevent duplicate rectangles
         map.off(L.Draw.Event.CREATED, onRectangleCreated);
       };
@@ -174,6 +178,30 @@ const Map = ({ selectedProjectId, onSave, userID }) => {
     ) : null;
   };
   
+  
+// Function to Remove Duplicate Rectangles
+const removeDuplicateRectangles = () => {
+  const allRectangles = [];
+  const duplicateRectangles = [];
+
+  featureGroupRef.current.eachLayer(layer => {
+    if (layer instanceof L.Rectangle) {
+      const layerBounds = layer.getBounds().toBBoxString();
+      if (allRectangles.includes(layerBounds)) {
+        // This is a duplicate rectangle
+        if (!layer.options.shape) {
+          // If it doesn't have the custom property, mark it for removal
+          duplicateRectangles.push(layer);
+        }
+      } else {
+        allRectangles.push(layerBounds);
+      }
+    }
+  });
+
+  // Remove the marked duplicate rectangles
+  duplicateRectangles.forEach(dupLayer => featureGroupRef.current.removeLayer(dupLayer));
+};
 
 
 useEffect(() => {
@@ -255,6 +283,34 @@ useEffect(() => {
       });
 
 
+/*
+        // Function to compare and remove non-"rectangleCrop" rectangles with duplicate coordinates
+        const removeDuplicateRectangles = () => {
+          const layers = featureGroupRef.current.getLayers(); // Get all layers in the FeatureGroup
+          const rectangles = layers.filter(layer => layer instanceof L.Rectangle); // Filter only rectangle layers
+  
+          rectangles.forEach((rect, index) => {
+            const currentBounds = rect.getBounds();
+            rectangles.forEach((otherRect, otherIndex) => {
+              if (index !== otherIndex) { // Avoid comparing the rectangle with itself
+                const otherBounds = otherRect.getBounds();
+                // Compare the bounds of the two rectangles to see if they are the same
+                if (currentBounds.equals(otherBounds)) {
+                  // Check if one of the rectangles does not have the "rectangleCrop" shape property
+                  if (rect.feature.properties.shape !== "rectangleCrop") {
+                    featureGroupRef.current.removeLayer(rect); // Remove the non-"rectangleCrop" rectangle
+                  } else if (otherRect.feature.properties.shape !== "rectangleCrop") {
+                    featureGroupRef.current.removeLayer(otherRect); // Remove the non-"rectangleCrop" rectangle
+                  }
+                }
+              }
+            });
+          });
+        };
+  
+        removeDuplicateRectangles(); // Call the function to remove duplicate rectangles
+*/
+        
 
       featureGroupRef.current.eachLayer(layer => {
         if (layer.feature && layer.feature.properties.shape === "rectangleCrop") {
