@@ -592,71 +592,147 @@ const Map = ({ selectedProjectId, onSave, userID }) => {
 
           }
         } 
+ 
         
+        else if (layer instanceof L.Polygon && !(layer instanceof L.Rectangle)) {
+          // Get the first array of LatLngs for the first polygon (ignores holes)
+        const latlngs = layer.getLatLngs()[0];
+        const coordinates = latlngs.map((latlng) => [latlng.lng, latlng.lat]);
         
-        
-        /*
-        else if (layer instanceof L.Polygon) {
+        // Ensure the polygon is closed by adding the first point at the end
+        if (coordinates[0] !== coordinates[coordinates.length - 1]) {
+          coordinates.push(coordinates[0]);
+        }
+
           if (layer.feature && layer.feature.properties.id !== undefined) {
             return;
-          } else {
-            const layerFeature = layer.toGeoJSON();
-            const UUID = uuidv4();
-            layerFeature.properties.isPolygon = true;
-            layerFeature.properties.id = UUID;
-            layerFeature.properties.attributes = {
-              objectNumber: ' ',
-              inventoryLevel: ' ',
-              natureValueClass: ' ',
-              preliminaryAssesment: ' ',
-              reason: ' ',
-              natureType: ' ',
-              habitat: ' ',
-              date: ' ',
-              executer: ' ',
-              organsation: ' ',
-              projectName: ' ',
-              area: ' ',
-              species: ' ',
-              habitatQualities: ' ',
-              valueElements: ' ',
-            };
-            features.push(layerFeature);
-          }
+          } else if ((!(layer.options && layer.options.attributes))) {
+            const polygonFeature = {
+              type: 'Feature',
+              geometry: {
+                type: 'Polygon',
+                coordinates: [coordinates]
+              },
+              properties: {
+                isPolygon: true,
+                id: layer.options.id,
+                attributes: layer.options.attributes ? { ...layer.options.attributes } : {
+                  objectNumber: ' ',
+                  inventoryLevel: ' ',
+                  natureValueClass: ' ',
+                  preliminaryAssesment: ' ',
+                  reason: ' ',
+                  natureType: ' ',
+                  habitat: ' ',
+                  date: ' ',
+                  executer: ' ',
+                  organsation: ' ',
+                  projectName: ' ',
+                  area: ' ',
+                  species: ' ',
+                  habitatQualities: ' ',
+                  valueElements: ' '
+                }
+               },
+
+                       }
+            features.push(polygonFeature);
+            console.log('layer 1 polygon: ', layer);
+            console.log('polygonFeature 1: ', polygonFeature);
+          } 
         } 
-        
+
         
         
         else if (layer instanceof L.Polyline) {
+          const position = layer.getLatLngs();
+          const coordinates = position.map(latlng => [latlng.lng, latlng.lat]);
+    
           if (layer.feature && layer.feature.properties.id !== undefined) {
+            console.log('return polyline: ', layer);
             return;
           } else {
-            const layerFeature = layer.toGeoJSON();
-            const UUID = uuidv4();
-            layerFeature.properties.isPolyLine = true;
-            layerFeature.properties.id = UUID;
-            layerFeature.properties.attributes = {
-              objectNumber: ' ',
-              inventoryLevel: ' ',
-              natureValueClass: ' ',
-              preliminaryAssesment: ' ',
-              reason: ' ',
-              natureType: ' ',
-              habitat: ' ',
-              date: ' ',
-              executer: ' ',
-              organsation: ' ',
-              projectName: ' ',
-              area: ' ',
-              species: ' ',
-              habitatQualities: ' ',
-              valueElements: ' ',
-            };
-            features.push(layerFeature);
+            const polylineFeature = {
+              type: 'Feature',
+              geometry: {
+                type: 'LineString',
+                coordinates: [coordinates]
+              },
+              properties: {
+                isPolyline: true,
+                id: layer.options.id,
+                attributes: layer.options.attributes ? { ...layer.options.attributes } : {
+                  objectNumber: ' ',
+                  inventoryLevel: ' ',
+                  natureValueClass: ' ',
+                  preliminaryAssesment: ' ',
+                  reason: ' ',
+                  natureType: ' ',
+                  habitat: ' ',
+                  date: ' ',
+                  executer: ' ',
+                  organsation: ' ',
+                  projectName: ' ',
+                  area: ' ',
+                  species: ' ',
+                  habitatQualities: ' ',
+                  valueElements: ' '
+                }
+               },
+
+                       }
+            features.push(polylineFeature);
+            console.log('layer 1 polyline: ', layer);
+            console.log('polylineFeature 1: ', polylineFeature);
+
           }
         } 
-        */
-        
+
+
+        else if (layer instanceof L.Marker) {
+          const position = layer.getLatLngs();
+    
+          if (layer.feature && layer.feature.properties.id !== undefined) {
+            console.log('return polyline: ', layer);
+            return;
+          } else {
+            const markerFeature = {
+              type: 'Feature',
+              geometry: {
+                type: 'Point',
+                coordinates: [position.lng, position.lat]
+              },
+              properties: {
+                isMarker: true,
+                id: layer.options.id,
+                attributes: layer.options.attributes ? { ...layer.options.attributes } : {
+                  objectNumber: ' ',
+                  inventoryLevel: ' ',
+                  natureValueClass: ' ',
+                  preliminaryAssesment: ' ',
+                  reason: ' ',
+                  natureType: ' ',
+                  habitat: ' ',
+                  date: ' ',
+                  executer: ' ',
+                  organsation: ' ',
+                  projectName: ' ',
+                  area: ' ',
+                  species: ' ',
+                  habitatQualities: ' ',
+                  valueElements: ' '
+                }
+               },
+
+                       }
+            features.push(markerFeature);
+            console.log('layer 1 marker: ', layer);
+            console.log('markerFeature 1: ', markerFeature);
+
+          }
+        }
+
+
         else {
           // For other shapes, use the default toGeoJSON method
           const layerFeature = layer.toGeoJSON();
@@ -714,6 +790,8 @@ const Map = ({ selectedProjectId, onSave, userID }) => {
 
     }
   };
+
+
   const onCreate = (e) => {
     const newLayer = e.layer;
     newLayer.options.id = uuidv4(); // Ensure each layer has a unique ID
@@ -742,6 +820,32 @@ const Map = ({ selectedProjectId, onSave, userID }) => {
       newLayer.options.radius = newLayer.getRadius();
     } 
     
+
+    if (newLayer instanceof L.Polygon && !(newLayer instanceof L.Rectangle)) {
+      // Get the first array of LatLngs for the first polygon (ignores holes)
+      const latlngs = newLayer.getLatLngs()[0];
+      const coordinates = latlngs.map((latlng) => [latlng.lng, latlng.lat]);
+      
+      // Ensure the polygon is closed by adding the first point at the end
+      if (coordinates[0] !== coordinates[coordinates.length - 1]) {
+        coordinates.push(coordinates[0]);
+      }
+  
+      feature = {
+        type: 'Feature',
+        properties: {
+          isPolygon: true,
+          id: newLayer.options.id,
+          attributes: newLayer.options.attributes
+        },
+        geometry: {
+          type: 'Polygon',
+          coordinates: [coordinates]
+        }
+      };
+    }
+
+
     if (newLayer instanceof L.Rectangle) {
       const bounds = newLayer.getBounds();
       feature = {
@@ -763,7 +867,64 @@ const Map = ({ selectedProjectId, onSave, userID }) => {
         }
       };
     }
-    // Handle other shapes here...
+
+    /*
+    if (newLayer instanceof L.Polyline) {
+      const bounds = newLayer.getBounds();
+      feature = {
+        type: 'Feature',
+        properties: {
+          isRectangle: true,
+          id: newLayer.options.id,
+          attributes: newLayer.options.attributes
+        },
+        geometry: {
+          type: 'Polygon',
+          coordinates: [[
+            [bounds.getSouthWest().lng, bounds.getSouthWest().lat],
+            [bounds.getNorthWest().lng, bounds.getNorthWest().lat],
+            [bounds.getNorthEast().lng, bounds.getNorthEast().lat],
+            [bounds.getSouthEast().lng, bounds.getSouthEast().lat],
+            [bounds.getSouthWest().lng, bounds.getSouthWest().lat] // Close the loop
+          ]]
+        }
+      };
+    }
+*/
+
+
+    if (newLayer instanceof L.Polyline && !(newLayer instanceof L.Polygon)) {
+      const latlngs = newLayer.getLatLngs();
+      const coordinates = latlngs.map(latlng => [latlng.lng, latlng.lat]);
+      feature = {
+        type: 'Feature',
+        properties: {
+          isPolyline: true,
+          id: newLayer.options.id,
+          attributes: newLayer.options.attributes
+        },
+        geometry: {
+          type: 'LineString',
+          coordinates: coordinates
+        }
+      };
+    }
+
+    if (newLayer instanceof L.Marker) {
+      const position = newLayer.getLatLng();
+      feature = {
+        type: 'Feature',
+        properties: {
+          isMarker: true,
+          id: newLayer.options.id,
+          attributes: newLayer.options.attributes
+        },
+        geometry: {
+          type: 'Point',
+          coordinates: [position.lng, position.lat]
+        }
+      };
+    }
   
     if (feature) {
       setGeoJsonData((prevData) => ({
