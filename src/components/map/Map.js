@@ -717,7 +717,6 @@ const Map = ({ selectedProjectId, onSave, userID }) => {
         <h3>Projektkarta</h3>
         <button className="toggle-form-button" onClick={saveDataToServer}>Spara ritning!</button>
         <span className="save-status">{saveStatus}</span>
-        <p>Tryck på kartobjekt för att se attribut.</p>
         {selectedId && attributesObject && showAttributeTable && (
           <div className="attributes-container">
             <h3>Objektattribut</h3>
@@ -868,7 +867,7 @@ const Map = ({ selectedProjectId, onSave, userID }) => {
         </label>
         <input id="file-upload" className="project-import-input" type="file" onChange={handleFileUploadShape} style={{ display: 'none' }} />
 
-      </div>
+
       <MapContainer center={position} zoom={zoom} style={{ height: '100vh', width: '100%' }} className="full-width-map">
         <LayersControl position="topright">
           <BaseLayer checked name="Informationskarta">
@@ -902,6 +901,7 @@ const Map = ({ selectedProjectId, onSave, userID }) => {
           ))}
         </FeatureGroup>
       </MapContainer>
+    </div>
     </div>
   );
 };

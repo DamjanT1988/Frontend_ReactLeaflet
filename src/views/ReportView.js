@@ -1,6 +1,6 @@
 // Import necessary modules and components
 import React, { useState, useRef, useEffect } from 'react';
-import { MapContainer, TileLayer, LayersControl, FeatureGroup, GeoJSON, useMapEvents } from 'react-leaflet';
+import { MapContainer, TileLayer, LayersControl, FeatureGroup, GeoJSON, useMapEvents, useMap } from 'react-leaflet';
 import { EditControl, drawControl } from "react-leaflet-draw";
 import { API_URLS } from '../constants/APIURLS'; // Import the API_URLS constant
 import L from 'leaflet';
@@ -94,6 +94,40 @@ L.drawLocal.edit.handlers.remove.tooltip = {
 window.toggleAttributeContainer = (id, attributes) => {
   // Function implementation will be set in the component
 };
+
+// Custom component to handle rectangle drawing
+const RectangleDrawButton = ({ isRectangleDrawn, setIsRectangleDrawn }) => {
+  const map = useMap(); // Access the Leaflet map instance
+
+  const startRectangleDraw = () => {
+    const drawControl = new L.Draw.Rectangle(map, {
+      shapeOptions: {
+        clickable: true,
+        color: '#f00', // Example color, change as needed
+      },
+    });
+    drawControl.enable(); // Enable the draw control for rectangles
+
+    // Event listener for when a rectangle is created
+    map.on(L.Draw.Event.CREATED, (e) => {
+      const { layer } = e;
+      layer.addTo(map); // Add the drawn rectangle to the map
+      setIsRectangleDrawn(true); // Update state to indicate a rectangle has been drawn
+      //drawControl.disable(); // Disable draw control after drawing a rectangle
+      map.off(L.Draw.Event.CREATED); // Remove the event listener to prevent multiple bindings
+    });
+  };
+
+  // Conditionally render the button based on isRectangleDrawn state
+  if (isRectangleDrawn) return null; // Don't render the button if a rectangle is drawn
+
+  return (
+    <button onClick={startRectangleDraw} className="draw-rectangle-btn">
+      Beskär karta
+    </button>
+  );
+};
+
 
 
 // Define the Map component
@@ -611,8 +645,11 @@ const Map = ({ selectedProjectId, onSave, userID }) => {
   };
 
   const onDeleted = (e) => {
-    updateGeoJson(); // Update GeoJSON when shapes are deleted
-  };
+
+
+    updateGeoJson(); // Update GeoJSON data if necessary
+};
+
 
 
   /*
@@ -886,12 +923,14 @@ const Map = ({ selectedProjectId, onSave, userID }) => {
             onDeleted={onDeleted}
 
             draw={{
+              
               rectangle: isRectangleDrawn ? false : {
                 shapeOptions: {
                   color: 'red',
                   weight: 2,
                   fillOpacity: 0.2
                 },
+                
                 //icon: customRectangleIcon 
               },
               circlemarker: false,
@@ -901,6 +940,7 @@ const Map = ({ selectedProjectId, onSave, userID }) => {
             <GeoJSON key={index} data={feature} />
           ))}
         </FeatureGroup>
+        <RectangleDrawButton isRectangleDrawn={isRectangleDrawn} setIsRectangleDrawn={setIsRectangleDrawn} />
       </MapContainer>
     </div>
   );

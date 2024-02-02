@@ -374,8 +374,6 @@ const ProjectView = () => {
         )}
 
       </div>
-        {/* SURVEY */}
-        <Survey />
 
         {/* MAP */}
         <Map
