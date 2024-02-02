@@ -117,7 +117,7 @@ const Map = ({ selectedProjectId, onSave, userID }) => {
     const map = useMap();
 
     const startRectangleDraw = () => {
-      const drawControl = new L.Draw.Polygon(map, {
+      const drawControl = new L.Draw.Rectangle(map, {
         shapeOptions: {
           color: '#f00', // Example color, change as needed
         },
@@ -134,7 +134,7 @@ const Map = ({ selectedProjectId, onSave, userID }) => {
             shape: "rectangleCrop",
           },
           geometry: {
-            type: 'Polygon',
+            type: 'Rectangle',
             coordinates: [[
               [rectangleBounds.getSouthWest().lng, rectangleBounds.getSouthWest().lat],
               [rectangleBounds.getNorthWest().lng, rectangleBounds.getNorthWest().lat],
@@ -696,53 +696,8 @@ const Map = ({ selectedProjectId, onSave, userID }) => {
           }
         }
 
-        /*
-                else if (layer instanceof L.Marker && !(layer instanceof L.CircleMarker)) {
-                  const position = layer.getLatLngs();
-            
-                  if (layer.feature && layer.feature.properties.id !== undefined) {
-                    console.log('return marker: ', layer);
-                    return;
-                  } else {
-                    const markerFeature = {
-                      type: 'Feature',
-                      geometry: {
-                        type: 'Point',
-                        coordinates: [position.lng, position.lat]
-                      },
-                      properties: {
-                        isMarker: true,
-                        id: layer.options.id,
-                        attributes: layer.options.attributes ? { ...layer.options.attributes } : {
-                          objectNumber: ' ',
-                          inventoryLevel: ' ',
-                          natureValueClass: ' ',
-                          preliminaryAssesment: ' ',
-                          reason: ' ',
-                          natureType: ' ',
-                          habitat: ' ',
-                          date: ' ',
-                          executer: ' ',
-                          organsation: ' ',
-                          projectName: ' ',
-                          area: ' ',
-                          species: ' ',
-                          habitatQualities: ' ',
-                          valueElements: ' '
-                        }
-                       },
-        
-                               }
-                    features.push(markerFeature);
-                    console.log('layer 1 marker: ', layer);
-                    console.log('markerFeature 1: ', markerFeature);
-        
-                  }
-                }
-        */
-
         else if (layer instanceof L.CircleMarker) {
-          const position = layer.getLatLngs();
+          const position = layer.getLatLng();
 
           if (layer.feature && layer.feature.properties.id !== undefined) {
             console.log('return circlemarker: ', layer);
@@ -920,30 +875,6 @@ const Map = ({ selectedProjectId, onSave, userID }) => {
         }
       };
     }
-
-    /*
-    if (newLayer instanceof L.Polyline) {
-      const bounds = newLayer.getBounds();
-      feature = {
-        type: 'Feature',
-        properties: {
-          isRectangle: true,
-          id: newLayer.options.id,
-          attributes: newLayer.options.attributes
-        },
-        geometry: {
-          type: 'Polygon',
-          coordinates: [[
-            [bounds.getSouthWest().lng, bounds.getSouthWest().lat],
-            [bounds.getNorthWest().lng, bounds.getNorthWest().lat],
-            [bounds.getNorthEast().lng, bounds.getNorthEast().lat],
-            [bounds.getSouthEast().lng, bounds.getSouthEast().lat],
-            [bounds.getSouthWest().lng, bounds.getSouthWest().lat] // Close the loop
-          ]]
-        }
-      };
-    }
-*/
 
 
     if (newLayer instanceof L.Polyline && !(newLayer instanceof L.Polygon)) {
