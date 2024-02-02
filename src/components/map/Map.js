@@ -162,7 +162,7 @@ const Map = ({ selectedProjectId, onSave, userID }) => {
     );
   };
 
-  
+
 
 
 
@@ -184,6 +184,17 @@ const Map = ({ selectedProjectId, onSave, userID }) => {
       featureGroupRef.current.clearLayers(); // Clear existing layers first
       if (geoJsonData) {
         L.geoJSON(geoJsonData, {
+          pointToLayer: (feature, latlng) => {
+            if (feature.properties.isCircleMarker) {
+              // If the feature has a property indicating it's a circle marker, create a L.CircleMarker
+              return L.circleMarker(latlng, {
+                radius: feature.properties.radius // Use the radius from the feature properties
+              });
+            } else {
+              // For other points, return a default marker
+              return L.marker(latlng);
+            }
+          },
           onEachFeature: (feature, layer) => {
 
 
@@ -202,9 +213,6 @@ const Map = ({ selectedProjectId, onSave, userID }) => {
             });
             */
 
-            if (feature.properties.attributes) {
-              layer.options.attributes = feature.properties.attributes;
-            }
 
             if (feature.properties && feature.properties.isCircle) {
               // If the feature is a circle, recreate it
@@ -518,11 +526,11 @@ const Map = ({ selectedProjectId, onSave, userID }) => {
             console.log('Circlefeature after 2: ', circleFeature);
           }
         }
-        
 
 
-        
-        
+
+
+
         else if (layer instanceof L.Rectangle) {
           const bounds = layer.getBounds();
           if (layer.feature && layer.feature.properties.shape === "rectangleCrop") {
@@ -561,9 +569,9 @@ const Map = ({ selectedProjectId, onSave, userID }) => {
                   habitatQualities: ' ',
                   valueElements: ' '
                 }
-               },
+              },
 
-                       }
+            }
             features.push(rectangleFeature);
             console.log('layer 1 rectangle: ', layer);
             console.log('rectangleFeature 1: ', rectangleFeature);
@@ -591,18 +599,18 @@ const Map = ({ selectedProjectId, onSave, userID }) => {
             console.log('rectangleFeature 2: ', rectangleFeature);
 
           }
-        } 
- 
-        
+        }
+
+
         else if (layer instanceof L.Polygon && !(layer instanceof L.Rectangle)) {
           // Get the first array of LatLngs for the first polygon (ignores holes)
-        const latlngs = layer.getLatLngs()[0];
-        const coordinates = latlngs.map((latlng) => [latlng.lng, latlng.lat]);
-        
-        // Ensure the polygon is closed by adding the first point at the end
-        if (coordinates[0] !== coordinates[coordinates.length - 1]) {
-          coordinates.push(coordinates[0]);
-        }
+          const latlngs = layer.getLatLngs()[0];
+          const coordinates = latlngs.map((latlng) => [latlng.lng, latlng.lat]);
+
+          // Ensure the polygon is closed by adding the first point at the end
+          if (coordinates[0] !== coordinates[coordinates.length - 1]) {
+            coordinates.push(coordinates[0]);
+          }
 
           if (layer.feature && layer.feature.properties.id !== undefined) {
             return;
@@ -633,21 +641,21 @@ const Map = ({ selectedProjectId, onSave, userID }) => {
                   habitatQualities: ' ',
                   valueElements: ' '
                 }
-               },
+              },
 
-                       }
+            }
             features.push(polygonFeature);
             console.log('layer 1 polygon: ', layer);
             console.log('polygonFeature 1: ', polygonFeature);
-          } 
-        } 
+          }
+        }
 
-        
-        
+
+
         else if (layer instanceof L.Polyline) {
           const position = layer.getLatLngs();
           const coordinates = position.map(latlng => [latlng.lng, latlng.lat]);
-    
+
           if (layer.feature && layer.feature.properties.id !== undefined) {
             console.log('return polyline: ', layer);
             return;
@@ -678,33 +686,78 @@ const Map = ({ selectedProjectId, onSave, userID }) => {
                   habitatQualities: ' ',
                   valueElements: ' '
                 }
-               },
+              },
 
-                       }
+            }
             features.push(polylineFeature);
             console.log('layer 1 polyline: ', layer);
             console.log('polylineFeature 1: ', polylineFeature);
 
           }
-        } 
+        }
 
+        /*
+                else if (layer instanceof L.Marker && !(layer instanceof L.CircleMarker)) {
+                  const position = layer.getLatLngs();
+            
+                  if (layer.feature && layer.feature.properties.id !== undefined) {
+                    console.log('return marker: ', layer);
+                    return;
+                  } else {
+                    const markerFeature = {
+                      type: 'Feature',
+                      geometry: {
+                        type: 'Point',
+                        coordinates: [position.lng, position.lat]
+                      },
+                      properties: {
+                        isMarker: true,
+                        id: layer.options.id,
+                        attributes: layer.options.attributes ? { ...layer.options.attributes } : {
+                          objectNumber: ' ',
+                          inventoryLevel: ' ',
+                          natureValueClass: ' ',
+                          preliminaryAssesment: ' ',
+                          reason: ' ',
+                          natureType: ' ',
+                          habitat: ' ',
+                          date: ' ',
+                          executer: ' ',
+                          organsation: ' ',
+                          projectName: ' ',
+                          area: ' ',
+                          species: ' ',
+                          habitatQualities: ' ',
+                          valueElements: ' '
+                        }
+                       },
+        
+                               }
+                    features.push(markerFeature);
+                    console.log('layer 1 marker: ', layer);
+                    console.log('markerFeature 1: ', markerFeature);
+        
+                  }
+                }
+        */
 
-        else if (layer instanceof L.Marker) {
+        else if (layer instanceof L.CircleMarker) {
           const position = layer.getLatLngs();
-    
+
           if (layer.feature && layer.feature.properties.id !== undefined) {
-            console.log('return polyline: ', layer);
+            console.log('return circlemarker: ', layer);
             return;
           } else {
-            const markerFeature = {
+            const circleMarkerFeature = {
               type: 'Feature',
               geometry: {
                 type: 'Point',
                 coordinates: [position.lng, position.lat]
               },
               properties: {
-                isMarker: true,
+                isCircleMarker: true,
                 id: layer.options.id,
+                radius: layer.getRadius(), // Radius in pixels
                 attributes: layer.options.attributes ? { ...layer.options.attributes } : {
                   objectNumber: ' ',
                   inventoryLevel: ' ',
@@ -722,12 +775,12 @@ const Map = ({ selectedProjectId, onSave, userID }) => {
                   habitatQualities: ' ',
                   valueElements: ' '
                 }
-               },
+              },
 
-                       }
-            features.push(markerFeature);
+            }
+            features.push(circleMarkerFeature);
             console.log('layer 1 marker: ', layer);
-            console.log('markerFeature 1: ', markerFeature);
+            console.log('circleMarker 1: ', circleMarkerFeature);
 
           }
         }
@@ -795,7 +848,7 @@ const Map = ({ selectedProjectId, onSave, userID }) => {
   const onCreate = (e) => {
     const newLayer = e.layer;
     newLayer.options.id = uuidv4(); // Ensure each layer has a unique ID
-  
+
     // Default attributes for all shapes
     newLayer.options.attributes = {
       objectNumber: ' ',
@@ -814,23 +867,23 @@ const Map = ({ selectedProjectId, onSave, userID }) => {
       habitatQualities: ' ',
       valueElements: ' ',
     };
-  
+
     let feature;
     if (newLayer instanceof L.Circle) {
       newLayer.options.radius = newLayer.getRadius();
-    } 
-    
+    }
+
 
     if (newLayer instanceof L.Polygon && !(newLayer instanceof L.Rectangle)) {
       // Get the first array of LatLngs for the first polygon (ignores holes)
       const latlngs = newLayer.getLatLngs()[0];
       const coordinates = latlngs.map((latlng) => [latlng.lng, latlng.lat]);
-      
+
       // Ensure the polygon is closed by adding the first point at the end
       if (coordinates[0] !== coordinates[coordinates.length - 1]) {
         coordinates.push(coordinates[0]);
       }
-  
+
       feature = {
         type: 'Feature',
         properties: {
@@ -925,7 +978,25 @@ const Map = ({ selectedProjectId, onSave, userID }) => {
         }
       };
     }
-  
+
+
+    if (newLayer instanceof L.CircleMarker) {
+      const center = newLayer.getLatLng();
+      feature = {
+        type: 'Feature',
+        properties: {
+          isCircleMarker: true,
+          id: newLayer.options.id,
+          radius: newLayer.getRadius(), // Radius in pixels
+          attributes: newLayer.options.attributes
+        },
+        geometry: {
+          type: 'Point',
+          coordinates: [center.lng, center.lat]
+        }
+      };
+    }
+
     if (feature) {
       setGeoJsonData((prevData) => ({
         ...prevData,
@@ -937,7 +1008,7 @@ const Map = ({ selectedProjectId, onSave, userID }) => {
 
     console.log('create layer: ', newLayer);
   };
-  
+
 
   const onEdited = (e) => {
     e.layers.eachLayer((editedLayer) => {
