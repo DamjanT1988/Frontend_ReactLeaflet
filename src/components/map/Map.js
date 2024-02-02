@@ -184,6 +184,7 @@ const Map = ({ selectedProjectId, onSave, userID }) => {
       featureGroupRef.current.clearLayers(); // Clear existing layers first
       if (geoJsonData) {
         L.geoJSON(geoJsonData, {
+          
           pointToLayer: (feature, latlng) => {
             if (feature.properties.isCircleMarker) {
               // If the feature has a property indicating it's a circle marker, create a L.CircleMarker
@@ -195,6 +196,7 @@ const Map = ({ selectedProjectId, onSave, userID }) => {
               return L.marker(latlng);
             }
           },
+          
           onEachFeature: (feature, layer) => {
 
 
@@ -438,7 +440,72 @@ const Map = ({ selectedProjectId, onSave, userID }) => {
 
   }, []);
 
-  const updateGeoJson = () => {
+
+
+  const updateGeoJsonEditDel = () => {
+    if (featureGroupRef.current) {
+      const features = [];
+  
+      featureGroupRef.current.eachLayer(layer => {
+        let layerFeature = layer.toGeoJSON();
+        
+        // Assign unique ID if not already present
+        if (!layerFeature.properties.id) {
+          layerFeature.properties.id = uuidv4();
+        }
+  
+        // Update attributes for the layer
+        if (!layerFeature.properties.attributes) {
+          layerFeature.properties.attributes = layer.options.attributes || {
+            objectNumber: ' ',
+            inventoryLevel: ' ',
+            natureValueClass: ' ',
+            preliminaryAssesment: ' ',
+            reason: ' ',
+            natureType: ' ',
+            habitat: ' ',
+            date: ' ',
+            executer: ' ',
+            organsation: ' ',
+            projectName: ' ',
+            area: ' ',
+            species: ' ',
+            habitatQualities: ' ',
+            valueElements: ' ',
+          };
+        }
+  
+      // Handle circle and circle marker radius correctly
+      if (layer instanceof L.Circle || layer instanceof L.CircleMarker) {
+        const radiusInMeters = layer.getRadius();
+        layerFeature.properties = {
+          ...layerFeature.properties,
+          radius: radiusInMeters, // Ensure radius is stored in meters
+          isCircle: layer instanceof L.Circle,
+          isCircleMarker: layer instanceof L.CircleMarker
+        };
+      }
+
+      // Copy other layer properties
+      layerFeature.properties.attributes = {
+        ...layerFeature.properties.attributes,
+        ...layer.options.attributes
+      };
+
+      features.push(layerFeature);
+    });
+  
+      const newGeoJsonData = {
+        type: 'FeatureCollection',
+        features: features
+      };
+  
+      setGeoJsonData(newGeoJsonData);
+    }
+  };
+  
+
+  const updateGeoJsonCreate = () => {
     if (featureGroupRef.current) {
       const features = [];
 
@@ -825,8 +892,41 @@ const Map = ({ selectedProjectId, onSave, userID }) => {
 
     let feature;
     if (newLayer instanceof L.Circle) {
-      newLayer.options.radius = newLayer.getRadius();
-    }
+      const center = newLayer.getLatLng();
+      const radius = newLayer.getRadius();
+      
+      // Create a GeoJSON feature for the circle
+      feature = {
+        type: 'Feature',
+        properties: {
+          isCircle: true,
+          id: newLayer.options.id,
+          radius: radius, // Save radius in meters
+          attributes: newLayer.options.attributes
+        },
+        geometry: {
+          type: 'Point',
+          coordinates: [center.lng, center.lat]
+        }
+      };
+    } else if (newLayer instanceof L.CircleMarker) {
+        const center = newLayer.getLatLng();
+        feature = {
+          type: 'Feature',
+          properties: {
+            isCircleMarker: true,
+            id: newLayer.options.id,
+            radius: newLayer.getRadius(), // Radius in pixels
+            attributes: newLayer.options.attributes
+          },
+          geometry: {
+            type: 'Point',
+            coordinates: [center.lng, center.lat]
+          }
+        };
+      }
+    
+    
 
 
     if (newLayer instanceof L.Polygon && !(newLayer instanceof L.Rectangle)) {
@@ -894,6 +994,7 @@ const Map = ({ selectedProjectId, onSave, userID }) => {
       };
     }
 
+    
     if (newLayer instanceof L.Marker) {
       const position = newLayer.getLatLng();
       feature = {
@@ -911,22 +1012,7 @@ const Map = ({ selectedProjectId, onSave, userID }) => {
     }
 
 
-    if (newLayer instanceof L.CircleMarker) {
-      const center = newLayer.getLatLng();
-      feature = {
-        type: 'Feature',
-        properties: {
-          isCircleMarker: true,
-          id: newLayer.options.id,
-          radius: newLayer.getRadius(), // Radius in pixels
-          attributes: newLayer.options.attributes
-        },
-        geometry: {
-          type: 'Point',
-          coordinates: [center.lng, center.lat]
-        }
-      };
-    }
+
 
     if (feature) {
       setGeoJsonData((prevData) => ({
@@ -934,7 +1020,7 @@ const Map = ({ selectedProjectId, onSave, userID }) => {
         features: [...prevData.features, feature]
       }));
     } else {
-      updateGeoJson();
+      updateGeoJsonCreate();
     }
 
     console.log('create layer: ', newLayer);
@@ -942,6 +1028,8 @@ const Map = ({ selectedProjectId, onSave, userID }) => {
 
 
   const onEdited = (e) => {
+
+    /*
     e.layers.eachLayer((editedLayer) => {
       if (editedLayer.feature && editedLayer.feature.properties.shape === "rectangleCrop") {
         // Remove existing inverted mask
@@ -973,15 +1061,18 @@ const Map = ({ selectedProjectId, onSave, userID }) => {
         updatedFeatures[featureIndex].geometry = editedLayer.toGeoJSON().geometry;
       }
     });
+
     // Update the state
     setShapeLayers(updatedFeatures);
-    updateGeoJson(); // Update GeoJSON when shapes are edited
+    */
+
+    updateGeoJsonEditDel(); // Update GeoJSON when shapes are edited
   };
 
   const onDeleted = (e) => {
 
 
-    updateGeoJson(); // Update GeoJSON data if necessary
+    updateGeoJsonEditDel(); // Update GeoJSON data if necessary
   };
 
 
@@ -1049,7 +1140,7 @@ const Map = ({ selectedProjectId, onSave, userID }) => {
               });
             }
           });
-          updateGeoJson();
+          updateGeoJsonCreate();
           console.log('Parsed Features:', featuresArray);
           console.log('New GeoJSON Data:', newGeoJsonData);
 
