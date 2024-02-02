@@ -1,6 +1,6 @@
 // Import necessary modules and components
 import React, { useState, useRef, useEffect } from 'react';
-import { MapContainer, TileLayer, LayersControl, FeatureGroup, GeoJSON, useMapEvents } from 'react-leaflet';
+import { MapContainer, TileLayer, LayersControl, FeatureGroup, GeoJSON, useMapEvents, useMap } from 'react-leaflet';
 import { EditControl, drawControl } from "react-leaflet-draw";
 import { API_URLS } from '../../constants/APIURLS'; // Import the API_URLS constant
 import L from 'leaflet';
@@ -96,6 +96,7 @@ window.toggleAttributeContainer = (id, attributes) => {
 };
 
 
+
 // Define the Map component
 const Map = ({ selectedProjectId, onSave, userID }) => {
   const featureGroupRef = useRef(null);
@@ -112,6 +113,59 @@ const Map = ({ selectedProjectId, onSave, userID }) => {
   const [showAttributeTable, setShowAttributeTable] = useState(false);
 
 
+  const RectangleDrawButton = () => {
+    const map = useMap();
+
+    const startRectangleDraw = () => {
+      const drawControl = new L.Draw.Polygon(map, {
+        shapeOptions: {
+          color: '#f00', // Example color, change as needed
+        },
+      });
+      drawControl.enable(); // Enable the draw control for rectangles
+
+      // Event listener for when a rectangle is created
+      map.once(L.Draw.Event.CREATED, (e) => {
+        const { layer } = e;
+        const rectangleBounds = layer.getBounds();
+        const rectangle = {
+          type: 'Feature',
+          properties: {
+            shape: "rectangleCrop",
+          },
+          geometry: {
+            type: 'Polygon',
+            coordinates: [[
+              [rectangleBounds.getSouthWest().lng, rectangleBounds.getSouthWest().lat],
+              [rectangleBounds.getNorthWest().lng, rectangleBounds.getNorthWest().lat],
+              [rectangleBounds.getNorthEast().lng, rectangleBounds.getNorthEast().lat],
+              [rectangleBounds.getSouthEast().lng, rectangleBounds.getSouthEast().lat],
+              [rectangleBounds.getSouthWest().lng, rectangleBounds.getSouthWest().lat] // Close the loop
+            ]]
+          }
+        };
+        // Update GeoJSON data with the new rectangle
+        setGeoJsonData(prevData => {
+          return {
+            ...prevData,
+            features: [...prevData.features, rectangle]
+          };
+        });
+        layer.addTo(map); // Add the drawn rectangle to the map
+      });
+    };
+
+    return (
+      <button onClick={startRectangleDraw} style={{ position: 'absolute', top: '10px', right: '10px', zIndex: 1000 }}>
+        Draw Rectangle
+      </button>
+    );
+  };
+
+  
+
+
+
   useEffect(() => {
     window.toggleAttributeContainer = (id, attributes) => {
       setShowAttributeTable(true); // Always show the attribute table when the button is clicked
@@ -123,7 +177,6 @@ const Map = ({ selectedProjectId, onSave, userID }) => {
       window.toggleAttributeContainer = undefined; // Clean up
     };
   }, []);
-
 
 
   useEffect(() => {
@@ -182,6 +235,7 @@ const Map = ({ selectedProjectId, onSave, userID }) => {
         });
 
 
+        /*
         featureGroupRef.current.eachLayer(layer => {
           if (layer.feature && layer.feature.properties.shape === "rectangleCrop") {
             layer.setStyle({
@@ -203,7 +257,7 @@ const Map = ({ selectedProjectId, onSave, userID }) => {
 
           }
         });
-
+        */
 
       }
     }
@@ -382,50 +436,15 @@ const Map = ({ selectedProjectId, onSave, userID }) => {
 
       featureGroupRef.current.eachLayer(layer => {
         // Exclude the mask layer
+        /*
         if (layer.isMask) {
           return;
         }
+        */
 
-
-        if (layer instanceof L.Circle) {
-          if (layer.options.id === undefined) {
-            console.log('feature: ', layer.options);
-            const circleFeature = {
-              type: 'Feature',
-              geometry: {
-                type: 'Point',
-                coordinates: [layer.getLatLng().lng, layer.getLatLng().lat]
-              },
-              properties: {
-                isCircle: true,
-                radius: layer.getRadius(),
-                id: layer.options.customId,
-                attributes: {
-                  objectNumber: ' ',
-                  inventoryLevel: ' ',
-                  natureValueClass: ' ',
-                  preliminaryAssesment: ' ',
-                  reason: ' ',
-                  natureType: ' ',
-                  habitat: ' ',
-                  date: ' ',
-                  executer: ' ',
-                  organsation: ' ',
-                  projectName: ' ',
-                  area: ' ',
-                  species: ' ',
-                  habitatQualities: ' ',
-                  valueElements: ' ',
-                }
-              }
-            };
-            features.push(circleFeature);
-
-          } else if (layer.options.id !== undefined) {
-            console.log('layer: ', layer);
-            console.log('id: ', layer.options.id);
-            console.log('feature: ', layer.options);
-
+        if (layer instanceof L.Circle/* && layer.options.id !== undefined*/) {
+          if (!(layer.options && layer.options.attributes)) {
+            console.log('full layer 1: ', layer);
             const circleFeature = {
               type: 'Feature',
               geometry: {
@@ -456,32 +475,189 @@ const Map = ({ selectedProjectId, onSave, userID }) => {
               }
             };
             features.push(circleFeature);
+            console.log('Layer after 1: ', layer);
+            console.log('Circlefeature after 2: ', circleFeature);
+          } else {
+            console.log('full layer 2: ', layer);
+            //console.log('layer 2 options id: ', layer.options.id);
+            //console.log('layer 2 options: ', layer.options);
+
+            const circleFeature = {
+              type: 'Feature',
+              geometry: {
+                type: 'Point',
+                coordinates: [layer.getLatLng().lng, layer.getLatLng().lat]
+              },
+              properties: {
+                isCircle: true,
+                radius: layer.getRadius(),
+                id: layer.options.id,
+                attributes: {
+
+                  objectNumber: layer.options.attributes.objectNumber,
+                  inventoryLevel: layer.options.attributes.inventoryLevel,
+                  natureValueClass: layer.options.attributes.natureValueClass,
+                  preliminaryAssesment: layer.options.attributes.preliminaryAssesment,
+                  reason: layer.options.attributes.reason,
+                  natureType: layer.options.attributes.natureType,
+                  habitat: layer.options.attributes.habitat,
+                  date: layer.options.attributes.date,
+                  executer: layer.options.attributes.executer,
+                  organsation: layer.options.attributes.organsation,
+                  projectName: layer.options.attributes.projectName,
+                  area: layer.options.attributes.area,
+                  species: layer.options.attributes.species,
+                  habitatQualities: layer.options.attributes.habitatQualities,
+                  valueElements: layer.options.attributes.valueElements,
+
+                }
+              }
+            };
+            features.push(circleFeature);
+            console.log('Layer after 2: ', layer);
+            console.log('Circlefeature after 2: ', circleFeature);
           }
-        } else if (layer instanceof L.Rectangle) {
+        }
+        
 
-          // Handle rectangle layer
+
+        
+        
+        else if (layer instanceof L.Rectangle) {
           const bounds = layer.getBounds();
-          const rectangleCoordinates = [
-            [bounds.getSouthWest().lng, bounds.getSouthWest().lat],
-            [bounds.getNorthWest().lng, bounds.getNorthWest().lat],
-            [bounds.getNorthEast().lng, bounds.getNorthEast().lat],
-            [bounds.getSouthEast().lng, bounds.getSouthEast().lat],
-            [bounds.getSouthWest().lng, bounds.getSouthWest().lat] // Closing the loop
-          ];
+          if (layer.feature && layer.feature.properties.shape === "rectangleCrop") {
+            console.log('return crop rectangle: ', layer);
+            return;
+          } else if ((!(layer.options && layer.options.attributes))) {
+            const rectangleFeature = {
+              type: 'Feature',
+              geometry: {
+                type: 'Polygon',
+                coordinates: [[
+                  [bounds.getSouthWest().lng, bounds.getSouthWest().lat],
+                  [bounds.getNorthWest().lng, bounds.getNorthWest().lat],
+                  [bounds.getNorthEast().lng, bounds.getNorthEast().lat],
+                  [bounds.getSouthEast().lng, bounds.getSouthEast().lat],
+                  [bounds.getSouthWest().lng, bounds.getSouthWest().lat] // Close the loop
+                ]]
+              },
+              properties: {
+                isRectangle: true,
+                id: layer.options.id,
+                attributes: {
+                  objectNumber: ' ',
+                  inventoryLevel: ' ',
+                  natureValueClass: ' ',
+                  preliminaryAssesment: ' ',
+                  reason: ' ',
+                  natureType: ' ',
+                  habitat: ' ',
+                  date: ' ',
+                  executer: ' ',
+                  organsation: ' ',
+                  projectName: ' ',
+                  area: ' ',
+                  species: ' ',
+                  habitatQualities: ' ',
+                  valueElements: ' '
+                }
+               },
 
-          const rectangleFeature = {
-            type: "Feature",
-            geometry: {
-              type: "Polygon",
-              coordinates: [rectangleCoordinates]
-            },
-            properties: {
-              shape: "rectangleCrop",
-              id: uuidv4(),
+                       }
+            features.push(rectangleFeature);
+            console.log('layer 1 rectangle: ', layer);
+            console.log('rectangleFeature 1: ', rectangleFeature);
+          } else {
+            const rectangleFeature = {
+              type: 'Feature',
+              geometry: {
+                type: 'Polygon',
+                coordinates: [[
+                  [bounds.getSouthWest().lng, bounds.getSouthWest().lat],
+                  [bounds.getNorthWest().lng, bounds.getNorthWest().lat],
+                  [bounds.getNorthEast().lng, bounds.getNorthEast().lat],
+                  [bounds.getSouthEast().lng, bounds.getSouthEast().lat],
+                  [bounds.getSouthWest().lng, bounds.getSouthWest().lat] // Close the loop
+                ]]
+              },
+              properties: {
+                isRectangle: true,
+                id: layer.options.id,
+                attributes: layer.options.attributes
+              },
             }
-          };
-          features.push(rectangleFeature);
-        } else {
+            features.push(rectangleFeature);
+            console.log('layer 2 rectangle: ', layer);
+            console.log('rectangleFeature 2: ', rectangleFeature);
+
+          }
+        } 
+        
+        
+        
+        /*
+        else if (layer instanceof L.Polygon) {
+          if (layer.feature && layer.feature.properties.id !== undefined) {
+            return;
+          } else {
+            const layerFeature = layer.toGeoJSON();
+            const UUID = uuidv4();
+            layerFeature.properties.isPolygon = true;
+            layerFeature.properties.id = UUID;
+            layerFeature.properties.attributes = {
+              objectNumber: ' ',
+              inventoryLevel: ' ',
+              natureValueClass: ' ',
+              preliminaryAssesment: ' ',
+              reason: ' ',
+              natureType: ' ',
+              habitat: ' ',
+              date: ' ',
+              executer: ' ',
+              organsation: ' ',
+              projectName: ' ',
+              area: ' ',
+              species: ' ',
+              habitatQualities: ' ',
+              valueElements: ' ',
+            };
+            features.push(layerFeature);
+          }
+        } 
+        
+        
+        
+        else if (layer instanceof L.Polyline) {
+          if (layer.feature && layer.feature.properties.id !== undefined) {
+            return;
+          } else {
+            const layerFeature = layer.toGeoJSON();
+            const UUID = uuidv4();
+            layerFeature.properties.isPolyLine = true;
+            layerFeature.properties.id = UUID;
+            layerFeature.properties.attributes = {
+              objectNumber: ' ',
+              inventoryLevel: ' ',
+              natureValueClass: ' ',
+              preliminaryAssesment: ' ',
+              reason: ' ',
+              natureType: ' ',
+              habitat: ' ',
+              date: ' ',
+              executer: ' ',
+              organsation: ' ',
+              projectName: ' ',
+              area: ' ',
+              species: ' ',
+              habitatQualities: ' ',
+              valueElements: ' ',
+            };
+            features.push(layerFeature);
+          }
+        } 
+        */
+        
+        else {
           // For other shapes, use the default toGeoJSON method
           const layerFeature = layer.toGeoJSON();
           const UUID = uuidv4();
@@ -505,13 +681,13 @@ const Map = ({ selectedProjectId, onSave, userID }) => {
           };
 
           features.push(layerFeature);
-          setIsRectangleDrawn(false);
+          //setIsRectangleDrawn(false);
         }
 
       });
 
       if (features == 0 || features == null || features == undefined || features == '') {
-        setIsRectangleDrawn(false);
+        //setIsRectangleDrawn(false);
       }
 
       const geoJson = {
@@ -534,16 +710,15 @@ const Map = ({ selectedProjectId, onSave, userID }) => {
       }
       */
 
-      console.log('geojson: ', geoJson);
+      console.log('updateGeojson: ', geoJson);
 
     }
   };
-
   const onCreate = (e) => {
     const newLayer = e.layer;
-
-    // Assign custom properties to the layer's options
-    newLayer.options.customId = uuidv4();
+    newLayer.options.id = uuidv4(); // Ensure each layer has a unique ID
+  
+    // Default attributes for all shapes
     newLayer.options.attributes = {
       objectNumber: ' ',
       inventoryLevel: ' ',
@@ -560,18 +735,48 @@ const Map = ({ selectedProjectId, onSave, userID }) => {
       species: ' ',
       habitatQualities: ' ',
       valueElements: ' ',
+    };
+  
+    let feature;
+    if (newLayer instanceof L.Circle) {
+      newLayer.options.radius = newLayer.getRadius();
+    } 
+    
+    if (newLayer instanceof L.Rectangle) {
+      const bounds = newLayer.getBounds();
+      feature = {
+        type: 'Feature',
+        properties: {
+          isRectangle: true,
+          id: newLayer.options.id,
+          attributes: newLayer.options.attributes
+        },
+        geometry: {
+          type: 'Polygon',
+          coordinates: [[
+            [bounds.getSouthWest().lng, bounds.getSouthWest().lat],
+            [bounds.getNorthWest().lng, bounds.getNorthWest().lat],
+            [bounds.getNorthEast().lng, bounds.getNorthEast().lat],
+            [bounds.getSouthEast().lng, bounds.getSouthEast().lat],
+            [bounds.getSouthWest().lng, bounds.getSouthWest().lat] // Close the loop
+          ]]
+        }
+      };
+    }
+    // Handle other shapes here...
+  
+    if (feature) {
+      setGeoJsonData((prevData) => ({
+        ...prevData,
+        features: [...prevData.features, feature]
+      }));
+    } else {
+      updateGeoJson();
     }
 
-    if (newLayer instanceof L.Circle) {
-      // Additional properties for a circle
-      newLayer.options.radius = newLayer.getRadius();
-    }
-    // Check if the layer is a rectangle and update the state accordingly
-    if (newLayer instanceof L.Rectangle) {
-      setIsRectangleDrawn(true);
-    }
-    updateGeoJson();
+    console.log('create layer: ', newLayer);
   };
+  
 
   const onEdited = (e) => {
     e.layers.eachLayer((editedLayer) => {
@@ -611,8 +816,11 @@ const Map = ({ selectedProjectId, onSave, userID }) => {
   };
 
   const onDeleted = (e) => {
-    updateGeoJson(); // Update GeoJSON when shapes are deleted
+
+
+    updateGeoJson(); // Update GeoJSON data if necessary
   };
+
 
 
   /*
@@ -690,6 +898,28 @@ const Map = ({ selectedProjectId, onSave, userID }) => {
     }
   };
 
+  /*  const saveAttributes = () => {
+      const updatedFeatures = geoJsonData.features.map((feature) => {
+        if (feature.properties.id === selectedId) {
+          return {
+            ...feature,
+            properties: {
+              ...feature.properties,
+              attributes: { ...attributesObject },
+            },
+          };
+        }
+        setSelectedId(null)
+        return feature;
+      });
+      setSelectedId(null)
+      setGeoJsonData({ ...geoJsonData, features: updatedFeatures });
+      
+      console.log('geoJsonData after edit attr: ', geoJsonData);
+      featureGroupRef.current.eachLayer(layer => { console.log('layer after edit attr: ', layer); } );
+    };
+    */
+
   const saveAttributes = () => {
     const updatedFeatures = geoJsonData.features.map((feature) => {
       if (feature.properties.id === selectedId) {
@@ -701,13 +931,39 @@ const Map = ({ selectedProjectId, onSave, userID }) => {
           },
         };
       }
-      setSelectedId(null)
       return feature;
     });
 
+    // Update GeoJSON state
     setGeoJsonData({ ...geoJsonData, features: updatedFeatures });
+    setSelectedId(null); // Deselect the current feature
   };
 
+  // useEffect hook to synchronize layer options with geoJsonData changes
+  useEffect(() => {
+    syncLayerAttributes();
+  }, [geoJsonData]); // Dependency array ensures this runs only when geoJsonData changes
+
+
+
+  const syncLayerAttributes = () => {
+    if (featureGroupRef.current) {
+      featureGroupRef.current.eachLayer((layer) => {
+        const correspondingFeature = geoJsonData.features.find(feature => feature.properties.id === layer.options.id);
+        if (correspondingFeature && correspondingFeature.properties.attributes) {
+          // Ensure layer.options.attributes exists before trying to assign to it
+          if (!layer.options.attributes) {
+            layer.options.attributes = {};
+          }
+
+          // Update layer.options.attributes
+          Object.assign(layer.options.attributes, correspondingFeature.properties.attributes);
+        }
+        //console.log('sync full layer: ', layer);
+        //console.log('options layer: ', layer.options);
+      });
+    }
+  };
 
 
   //      Import (GeoJSON): <input type="file" onChange={handleFileUploadGeoJSON} />
@@ -717,6 +973,7 @@ const Map = ({ selectedProjectId, onSave, userID }) => {
         <h3>Projektkarta</h3>
         <button className="toggle-form-button" onClick={saveDataToServer}>Spara ritning!</button>
         <span className="save-status">{saveStatus}</span>
+        <p>Tryck på kartobjekt för att se attribut.</p>
         {selectedId && attributesObject && showAttributeTable && (
           <div className="attributes-container">
             <h3>Objektattribut</h3>
@@ -867,7 +1124,7 @@ const Map = ({ selectedProjectId, onSave, userID }) => {
         </label>
         <input id="file-upload" className="project-import-input" type="file" onChange={handleFileUploadShape} style={{ display: 'none' }} />
 
-
+      </div>
       <MapContainer center={position} zoom={zoom} style={{ height: '100vh', width: '100%' }} className="full-width-map">
         <LayersControl position="topright">
           <BaseLayer checked name="Informationskarta">
@@ -885,23 +1142,26 @@ const Map = ({ selectedProjectId, onSave, userID }) => {
             onDeleted={onDeleted}
 
             draw={{
-              rectangle: isRectangleDrawn ? false : {
-                shapeOptions: {
-                  color: 'red',
-                  weight: 2,
-                  fillOpacity: 0.2
+              /*  
+                rectangle: isRectangleDrawn ? false : {
+                  shapeOptions: {
+                    color: 'red',
+                    weight: 2,
+                    fillOpacity: 0.2
+                  },
+                  
+                  //icon: customRectangleIcon 
                 },
-                //icon: customRectangleIcon 
-              },
-              circlemarker: false,
+                */
+              //circlemarker: false,
             }}
           />
           {shapeLayers && shapeLayers.map((feature, index) => (
             <GeoJSON key={index} data={feature} />
           ))}
         </FeatureGroup>
+        <RectangleDrawButton isRectangleDrawn={isRectangleDrawn} setIsRectangleDrawn={setIsRectangleDrawn} />
       </MapContainer>
-    </div>
     </div>
   );
 };
