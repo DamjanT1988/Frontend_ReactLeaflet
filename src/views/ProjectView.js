@@ -42,7 +42,7 @@ const ProjectView = () => {
   const [sortOrder, setSortOrder] = useState('desc'); // State for sort order ('asc' or 'desc')
 
 
-  
+
   useEffect(() => {
     if (projectId) {
       viewProjectDetails(projectId);
@@ -81,73 +81,75 @@ const ProjectView = () => {
     });
 
 
-  // Function to handle saving map data
-  const handleSaveMapData = (geoJsonData) => {
-    // Check if there is a selected project and GeoJSON data to save
-    if (!selectedProject || !geoJsonData || !geoJsonData.features || geoJsonData.features.length === 0) {
-      console.error("No GeoJSON data to save."); // Log an error message
-      return Promise.reject("Ingen GeoJSON-data att spara."); // Reject the promise
-    }
-
-    // Map over the features in the GeoJSON data
-    const savePromises = geoJsonData.features.map(feature => {
-      let url; // Variable for the URL
-      let dataToSend; // Variable for the data to send
-
-      // Switch statement for handling different types of features
-      switch (feature.geometry.type) {
-        case 'Polygon': // If the feature is a polygon
-          url = `${API_URLS.PROJECT_DETAIL}${selectedProject.id}/add_polygon/`; // Set the URL for adding a polygon
-          dataToSend = { // Set the data to send
-            name: "Polygon Name", // Name of the polygon
-            status: "Active", // Status of the polygon
-            geo_data: feature.geometry // Geometry data of the polygon
-          };
-          break;
-        case 'LineString': // If the feature is a line string
-          url = `${API_URLS.PROJECT_DETAIL}${selectedProject.id}/add_line/`; // Set the URL for adding a line string
-          dataToSend = { // Set the data to send
-            name: "Line Name", // Name of the line string
-            status: "Active", // Status of the line string
-            geo_data: feature.geometry // Geometry data of the line string
-          };
-          break;
-        case 'Point': // If the feature is a point
-          url = `${API_URLS.PROJECT_DETAIL}${selectedProject.id}/add_point/`; // Set the URL for adding a point
-          dataToSend = { // Set the data to send
-            name: "Point Name", // Name of the point
-            status: "Active", // Status of the point
-            geo_data: feature.geometry, // Geometry data of the point
-            attributes: {} // Attributes of the point
-          };
-          break;
-        default: // If the feature type is not supported
-          console.error('Unsupported feature type:', feature.geometry.type); // Log an error message
-          return; // Return from the function
+  /*
+    // Function to handle saving map data
+    const handleSaveMapData = (geoJsonData) => {
+      // Check if there is a selected project and GeoJSON data to save
+      if (!selectedProject || !geoJsonData || !geoJsonData.features || geoJsonData.features.length === 0) {
+        console.error("No GeoJSON data to save."); // Log an error message
+        return Promise.reject("Ingen GeoJSON-data att spara."); // Reject the promise
       }
-
-      // Fetch request to save the feature
-      return fetch(url, {
-        method: 'POST', // HTTP method
-        headers: { // HTTP headers
-          'Content-Type': 'application/json', // Content type header
-          'Authorization': `Bearer ${accessToken}`, // Authorization header
-        },
-        body: JSON.stringify(dataToSend), // Body of the request
-      }).then(response => response.json()); // Parse the response as JSON
-    });
-
-    // Wait for all save promises to resolve
-    return Promise.all(savePromises)
-      .then(data => {
-        console.log("All features saved:", data); // Log the saved data
-        return data; // Resolve the promise with the saved data
-      })
-      .catch(error => {
-        console.error("Error saving features:", error); // Log the error
-        return Promise.reject(error); // Reject the promise on error
+  
+      // Map over the features in the GeoJSON data
+      const savePromises = geoJsonData.features.map(feature => {
+        let url; // Variable for the URL
+        let dataToSend; // Variable for the data to send
+  
+        // Switch statement for handling different types of features
+        switch (feature.geometry.type) {
+          case 'Polygon': // If the feature is a polygon
+            url = `${API_URLS.PROJECT_DETAIL}${selectedProject.id}/add_polygon/`; // Set the URL for adding a polygon
+            dataToSend = { // Set the data to send
+              name: "Polygon Name", // Name of the polygon
+              status: "Active", // Status of the polygon
+              geo_data: feature.geometry // Geometry data of the polygon
+            };
+            break;
+          case 'LineString': // If the feature is a line string
+            url = `${API_URLS.PROJECT_DETAIL}${selectedProject.id}/add_line/`; // Set the URL for adding a line string
+            dataToSend = { // Set the data to send
+              name: "Line Name", // Name of the line string
+              status: "Active", // Status of the line string
+              geo_data: feature.geometry // Geometry data of the line string
+            };
+            break;
+          case 'Point': // If the feature is a point
+            url = `${API_URLS.PROJECT_DETAIL}${selectedProject.id}/add_point/`; // Set the URL for adding a point
+            dataToSend = { // Set the data to send
+              name: "Point Name", // Name of the point
+              status: "Active", // Status of the point
+              geo_data: feature.geometry, // Geometry data of the point
+              attributes: {} // Attributes of the point
+            };
+            break;
+          default: // If the feature type is not supported
+            console.error('Unsupported feature type:', feature.geometry.type); // Log an error message
+            return; // Return from the function
+        }
+  
+        // Fetch request to save the feature
+        return fetch(url, {
+          method: 'POST', // HTTP method
+          headers: { // HTTP headers
+            'Content-Type': 'application/json', // Content type header
+            'Authorization': `Bearer ${accessToken}`, // Authorization header
+          },
+          body: JSON.stringify(dataToSend), // Body of the request
+        }).then(response => response.json()); // Parse the response as JSON
       });
-  };
+  
+      // Wait for all save promises to resolve
+      return Promise.all(savePromises)
+        .then(data => {
+          console.log("All features saved:", data); // Log the saved data
+          return data; // Resolve the promise with the saved data
+        })
+        .catch(error => {
+          console.error("Error saving features:", error); // Log the error
+          return Promise.reject(error); // Reject the promise on error
+        });
+    };
+    */
 
 
   // Function to fetch projects from the API
@@ -294,93 +296,89 @@ const ProjectView = () => {
       });
     }
   };
-  
-
-  // Call this function when the "Edit" button is clicked
 
 
   if (selectedProject) {
     return (
       <div>
         <div className="project-details-container">
-            <h1>Projekt</h1>
-            <button className="project-back" onClick={() => setSelectedProject(null)}>Tillbaka till projektlista!</button>
-            <button className="project-back" onClick={toggleEditMode}>
-                {isEditMode ? "Avbryt" : "Redigera information!"}
-            </button>
-            {isEditMode && <button className="project-back" onClick={updateProjectInfo}>Spara ändringar</button>}
+          <h1>Projekt</h1>
+          <button className="project-back" onClick={() => setSelectedProject(null)}>Tillbaka till projektlista!</button>
+          <button className="project-back" onClick={toggleEditMode}>
+            {isEditMode ? "Avbryt" : "Redigera information!"}
+          </button>
+          {isEditMode && <button className="project-back" onClick={updateProjectInfo}>Spara ändringar</button>}
 
-            {isEditMode ? (
-                <>
-                    {/* Input fields for editable project information */}
-                    <label>Projektnamn:</label>
-                    <input type="text" className="editable-field" value={editedProject.project_name} onChange={(e) => setEditedProject({ ...editedProject, project_name: e.target.value })} />
+          {isEditMode ? (
+            <>
+              {/* Input fields for editable project information */}
+              <label>Projektnamn:</label>
+              <input type="text" className="editable-field" value={editedProject.project_name} onChange={(e) => setEditedProject({ ...editedProject, project_name: e.target.value })} />
 
-                    <label>Projektidentitet:</label>
-                    <input type="text" className="editable-field" value={editedProject.project_identity} onChange={(e) => setEditedProject({ ...editedProject, project_identity: e.target.value })} />
+              <label>Projektidentitet:</label>
+              <input type="text" className="editable-field" value={editedProject.project_identity} onChange={(e) => setEditedProject({ ...editedProject, project_identity: e.target.value })} />
 
-                    <label>Objektversion:</label>
-                    <input type="number" className="editable-field" value={editedProject.object_version} onChange={(e) => setEditedProject({ ...editedProject, object_version: e.target.value })} />
+              <label>Objektversion:</label>
+              <input type="number" className="editable-field" value={editedProject.object_version} onChange={(e) => setEditedProject({ ...editedProject, object_version: e.target.value })} />
 
-                    <label>Beskrivning och anteckningar:</label>
-                    <textarea className="project-textarea" value={editedProject.description} onChange={(e) => setEditedProject({ ...editedProject, description: e.target.value })} />
+              <label>Beskrivning och anteckningar:</label>
+              <textarea className="project-textarea" value={editedProject.description} onChange={(e) => setEditedProject({ ...editedProject, description: e.target.value })} />
 
-                    <label>Anledning:</label>
-                    <input type="text" className="editable-field" value={editedProject.reason} onChange={(e) => setEditedProject({ ...editedProject, reason: e.target.value })} />
+              <label>Anledning:</label>
+              <input type="text" className="editable-field" value={editedProject.reason} onChange={(e) => setEditedProject({ ...editedProject, reason: e.target.value })} />
 
-                    <label>Kartläggningsområdesbeskrivning:</label>
-                    <textarea className="project-textarea" value={editedProject.mapping_area_description} onChange={(e) => setEditedProject({ ...editedProject, mapping_area_description: e.target.value })} />
+              <label>Kartläggningsområdesbeskrivning:</label>
+              <textarea className="project-textarea" value={editedProject.mapping_area_description} onChange={(e) => setEditedProject({ ...editedProject, mapping_area_description: e.target.value })} />
 
-                    <label>Beställande organisation namn:</label>
-                    <input type="text" className="editable-field" value={editedProject.ordering_organization_name} onChange={(e) => setEditedProject({ ...editedProject, ordering_organization_name: e.target.value })} />
+              <label>Beställande organisation namn:</label>
+              <input type="text" className="editable-field" value={editedProject.ordering_organization_name} onChange={(e) => setEditedProject({ ...editedProject, ordering_organization_name: e.target.value })} />
 
-                    <label>Beställande organisation nummer:</label>
-                    <input type="text" className="editable-field" value={editedProject.ordering_organization_number} onChange={(e) => setEditedProject({ ...editedProject, ordering_organization_number: e.target.value })} />
+              <label>Beställande organisation nummer:</label>
+              <input type="text" className="editable-field" value={editedProject.ordering_organization_number} onChange={(e) => setEditedProject({ ...editedProject, ordering_organization_number: e.target.value })} />
 
-                    <label>Utförande organisation namn:</label>
-                    <input type="text" className="editable-field" value={editedProject.executing_organization_name} onChange={(e) => setEditedProject({ ...editedProject, executing_organization_name: e.target.value })} />
+              <label>Utförande organisation namn:</label>
+              <input type="text" className="editable-field" value={editedProject.executing_organization_name} onChange={(e) => setEditedProject({ ...editedProject, executing_organization_name: e.target.value })} />
 
-                    <label>Utförande organisation nummer:</label>
-                    <input type="text" className="editable-field" value={editedProject.executing_organization_number} onChange={(e) => setEditedProject({ ...editedProject, executing_organization_number: e.target.value })} />
+              <label>Utförande organisation nummer:</label>
+              <input type="text" className="editable-field" value={editedProject.executing_organization_number} onChange={(e) => setEditedProject({ ...editedProject, executing_organization_number: e.target.value })} />
 
-                    <label>Projektperiod Start:</label>
-                    <input type="date" className="editable-field" value={editedProject.period_start} onChange={(e) => setEditedProject({ ...editedProject, period_start: e.target.value })} />
+              <label>Projektperiod Start:</label>
+              <input type="date" className="editable-field" value={editedProject.period_start} onChange={(e) => setEditedProject({ ...editedProject, period_start: e.target.value })} />
 
-                    <label>Projektperiod Slut:</label>
-                    <input type="date" className="editable-field" value={editedProject.period_end} onChange={(e) => setEditedProject({ ...editedProject, period_end: e.target.value })} />
+              <label>Projektperiod Slut:</label>
+              <input type="date" className="editable-field" value={editedProject.period_end} onChange={(e) => setEditedProject({ ...editedProject, period_end: e.target.value })} />
 
-                    <label>Versionsgiltighetsperiod Start:</label>
-                    <input type="date" className="editable-field" value={editedProject.version_start} onChange={(e) => setEditedProject({ ...editedProject, version_start: e.target.value })} />
+              <label>Versionsgiltighetsperiod Start:</label>
+              <input type="date" className="editable-field" value={editedProject.version_start} onChange={(e) => setEditedProject({ ...editedProject, version_start: e.target.value })} />
 
-                    <label>Versionsgiltighetsperiod Slut:</label>
-                    <input type="date" className="editable-field" value={editedProject.version_end} onChange={(e) => setEditedProject({ ...editedProject, version_end: e.target.value })} />
-                </>
-            ) : (
-                <>
-                    {/* Displaying project information in read-only mode */}
-                    <p><strong>Projektnamn:</strong> {selectedProject.project_name}</p>
-                    <p><strong>Projektidentitet:</strong> {selectedProject.project_identity}</p>
-                    <p><strong>Objektversion:</strong> {selectedProject.object_version}</p>
-                    <p><strong>Projektbeskrivning:</strong></p><textarea readOnly className="project-textarea" value={selectedProject.description} />
-                    <p><strong>Anledning:</strong> {selectedProject.reason}</p>
-                    <p><strong>Kartläggningsområdesbeskrivning:</strong></p><textarea readOnly className="project-textarea" value={selectedProject.mapping_area_description} />
-                    <p><strong>Beställande organisation namn:</strong> {selectedProject.ordering_organization_name}</p>
-                    <p><strong>Beställande organisation nummer:</strong> {selectedProject.ordering_organization_number}</p>
-                    <p><strong>Utförande organisation namn:</strong> {selectedProject.executing_organization_name}</p>
-                    <p><strong>Utförande organisation nummer:</strong> {selectedProject.executing_organization_number}</p>
-                    <p><strong>Projektperiod Start:</strong> {selectedProject.period_start}</p>
-                    <p><strong>Projektperiod Slut:</strong> {selectedProject.period_end}</p>
-                    <p><strong>Versionsgiltighetsperiod Start:</strong> {selectedProject.version_start}</p>
-                    <p><strong>Versionsgiltighetsperiod Slut:</strong> {selectedProject.version_end}</p>
-                </>
-        )}
+              <label>Versionsgiltighetsperiod Slut:</label>
+              <input type="date" className="editable-field" value={editedProject.version_end} onChange={(e) => setEditedProject({ ...editedProject, version_end: e.target.value })} />
+            </>
+          ) : (
+            <>
+              {/* Displaying project information in read-only mode */}
+              <p><strong>Projektnamn:</strong> {selectedProject.project_name}</p>
+              <p><strong>Projektidentitet:</strong> {selectedProject.project_identity}</p>
+              <p><strong>Objektversion:</strong> {selectedProject.object_version}</p>
+              <p><strong>Projektbeskrivning:</strong></p><textarea readOnly className="project-textarea" value={selectedProject.description} />
+              <p><strong>Anledning:</strong> {selectedProject.reason}</p>
+              <p><strong>Kartläggningsområdesbeskrivning:</strong></p><textarea readOnly className="project-textarea" value={selectedProject.mapping_area_description} />
+              <p><strong>Beställande organisation namn:</strong> {selectedProject.ordering_organization_name}</p>
+              <p><strong>Beställande organisation nummer:</strong> {selectedProject.ordering_organization_number}</p>
+              <p><strong>Utförande organisation namn:</strong> {selectedProject.executing_organization_name}</p>
+              <p><strong>Utförande organisation nummer:</strong> {selectedProject.executing_organization_number}</p>
+              <p><strong>Projektperiod Start:</strong> {selectedProject.period_start}</p>
+              <p><strong>Projektperiod Slut:</strong> {selectedProject.period_end}</p>
+              <p><strong>Versionsgiltighetsperiod Start:</strong> {selectedProject.version_start}</p>
+              <p><strong>Versionsgiltighetsperiod Slut:</strong> {selectedProject.version_end}</p>
+            </>
+          )}
 
-      </div>
+        </div>
 
         {/* MAP */}
         <Map
           selectedProjectId={selectedProject.id}
-          onSave={handleSaveMapData}
           geoJsonData={geoJsonData}
           userID={selectedProject.user}
         />
@@ -425,7 +423,7 @@ const ProjectView = () => {
 
           <label htmlFor="executingOrganizationName">Utförande organisation namn:</label>
           <input type="text" id="executingOrganizationName" name="executingOrganizationName" required />
-          
+
           <label htmlFor="executingOrganizationNumber">Utförande organisation nummer:</label>
           <input type="text" id="executingOrganizationNumber" name="executingOrganizationNumber" required />
 
