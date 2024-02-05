@@ -1,13 +1,13 @@
 // Import necessary modules and components
 import React, { useState, useEffect } from 'react'; // Import React and the useState and useEffect hooks
-import { useNavigate } from 'react-router-dom'; // Import the useNavigate hook from react-router-dom for navigation
+import { useNavigate, useParams } from 'react-router-dom'; // Import the useNavigate hook from react-router-dom for navigation
 import { API_URLS } from '../constants/APIURLS'; // Import the API_URLS constant
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-draw/dist/leaflet.draw.css';
 import Map from '../components/map/Map';
-import { useParams } from 'react-router-dom';
 import './DataView.css'; // Import the CSS for the DataView component
+
 
 
 const DataView = () => {
@@ -35,6 +35,7 @@ const DataView = () => {
       navigate('/login'); // Navigate to the login page
     } else { // If there is an access token
       fetchProjects(); // Fetch the projects
+      //viewProjectDetails(projectId);
       navigate('/data');
     }
   }, [accessToken]); // Dependency array for the useEffect hook
@@ -94,90 +95,124 @@ const DataView = () => {
   };
 
 
-  if (selectedProject) {
+  const handleAttributeValueChange = (featureIndex, attributeName, newValue) => {
+    const updatedGeoJsonData = { ...geoJsonData };
+    updatedGeoJsonData.features[featureIndex].properties[attributeName] = newValue;
+    setGeoJsonData(updatedGeoJsonData);
+  };
+
+    if (selectedProject) {
+      return (
+
+        <div className="dataView-container">
+          <div className="top-bar">
+            <div className="project-name">Project Name</div>
+            <div className="top-bar-buttons">
+              <button>Filter</button>
+              <button>Rapport</button>
+              <button>Export</button>
+            </div>
+            <div className="hamburger-menu">Menu</div>
+          </div>
+
+          <div className="content">
+            <div className="left-window">
+              <div className="buttons-section">
+                <button>Kartläggning biologisk mångfald</button>
+                <button>Naturvärdesbiologi</button>
+                <button>Landskapsområden</button>
+              </div>
+              <div className="additional-section">
+                Tillägg
+                {/* Additional buttons can be added here */}
+              </div>
+              <div className="mapping-types-section">
+                Utförda kartläggningstyper
+                {/* More buttons can be added here */}
+              </div>
+            </div>
+
+            <div className="middle-window">
+              <div className="parent-one">
+                <Map
+                  selectedProjectId={selectedProject.id}
+                  geoJsonData={geoJsonData}
+                  userID={selectedProject.user}
+                  shouldHide={true}
+                />
+              </div>
+              <div className="attribute-table">
+                <h3>Attribute Table</h3>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Feature ID</th>
+                      <th>Attribute</th>
+                      <th>Value</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {geoJsonData && geoJsonData.features.map((feature, featureIndex) => (
+                      Object.entries(feature.properties).map(([attributeName, value], index) => (
+                        <tr key={index}>
+                          {index === 0 && <td rowSpan={Object.keys(feature.properties).length}>{feature.id}</td>}
+                          <td>{attributeName}</td>
+                          <td>
+                            <input
+                              type="text"
+                              value={value}
+                              onChange={(e) => handleAttributeValueChange(featureIndex, attributeName, e.target.value)}
+                            />
+                          </td>
+                        </tr>
+                      ))
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+
+            <div className="right-window">
+              <div className="project-info">Project Information</div>
+              <div className="project-image">Project Image</div>
+              <div className="edit-section">Redigera objekt</div>
+            </div>
+
+          </div>
+        </div>
+      );
+    }
+
+
     return (
 
-      <div className="dataView-container">
-        <div className="top-bar">
-          <div className="project-name">Project Name</div>
-          <div className="top-bar-buttons">
-            <button>Filter</button>
-            <button>Rapport</button>
-            <button>Export</button>
-          </div>
-          <div className="hamburger-menu">Menu</div>
+      <div className="project-container">
+        <h1>Välj projekt för analys</h1>
+
+        <div className="project-controls">
+          <input
+            type="text"
+            placeholder="Sök projekt..."
+            onChange={handleSearchChange}
+          />
+          <button onClick={toggleSortOrder}>
+            Sortera: {sortOrder === 'asc' ? 'äldst' : 'senaste'}
+          </button>
         </div>
 
-        <div className="content">
-          <div className="left-window">
-            <div className="buttons-section">
-              <button>Kartläggning biologisk mångfald</button>
-              <button>Naturvärdesbiologi</button>
-              <button>Landskapsområden</button>
+        {
+          filteredProjects.map(project => (
+            <div key={project.id} className='project'>
+              <h2>{project.project_name} - #{project.id}</h2>
+              <p>{project.description}</p>
+              <button className="toggle-form-button" onClick={() => viewProjectDetails(project.id)}>Välj projekt!</button>
             </div>
-            <div className="additional-section">
-              Tillägg
-              {/* Additional buttons can be added here */}
-            </div>
-            <div className="mapping-types-section">
-              Utförda kartläggningstyper
-              {/* More buttons can be added here */}
-            </div>
-          </div>
-
-          <div className="middle-window">
-            <div className="parent-one">
-              <Map
-                selectedProjectId={selectedProject.id}
-                geoJsonData={geoJsonData}
-                userID={selectedProject.user}
-                shouldHide={true}
-              />
-            </div>
-            <div className="attribute-table">
-              Attributtabell
-              {/* Tabs with tables displaying attributes from every map object */}
-            </div>
-          </div>
-
-          <div className="right-window">
-            <div className="project-info">Project Information</div>
-            <div className="project-image">Project Image</div>
-            <div className="edit-section">Redigera objekt</div>
-          </div>
-        </div>
+          ))
+        }
       </div>
-    );
+    )
   }
-
-  return (
-
-    <div className="project-container">
-      <h1>Välj projekt för analys</h1>
-
-      <div className="project-controls">
-        <input
-          type="text"
-          placeholder="Sök projekt..."
-          onChange={handleSearchChange}
-        />
-        <button onClick={toggleSortOrder}>
-          Sortera: {sortOrder === 'asc' ? 'äldst' : 'senaste'}
-        </button>
-      </div>
-
-      {
-        filteredProjects.map(project => (
-          <div key={project.id} className='project'>
-            <h2>{project.project_name} - #{project.id}</h2>
-            <p>{project.description}</p>
-            <button className="toggle-form-button" onClick={() => viewProjectDetails(project.id)}>Välj projekt!</button>
-          </div>
-        ))
-      }
-    </div>
-  )
-}
 
 
 
