@@ -179,29 +179,47 @@ const Map = ({ selectedProjectId, onSave, userID }) => {
   };
   
   
-// Function to Remove Duplicate Rectangles
-const removeDuplicateRectangles = () => {
-  const allRectangles = [];
-  const duplicateRectangles = [];
-
-  featureGroupRef.current.eachLayer(layer => {
-    if (layer instanceof L.Rectangle) {
-      const layerBounds = layer.getBounds().toBBoxString();
-      if (allRectangles.includes(layerBounds)) {
-        // This is a duplicate rectangle
-        if (!layer.options.shape) {
-          // If it doesn't have the custom property, mark it for removal
-          duplicateRectangles.push(layer);
-        }
+  const removeDuplicateRectangles = () => {
+    const layers = featureGroupRef.current.getLayers();
+    const rectangles = layers.filter(layer => layer instanceof L.Rectangle);
+    let uniqueRectangles = [];
+  
+    rectangles.forEach(currentRect => {
+      const duplicateIndex = uniqueRectangles.findIndex(uniqueRect =>
+        uniqueRect.getBounds().equals(currentRect.getBounds())
+      );
+  
+      if (duplicateIndex === -1) {
+        uniqueRectangles.push(currentRect);
       } else {
-        allRectangles.push(layerBounds);
+        const duplicateRect = uniqueRectangles[duplicateIndex];
+        const hasCurrentRectCropProperty = currentRect.options && currentRect.options.shape === "rectangleCrop";
+        const hasDuplicateRectCropProperty = duplicateRect.options && duplicateRect.options.shape === "rectangleCrop";
+  
+        if (hasCurrentRectCropProperty && !hasDuplicateRectCropProperty) {
+          featureGroupRef.current.removeLayer(duplicateRect);
+          uniqueRectangles[duplicateIndex] = currentRect;
+        } else if (!hasCurrentRectCropProperty) {
+          featureGroupRef.current.removeLayer(currentRect);
+        }
       }
-    }
-  });
-
-  // Remove the marked duplicate rectangles
-  duplicateRectangles.forEach(dupLayer => featureGroupRef.current.removeLayer(dupLayer));
-};
+    });
+  
+    // Convert unique rectangles to GeoJSON and ensure "shape" property is included
+    const updatedFeatures = uniqueRectangles.map(rect => {
+      const geoJsonFeature = rect.toGeoJSON();
+      // Ensure "shape" property is included from layer options if it exists
+      geoJsonFeature.properties.shape = rect.options.shape || 'rectangleCrop'; // Setting "shape" property, defaulting to 'Unknown' if not present
+      return geoJsonFeature;
+    });
+  
+    setGeoJsonData({
+      type: 'FeatureCollection',
+      features: updatedFeatures
+    });
+  };
+  
+    
 
 
 useEffect(() => {
