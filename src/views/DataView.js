@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'; // Import the useNavigate hook f
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-draw/dist/leaflet.draw.css';
+import Map from '../components/map/Map';
 
 const DataView = () => {
   const navigate = useNavigate();
@@ -20,6 +21,7 @@ const DataView = () => {
 
   return (
       <div>
+      <Map />
       </div>
   );
 };

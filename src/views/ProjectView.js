@@ -7,11 +7,11 @@ import Map from '../components/map/Map.js'; // Import the Map component
 import Survey from '../components/survey/Survey.js'; // Import the Survey component
 import { useParams } from 'react-router-dom';
 
-
 /**
  * Represents the view for managing projects.
  * @returns {JSX.Element} The ProjectView component.
  */
+
 const ProjectView = () => {
   // Define state variables
   const [projects, setProjects] = useState([]); // State for storing the list of projects
@@ -40,8 +40,6 @@ const ProjectView = () => {
   });
   const [searchTerm, setSearchTerm] = useState(''); // State for search term
   const [sortOrder, setSortOrder] = useState('desc'); // State for sort order ('asc' or 'desc')
-
-
 
   useEffect(() => {
     if (projectId) {
@@ -79,77 +77,6 @@ const ProjectView = () => {
         return b.id - a.id; // Descending order
       }
     });
-
-
-  /*
-    // Function to handle saving map data
-    const handleSaveMapData = (geoJsonData) => {
-      // Check if there is a selected project and GeoJSON data to save
-      if (!selectedProject || !geoJsonData || !geoJsonData.features || geoJsonData.features.length === 0) {
-        console.error("No GeoJSON data to save."); // Log an error message
-        return Promise.reject("Ingen GeoJSON-data att spara."); // Reject the promise
-      }
-  
-      // Map over the features in the GeoJSON data
-      const savePromises = geoJsonData.features.map(feature => {
-        let url; // Variable for the URL
-        let dataToSend; // Variable for the data to send
-  
-        // Switch statement for handling different types of features
-        switch (feature.geometry.type) {
-          case 'Polygon': // If the feature is a polygon
-            url = `${API_URLS.PROJECT_DETAIL}${selectedProject.id}/add_polygon/`; // Set the URL for adding a polygon
-            dataToSend = { // Set the data to send
-              name: "Polygon Name", // Name of the polygon
-              status: "Active", // Status of the polygon
-              geo_data: feature.geometry // Geometry data of the polygon
-            };
-            break;
-          case 'LineString': // If the feature is a line string
-            url = `${API_URLS.PROJECT_DETAIL}${selectedProject.id}/add_line/`; // Set the URL for adding a line string
-            dataToSend = { // Set the data to send
-              name: "Line Name", // Name of the line string
-              status: "Active", // Status of the line string
-              geo_data: feature.geometry // Geometry data of the line string
-            };
-            break;
-          case 'Point': // If the feature is a point
-            url = `${API_URLS.PROJECT_DETAIL}${selectedProject.id}/add_point/`; // Set the URL for adding a point
-            dataToSend = { // Set the data to send
-              name: "Point Name", // Name of the point
-              status: "Active", // Status of the point
-              geo_data: feature.geometry, // Geometry data of the point
-              attributes: {} // Attributes of the point
-            };
-            break;
-          default: // If the feature type is not supported
-            console.error('Unsupported feature type:', feature.geometry.type); // Log an error message
-            return; // Return from the function
-        }
-  
-        // Fetch request to save the feature
-        return fetch(url, {
-          method: 'POST', // HTTP method
-          headers: { // HTTP headers
-            'Content-Type': 'application/json', // Content type header
-            'Authorization': `Bearer ${accessToken}`, // Authorization header
-          },
-          body: JSON.stringify(dataToSend), // Body of the request
-        }).then(response => response.json()); // Parse the response as JSON
-      });
-  
-      // Wait for all save promises to resolve
-      return Promise.all(savePromises)
-        .then(data => {
-          console.log("All features saved:", data); // Log the saved data
-          return data; // Resolve the promise with the saved data
-        })
-        .catch(error => {
-          console.error("Error saving features:", error); // Log the error
-          return Promise.reject(error); // Reject the promise on error
-        });
-    };
-    */
 
 
   // Function to fetch projects from the API
