@@ -205,19 +205,23 @@ const Map = ({ selectedProjectId, onSave, userID }) => {
       }
     });
   
+    // Extract non-rectangle features from the existing geoJsonData
+    const nonRectangleFeatures = geoJsonData.features.filter(feature => feature.properties.shape !== "rectangleCrop");
+  
     // Convert unique rectangles to GeoJSON and ensure "shape" property is included
-    const updatedFeatures = uniqueRectangles.map(rect => {
+    const updatedRectangleFeatures = uniqueRectangles.map(rect => {
       const geoJsonFeature = rect.toGeoJSON();
-      // Ensure "shape" property is included from layer options if it exists
-      geoJsonFeature.properties.shape = rect.options.shape || 'rectangleCrop'; // Setting "shape" property, defaulting to 'Unknown' if not present
+      geoJsonFeature.properties.shape = rect.options.shape || 'rectangleCrop'; // Ensuring "shape" property is set
       return geoJsonFeature;
     });
   
+    // Merge non-rectangle features with updated rectangle features
     setGeoJsonData({
       type: 'FeatureCollection',
-      features: updatedFeatures
+      features: [...nonRectangleFeatures, ...updatedRectangleFeatures]
     });
   };
+  
   
     
 
