@@ -13,7 +13,18 @@
     align-items: center;
     justify-content: space-between; /* Space between logo and navigation */
     border-bottom: 10px solid #30A875; /* Thick green line at the bottom */
+    
 }
+
+.header-content {
+    max-width: 1600px; /* Maximum width for the header contents */
+    width: 100%; /* Ensure it takes up available space up to the max-width */
+    margin: auto; /* Center the wrapper within the header */
+    display: flex; /* Maintain the flex layout of the header contents */
+    align-items: center; /* Center items vertically */
+    justify-content: space-between; /* Maintain spacing between items */
+}
+
 
 .logo-container {
     display: flex;

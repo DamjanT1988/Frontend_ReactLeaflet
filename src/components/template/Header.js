@@ -20,6 +20,7 @@ const Header = () => {
 
   return (
     <header className="header">
+    <div className='header-content'>
       <div className="logo-container">
         <img src={Logo} alt="logo" className="logo" />
       </div>
@@ -33,6 +34,7 @@ const Header = () => {
         <NavLink to="/news" className={({ isActive }) => getNavLinkClass(isActive)}>NYHETER</NavLink>
         <NavLink to="/settings" className={({ isActive }) => getNavLinkClass(isActive)}>ANVÄNDARKONTO</NavLink>
         <button onClick={handleLogout}>LOGGA UT</button>
+      </div>
       </div>
     </header>
   );

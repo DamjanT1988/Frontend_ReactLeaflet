@@ -22,6 +22,7 @@ const ProjectView = () => {
   const toggleFormVisibility = () => setShowForm(!showForm); // Function to toggle the visibility of the form
   const { projectId } = useParams(); // Assuming the URL parameter is named 'projectId'
   const [isEditMode, setIsEditMode] = useState(false);
+  const [geoJsonData, setGeoJsonData] = useState(null);
   const [editedProject, setEditedProject] = useState({
     project_name: '',
     description: '',
@@ -92,9 +93,6 @@ const ProjectView = () => {
       .then(data => setProjects(data)) // Set the projects state with the fetched data
       .catch(error => console.error('Error fetching projects:', error)); // Log any errors
   };
-
-  // State for storing GeoJSON data
-  const [geoJsonData, setGeoJsonData] = useState(null);
 
   // Function to view the details of a project
   const viewProjectDetails = (projectId) => {
@@ -304,11 +302,13 @@ const ProjectView = () => {
         </div>
 
         {/* MAP */}
-        <Map
-          selectedProjectId={selectedProject.id}
-          geoJsonData={geoJsonData}
-          userID={selectedProject.user}
-        />
+        <div>
+          <Map
+            selectedProjectId={selectedProject.id}
+            geoJsonData={geoJsonData}
+            userID={selectedProject.user}
+          />
+        </div>
       </div>
     );
   }
