@@ -238,6 +238,8 @@ useEffect(() => {
 useEffect(() => {
   if (featureGroupRef.current) {
     featureGroupRef.current.clearLayers(); // Clear existing layers first
+    let foundCropRectangle = false;
+
     if (geoJsonData) {
       L.geoJSON(geoJsonData, {
 
@@ -255,6 +257,9 @@ useEffect(() => {
 
         onEachFeature: (feature, layer) => {
 
+          if (feature.properties.shape === "rectangleCrop") {
+            foundCropRectangle = true; // Set the flag if a crop rectangle is found
+          }
 
           // Generate popup content based on feature properties
           const popupContent = generatePopupContent(feature.properties);
@@ -354,6 +359,10 @@ useEffect(() => {
 
 
     }
+
+    setIsRectangleDrawn(foundCropRectangle); // Update the state based on the presence of a crop rectangle
+    setShowRectangleButton(!foundCropRectangle); // Hide or show the button based on the presence of a crop rectangle
+
   }
 }, [geoJsonData]);
 
