@@ -38,6 +38,16 @@
     background-color: green;
     color: white;
   }
+
+  .highlighted-row {
+    border: 2px solid green !important;
+  }
+  
+  .highlighted-button {
+    background-color: #4CAF50; /* Green background */
+    color: white; /* White text */
+    /* Other styling as needed */
+  }
   
 /* Style for each project */
 .project {
