@@ -314,6 +314,15 @@ const Map = ({ selectedProjectId, onSave, userID, shouldHide }) => {
 
           onEachFeature: (feature, layer) => {
 
+            layer.on('click', () => {
+              setHighlightedId(feature.properties.id); // Set the highlighted feature's ID
+              // You can also apply a style change here to highlight the feature on the map
+              layer.setStyle({
+                color: 'green', // Example style change
+                weight: 5,
+              });
+            });
+
             if (feature.properties.shape === "rectangleCrop") {
               foundCropRectangle = true; // Set the flag if a crop rectangle is found
             }
@@ -1386,6 +1395,7 @@ const Map = ({ selectedProjectId, onSave, userID, shouldHide }) => {
   };
 
 
+  const [highlightedId, setHighlightedId] = useState(null);
 
   
 // Mapping of attribute property keys to custom display names
@@ -1441,7 +1451,13 @@ const renderAttributeTable = () => {
           {geoJsonData.features.map((feature, featureIndex) => (
             <tr key={featureIndex}>
               <td>
-                <button onClick={() => highlightFeature(feature.properties.id)}>Markera</button>
+              <button
+  className={highlightedId === feature.properties.id ? 'highlighted' : ''}
+  onClick={() => highlightFeature(feature.properties.id)}
+>
+  Markera
+</button>
+
               </td>
               {attributeNames.map((name, index) => (
                 <td key={`${featureIndex}-${index}`}>

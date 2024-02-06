@@ -34,7 +34,11 @@
     display: none;
 }
 
-
+.highlighted {
+    background-color: green;
+    color: white;
+  }
+  
 /* Style for each project */
 .project {
     background-color: #fff; /* White background for each project */
