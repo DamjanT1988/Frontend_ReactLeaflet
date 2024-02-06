@@ -113,6 +113,62 @@ const Map = ({ selectedProjectId, onSave, userID, shouldHide }) => {
   const [showAttributeTable, setShowAttributeTable] = useState(false);
   const [showRectangleButton, setShowRectangleButton] = useState(true);
 
+
+
+  const handleFeatureClick = (featureId) => {
+    // Logic to handle click on a feature to potentially edit attributes
+  };
+
+/*
+  const handleAttributeValueChange = (featureId, attributeName, newValue) => {
+    const updatedGeoJsonData = { ...geoJsonData };
+    const featureIndex = updatedGeoJsonData.features.findIndex(f => f.properties.id === featureId);
+    if (featureIndex !== -1) {
+      updatedGeoJsonData.features[featureIndex].properties[attributeName] = newValue;
+      setGeoJsonData(updatedGeoJsonData);
+    }
+  };
+*/
+
+  // Function to add a feature to the GeoJSON data
+  const addFeature = (feature) => {
+    setGeoJsonData(prevData => ({
+      ...prevData,
+      features: [...prevData.features, feature]
+    }));
+  };
+
+  // Function to update a feature in the GeoJSON data
+  const updateFeature = (featureId, newGeometry) => {
+    setGeoJsonData(prevData => {
+      const updatedFeatures = prevData.features.map(f => {
+        if (f.properties.id === featureId) {
+          return { ...f, geometry: newGeometry };
+        }
+        return f;
+      });
+      return { ...prevData, features: updatedFeatures };
+    });
+  };
+
+  // Function to remove a feature from the GeoJSON data
+  const removeFeature = (featureId) => {
+    setGeoJsonData(prevData => {
+      const updatedFeatures = prevData.features.filter(f => f.properties.id !== featureId);
+      return { ...prevData, features: updatedFeatures };
+    });
+  };
+
+
+
+
+
+
+
+
+
+
+
   const RectangleDrawButton = () => {
     const map = useMap();
 
@@ -219,7 +275,6 @@ const Map = ({ selectedProjectId, onSave, userID, shouldHide }) => {
       features: [...nonRectangleFeatures, ...updatedRectangleFeatures]
     });
   };
-
 
 
 
@@ -1332,6 +1387,125 @@ const Map = ({ selectedProjectId, onSave, userID, shouldHide }) => {
 
 
 
+  
+// Mapping of attribute property keys to custom display names
+const attributeDisplayNameMap = {
+  area: "Area",
+  date: "Datum",
+  executer: "Utförare",
+  habitat: "Biotop",
+  habitatQualities: "Biotopkvaliteter",
+  inventoryLevel: "Inventeringsnivå",
+  natureType: "Naturtyp",
+  natureValueClass: "Naturvärdesklass",
+  objectNumber: "Objektnummer",
+  organsation: "Organisation",
+  preliminaryAssesment: "Preliminär bedömning",
+  projectName: "Projektnamn",
+  reason: "Motivering",
+  species: "Arter",
+  valueElements: "Värdeelement",
+  // Add more mappings as needed
+};
+
+const renderAttributeTable = () => {
+  // Ensure geoJsonData is not null and has features before proceeding
+  if (!geoJsonData || !geoJsonData.features) {
+    return <div>Loading data...</div>; // Or any other placeholder content
+  }
+
+  // Collect all unique attribute names across all features
+  const allAttributeNames = new Set();
+  geoJsonData.features.forEach(feature => {
+    Object.keys(feature.properties.attributes).forEach(attrName => {
+      allAttributeNames.add(attrName);
+    });
+  });
+
+  // Convert the Set to an array for mapping
+  const attributeNames = Array.from(allAttributeNames);
+
+  return (
+    <div className="attribute-table">
+      <h3>Attributtabell</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Kartan</th> {/* Additional column for highlight button */}
+            {attributeNames.map((name, index) => (
+              <th key={index}>{attributeDisplayNameMap[name] || name}</th> // Use display names from the map
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {geoJsonData.features.map((feature, featureIndex) => (
+            <tr key={featureIndex}>
+              <td>
+                <button onClick={() => highlightFeature(feature.properties.id)}>Markera</button>
+              </td>
+              {attributeNames.map((name, index) => (
+                <td key={`${featureIndex}-${index}`}>
+                  <input
+                    type="text"
+                    value={feature.properties.attributes[name] || ''}
+                    onChange={e => handleAttributeValueChange(featureIndex, name, e.target.value)}
+                      
+
+                  />
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+};
+
+const highlightFeature = (featureId) => {
+  if (featureGroupRef.current) {
+    const layers = featureGroupRef.current.getLayers();
+    layers.forEach(layer => {
+      if (layer.feature && layer.feature.properties.id === featureId) {
+        // Check if the layer is a type that supports setStyle
+        if (typeof layer.setStyle === 'function') {
+          // Logic to highlight the feature, e.g., changing its style
+          layer.setStyle({
+            color: '#ff7800', // Example highlight color
+            weight: 5 // Example weight
+          });
+        }
+      } else {
+        // Optionally, reset the style for non-highlighted features if they support setStyle
+        if (typeof layer.setStyle === 'function') {
+          layer.setStyle({
+            color: '#3388ff', // Original color
+            weight: 3 // Original weight
+          });
+        }
+      }
+    });
+  }
+};
+
+
+// Function to handle attribute value changes
+const handleAttributeValueChange = (featureIndex, attributeName, newValue) => {
+  const updatedFeatures = [...geoJsonData.features];
+  if (!updatedFeatures[featureIndex].properties.attributes) {
+    updatedFeatures[featureIndex].properties.attributes = {};
+  }
+  updatedFeatures[featureIndex].properties.attributes[attributeName] = newValue;
+
+  setGeoJsonData({
+    ...geoJsonData,
+    features: updatedFeatures,
+  });
+};
+
+
+
+
   //      Import (GeoJSON): <input type="file" onChange={handleFileUploadGeoJSON} />
   return (
     <div>
@@ -1508,21 +1682,6 @@ const Map = ({ selectedProjectId, onSave, userID, shouldHide }) => {
             onCreated={onCreate}
             onEdited={onEdited}
             onDeleted={onDeleted}
-
-            draw={{
-              /*  
-                rectangle: isRectangleDrawn ? false : {
-                  shapeOptions: {
-                    color: 'red',
-                    weight: 2,
-                    fillOpacity: 0.2
-                  },
-                  
-                  //icon: customRectangleIcon 
-                },
-                */
-              //circlemarker: false,
-            }}
           />
           {shapeLayers && shapeLayers.map((feature, index) => (
             <GeoJSON key={index} data={feature} />
@@ -1533,6 +1692,7 @@ const Map = ({ selectedProjectId, onSave, userID, shouldHide }) => {
       {shouldHide && <div className="elementToHide">
         <button className="toggle-form-button" onClick={saveDataToServer}>Spara ritning!</button>
         <span className="save-status">{saveStatus}</span>
+        {renderAttributeTable()}
       </div>}
     </div>
   );

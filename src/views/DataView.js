@@ -21,13 +21,15 @@ const DataView = () => {
   const [geoJsonData, setGeoJsonData] = useState(null);
   const [searchTerm, setSearchTerm] = useState(''); // State for search term
   const [sortOrder, setSortOrder] = useState('desc'); // State for sort order ('asc' or 'desc')
-
-
+/*
   useEffect(() => {
-    if (projectId) {
-      viewProjectDetails(projectId);
+    if (!accessToken) {
+      if (projectId) {
+        viewProjectDetails(projectId);
+      }
     }
   }, [projectId]);
+*/
 
   // Use effect hook to fetch projects if access token is available
   useEffect(() => {
@@ -35,10 +37,12 @@ const DataView = () => {
       navigate('/login'); // Navigate to the login page
     } else { // If there is an access token
       fetchProjects(); // Fetch the projects
+      //console.log(geoJsonData);
       //viewProjectDetails(projectId);
       navigate('/data');
     }
   }, [accessToken]); // Dependency array for the useEffect hook
+
 
   // Function to handle the search input change
   const handleSearchChange = (e) => {
@@ -95,124 +99,57 @@ const DataView = () => {
   };
 
 
+/*
   const handleAttributeValueChange = (featureIndex, attributeName, newValue) => {
     const updatedGeoJsonData = { ...geoJsonData };
     updatedGeoJsonData.features[featureIndex].properties[attributeName] = newValue;
     setGeoJsonData(updatedGeoJsonData);
+    console.log(geoJsonData);
   };
+*/
 
-    if (selectedProject) {
-      return (
-
-        <div className="dataView-container">
-          <div className="top-bar">
-            <div className="project-name">Project Name</div>
-            <div className="top-bar-buttons">
-              <button>Filter</button>
-              <button>Rapport</button>
-              <button>Export</button>
-            </div>
-            <div className="hamburger-menu">Menu</div>
-          </div>
-
-          <div className="content">
-            <div className="left-window">
-              <div className="buttons-section">
-                <button>Kartläggning biologisk mångfald</button>
-                <button>Naturvärdesbiologi</button>
-                <button>Landskapsområden</button>
-              </div>
-              <div className="additional-section">
-                Tillägg
-                {/* Additional buttons can be added here */}
-              </div>
-              <div className="mapping-types-section">
-                Utförda kartläggningstyper
-                {/* More buttons can be added here */}
-              </div>
-            </div>
-
-            <div className="middle-window">
-              <div className="parent-one">
-                <Map
-                  selectedProjectId={selectedProject.id}
-                  geoJsonData={geoJsonData}
-                  userID={selectedProject.user}
-                  shouldHide={true}
-                />
-              </div>
-              <div className="attribute-table">
-                <h3>Attribute Table</h3>
-                <table>
-                  <thead>
-                    <tr>
-                      <th>Feature ID</th>
-                      <th>Attribute</th>
-                      <th>Value</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {geoJsonData && geoJsonData.features.map((feature, featureIndex) => (
-                      Object.entries(feature.properties).map(([attributeName, value], index) => (
-                        <tr key={index}>
-                          {index === 0 && <td rowSpan={Object.keys(feature.properties).length}>{feature.id}</td>}
-                          <td>{attributeName}</td>
-                          <td>
-                            <input
-                              type="text"
-                              value={value}
-                              onChange={(e) => handleAttributeValueChange(featureIndex, attributeName, e.target.value)}
-                            />
-                          </td>
-                        </tr>
-                      ))
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-
-            <div className="right-window">
-              <div className="project-info">Project Information</div>
-              <div className="project-image">Project Image</div>
-              <div className="edit-section">Redigera objekt</div>
-            </div>
-
-          </div>
-        </div>
-      );
-    }
-
-
+  if (selectedProject) {
     return (
-
-      <div className="project-container">
-        <h1>Välj projekt för analys</h1>
-
-        <div className="project-controls">
-          <input
-            type="text"
-            placeholder="Sök projekt..."
-            onChange={handleSearchChange}
-          />
-          <button onClick={toggleSortOrder}>
-            Sortera: {sortOrder === 'asc' ? 'äldst' : 'senaste'}
-          </button>
-        </div>
-
-        {
-          filteredProjects.map(project => (
-            <div key={project.id} className='project'>
-              <h2>{project.project_name} - #{project.id}</h2>
-              <p>{project.description}</p>
-              <button className="toggle-form-button" onClick={() => viewProjectDetails(project.id)}>Välj projekt!</button>
+            <div className='parent-one'>
+              <Map
+                selectedProjectId={selectedProject.id}
+                geoJsonData={geoJsonData}
+                userID={selectedProject.user}
+                shouldHide={true}
+              />
             </div>
-          ))
-        }
-      </div>
-    )
+    );
   }
+
+
+  return (
+
+    <div className="project-container">
+      <h1>Välj projekt för analys</h1>
+
+      <div className="project-controls">
+        <input
+          type="text"
+          placeholder="Sök projekt..."
+          onChange={handleSearchChange}
+        />
+        <button onClick={toggleSortOrder}>
+          Sortera: {sortOrder === 'asc' ? 'äldst' : 'senaste'}
+        </button>
+      </div>
+
+      {
+        filteredProjects.map(project => (
+          <div key={project.id} className='project'>
+            <h2>{project.project_name} - #{project.id}</h2>
+            <p>{project.description}</p>
+            <button className="toggle-form-button" onClick={() => viewProjectDetails(project.id)}>Välj projekt!</button>
+          </div>
+        ))
+      }
+    </div>
+  )
+}
 
 
 
