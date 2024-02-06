@@ -262,6 +262,34 @@ const Map = ({ selectedProjectId, onSave, userID, shouldHide }) => {
           onEachFeature: (feature, layer) => {
 
             layer.on('click', () => {
+              // Reset style of the last highlighted layer
+              if (lastHighlightedLayer && lastHighlightedLayer !== layer) {
+                lastHighlightedLayer.setStyle({
+                  color: '#3388ff', // Original color
+                  weight: 2, // Original weight
+                });
+              }
+          
+              // Highlight the clicked layer only if it's not already highlighted
+              if (lastHighlightedLayer !== layer) {
+                layer.setStyle({
+                  color: 'green', // Highlight color
+                  weight: 5, // Highlighted weight
+                });
+              }
+          
+              // Update the reference to the last highlighted layer
+              setLastHighlightedLayer(layer);
+          
+              // Any other logic to be executed on layer click, such as updating selected feature properties
+              // For example, setting selectedId and attributesObject for the clicked feature
+              if (feature.properties && (feature.properties.id || feature.properties.attributes)) {
+                setSelectedId(feature.properties.id);
+                setAttributesObject(feature.properties.attributes);
+              }
+            });
+
+            layer.on('click', () => {
               setHighlightedId(feature.properties.id); // Set the highlighted feature's ID
               // You can also apply a style change here to highlight the feature on the map
               layer.setStyle({
@@ -274,6 +302,11 @@ const Map = ({ selectedProjectId, onSave, userID, shouldHide }) => {
               setHighlightedFeatureId(feature.properties.id); // Update highlighted feature ID
               // Existing code to set the selected feature's properties
             });
+
+
+
+
+
 
             if (feature.properties.shape === "rectangleCrop") {
               foundCropRectangle = true; // Set the flag if a crop rectangle is found
@@ -1349,6 +1382,7 @@ const Map = ({ selectedProjectId, onSave, userID, shouldHide }) => {
 
   const [highlightedId, setHighlightedId] = useState(null);
   const [highlightedFeatureId, setHighlightedFeatureId] = useState(null);
+  const [lastHighlightedLayer, setLastHighlightedLayer] = useState(null);
 
 
 
