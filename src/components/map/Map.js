@@ -112,8 +112,6 @@ const Map = ({ selectedProjectId, onSave, userID, shouldHide }) => {
   const [showAdditionalFields, setShowAdditionalFields] = useState(false);
   const [showAttributeTable, setShowAttributeTable] = useState(false);
   const [showRectangleButton, setShowRectangleButton] = useState(true);
-  const [highlightedIds, setHighlightedIds] = useState(new Set());
-
 
 
   const RectangleDrawButton = () => {
@@ -1351,28 +1349,67 @@ const Map = ({ selectedProjectId, onSave, userID, shouldHide }) => {
   const [highlightedFeatureId, setHighlightedFeatureId] = useState(null);
   const [selectedRowIds, setSelectedRowIds] = useState(new Set());
 
-  // Existing useEffect hooks and other logic...
+// State to track highlighted feature IDs
+const [highlightedIds, setHighlightedIds] = useState(new Set());
 
-  const handleRowClick = (featureId, event) => {
-    const newSelection = new Set(selectedRowIds);
+// Function to handle row clicks and feature highlighting
+const handleRowClick = (featureId, event) => {
+  setHighlightedIds(prevHighlightedIds => {
+    const newHighlightedIds = new Set(prevHighlightedIds); // Create a copy of the current Set
 
     if (event.ctrlKey) {
       // Toggle selection
-      if (newSelection.has(featureId)) {
-        newSelection.delete(featureId);
+      if (newHighlightedIds.has(featureId)) {
+        newHighlightedIds.delete(featureId); // Remove from selection
       } else {
-        newSelection.add(featureId);
+        newHighlightedIds.add(featureId); // Add to selection
       }
     } else {
       // Single selection
-      newSelection.clear();
-      newSelection.add(featureId);
+      newHighlightedIds.clear();
+      newHighlightedIds.add(featureId);
     }
 
-    setSelectedRowIds(newSelection);
+    return newHighlightedIds;
+  });
+
+  // Update the map to reflect the new highlighted features
+  updateMapHighlights();
+};
+
+const updateMapHighlights = () => {
+    if (featureGroupRef.current) {
+      featureGroupRef.current.eachLayer(layer => {
+        if (layer.feature && highlightedIds.has(layer.feature.properties.id)) {
+          if (typeof layer.setStyle === 'function') {
+            // Highlight the layer
+            layer.setStyle({
+              color: 'green', // Example highlight color
+              weight: 5, // Example weight
+            });
+          }
+        } else {
+          if (typeof layer.setStyle === 'function') {
+            // Reset the layer style to default
+            layer.setStyle({
+              color: '#3388ff', // Original color
+              weight: 2, // Original weight
+            });
+          }
+        }
+      });
+    }
   };
 
 
+  
+
+// Call updateMapHighlights in useEffect to ensure highlights are updated when highlightedIds changes
+useEffect(() => {
+  updateMapHighlights();
+}, [highlightedIds]);
+
+  
   // Mapping of attribute property keys to custom display names
   const attributeDisplayNameMap = {
     area: "Area",
@@ -1424,8 +1461,8 @@ const Map = ({ selectedProjectId, onSave, userID, shouldHide }) => {
           </thead>
           <tbody>
             {geoJsonData.features.map((feature, featureIndex) => (
-              <tr key={featureIndex} className={highlightedId === feature.properties.id ? 'highlighted-row' : ''}
-              onClick={(event) => handleRowClick(feature.properties.id, event)}>
+              <tr key={featureIndex}  className={highlightedIds.has(feature.properties.id) ? 'highlighted-row' : ''}
+      onClick={(event) => handleRowClick(feature.properties.id, event)}>
                 <td>
                   <button
                   
@@ -1501,6 +1538,17 @@ const Map = ({ selectedProjectId, onSave, userID, shouldHide }) => {
 
 
 
+
+
+
+
+
+
+
+
+
+
+  
   //      Import (GeoJSON): <input type="file" onChange={handleFileUploadGeoJSON} />
   return (
     <div>

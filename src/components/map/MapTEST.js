@@ -1401,31 +1401,7 @@ const updateMapHighlights = () => {
     }
   };
 
-  const highlightFeatures = () => {
-    if (featureGroupRef.current) {
-      const layers = featureGroupRef.current.getLayers();
-      layers.forEach(layer => {
-        if (layer.feature && highlightedIds.has(layer.feature.properties.id)) {
-          // Check if the layer supports setStyle
-          if (typeof layer.setStyle === 'function') {
-            // Highlight the feature
-            layer.setStyle({
-              color: '#ff7800', // Example highlight color
-              weight: 5 // Example weight
-            });
-          }
-        } else {
-          // Reset the style for non-highlighted features
-          if (typeof layer.setStyle === 'function') {
-            layer.setStyle({
-              color: '#3388ff', // Original color
-              weight: 3 // Original weight
-            });
-          }
-        }
-      });
-    }
-  };
+
   
 
 // Call updateMapHighlights in useEffect to ensure highlights are updated when highlightedIds changes
@@ -1433,6 +1409,7 @@ useEffect(() => {
   updateMapHighlights();
 }, [highlightedIds]);
 
+  
   // Mapping of attribute property keys to custom display names
   const attributeDisplayNameMap = {
     area: "Area",
