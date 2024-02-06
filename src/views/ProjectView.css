@@ -42,6 +42,9 @@
   .highlighted-row {
     border: 2px solid green !important;
   }
+  .highlighted-row, .selected {
+    background-color: green; 
+  }  
   
   .highlighted-button {
     background-color: #4CAF50; /* Green background */
