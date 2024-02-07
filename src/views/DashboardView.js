@@ -13,7 +13,7 @@ const DashboardView = () => {
     const accessToken = localStorage.getItem('accessToken');
 
     // If no access token is found, redirect to the login page
-    if (!accessToken) {
+    if (/*!accessToken*/false) {
       navigate('/login');
       return;
     }

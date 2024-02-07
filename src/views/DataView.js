@@ -33,7 +33,7 @@ const DataView = () => {
 
   // Use effect hook to fetch projects if access token is available
   useEffect(() => {
-    if (!accessToken) { // If there is no access token
+    if (/*!accessToken*/false) { // If there is no access token
       navigate('/login'); // Navigate to the login page
     } else { // If there is an access token
       fetchProjects(); // Fetch the projects

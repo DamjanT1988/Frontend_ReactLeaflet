@@ -49,7 +49,7 @@ const SettingsView = () => {
   // Fetch user and payment details on component mount
   useEffect(() => {
     const accessToken = localStorage.getItem('accessToken');
-    if (!accessToken) {
+    if (/*!accessToken*/false) {
       navigate('/login');
     } else {
       fetchUserDetails(accessToken);
