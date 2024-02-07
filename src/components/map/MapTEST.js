@@ -287,6 +287,7 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
             let foundCropRectangle = false;
 
             if (geoJsonData) {
+                
                 L.geoJSON(geoJsonData, {
                     /*
                         pointToLayer: (feature, latlng) => {
@@ -308,7 +309,7 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
                             });
                 
                             return circle;
-                          }
+                          } 
                         },
                     */
 
