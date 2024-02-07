@@ -317,7 +317,7 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
                                 console.log('Circle clicked!'); // Log to confirm the click event is working
                                 circle.setStyle({
                                     color: 'green', // Change color to green upon click
-                                    //fillColor: 'green', // Change fill color to green upon click
+                                    fillColor: 'green', // Change fill color to green upon click
                                     fillOpacity: 0.2,
                                     weight: 5,
                                 });
