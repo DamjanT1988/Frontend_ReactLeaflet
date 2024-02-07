@@ -19,7 +19,7 @@ const LoginView = () => {
 
     // Check if the access token exists
     const accessToken = localStorage.getItem('accessToken');
-    if (accessToken) {
+    if (/*accessToken*/true) {
       navigate('/dashboard'); // If the access token exists in localStorage, navigate to Dashboard
     }
     // Dependency array is empty, meaning it will run once on mount
