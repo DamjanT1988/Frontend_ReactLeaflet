@@ -96,7 +96,6 @@ window.toggleAttributeContainer = (id, attributes) => {
 };
 
 
-
 // Define the Map component
 const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
     const featureGroupRef = useRef(null);
@@ -264,6 +263,7 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
                     },
 
                     onEachFeature: (feature, layer) => {
+
                         layer.on('click', () => {
                             setHighlightedId(feature.properties.id); // Set the highlighted feature's ID
                             if (typeof layer.setStyle === 'function' && feature.properties.shape !== "rectangleCrop") {
@@ -335,6 +335,7 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
                         if (feature.properties && feature.properties.isCircle) {
                             // If the feature is a circle, recreate it
                             const center = L.latLng(feature.geometry.coordinates[1], feature.geometry.coordinates[0]);
+                            
                             const circle = L.circle(center, {
                                 radius: feature.properties.radius,
                                 id: feature.properties.id,
@@ -352,6 +353,7 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
 
                             // Directly attach a click event listener to the circle
                             circle.on('click', () => {
+                                setHighlightedId(feature.properties.id); // Set the highlighted feature's ID
                                 circle.bindPopup(popupContent); // Bind popup to circle
                                 console.log('Circle clicked!'); // Log to confirm the click event is working
                                 circle.setStyle({
@@ -395,38 +397,6 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
             }
         }
     }, [geoJsonData]);
-
-
-
-    /*
-    // Function to reset the style of a layer to its default
-    const resetLayerStyle = (layer) => {
-        // Define the default style for different types of layers
-        const defaultStyle = {
-            color: '#3388ff',  // Default blue color for Leaflet
-            weight: 2,         // Default weight
-            fillColor: '#3388ff', // Default fill color for polygons
-            fillOpacity: 0.2,  // Default fill opacity for polygons
-        };
-
-        // Reset the style if the layer supports setStyle method
-        if (typeof layer.setStyle === 'function') {
-            layer.setStyle(defaultStyle);
-        }
-    };
-
-    // Update the useEffect hook for highlightedId to reset the style when it changes
-    useEffect(() => {
-        if (highlightedId && featureGroupRef.current) {
-            const layer = featureGroupRef.current.getLayer(highlightedId);
-            if (layer) {
-                resetLayerStyle(layer);
-            }
-        }
-    }, [highlightedId]);
-*/
-
-
 
 
     // Function to generate popup content from feature properties
@@ -1559,9 +1529,41 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
         );
     };
 
+
+    const greenRingIcon = new L.Icon({
+        iconUrl: 'path/to/your/green-ring-icon.png', // Path to your icon with a green ring
+        iconSize: [25, 41], // Size of the icon, adjust as needed
+        iconAnchor: [12, 41], // Point of the icon which will correspond to marker's location
+        popupAnchor: [1, -34], // Point from which the popup should open relative to the iconAnchor
+        shadowUrl: 'path/to/marker-shadow.png', // Optional: Path to your marker's shadow
+        shadowSize: [41, 41] // Size of the shadow, adjust as needed
+    });
+    
+
+
     const highlightFeature = (featureId) => {
         if (featureGroupRef.current) {
+            setHighlightedId(featureId); // Set the highlighted feature's ID
             featureGroupRef.current.eachLayer(layer => {
+                // Check if the layer has an ID
+                if (layer.options.id) {
+                    if (layer.options.id === featureId && layer instanceof L.Marker) {
+                        // This is the marker to be highlighted
+                        layer.setIcon(greenRingIcon);
+                    } else if (layer instanceof L.Marker) {
+                        // Reset the icon of all other markers to the default icon
+                        layer.setIcon(new L.Icon.Default());
+                    } else {
+                        // Reset the style of all other layers (not markers) to their default
+                        layer.setStyle({
+                            color: '#3388ff', // Default line color
+                            fillColor: '#3388ff', // Default fill color
+                            fillOpacity: 0.2, // Default fill opacity
+                            weight: 2 // Default line weight
+                        });
+                    }
+                }
+
                 // Check if the layer has an ID and is either a circle, polygon, polyline, or marker
                 if (layer.options.id) {
                     if (layer.options.id === featureId) {
@@ -1585,7 +1587,7 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
             });
         }
     };
-    
+
 
 
     const handleAttributeValueChange = (featureIndex, attributeName, newValue) => {
