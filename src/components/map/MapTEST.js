@@ -1412,6 +1412,7 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
             setHighlightedId(featureId); // Set the highlighted feature's ID
             featureGroupRef.current.eachLayer(layer => {
                 // Reset the style for non-highlighted layers
+            
                 if (layer instanceof L.Path) {
                     layer.setStyle({
                         color: '#3388ff', // Default color
