@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/static/css/main.9ffd9b6f.css",
+    "main.js": "/static/js/main.be47e595.js",
+    "static/media/vagmiljo_logotyp_grey.png": "/static/media/vagmiljo_logotyp_grey.4020f05d3bb685d0430a.png",
+    "static/media/spritesheet.svg": "/static/media/spritesheet.a4e0eb7ad904a4858361.svg",
+    "index.html": "/index.html",
+    "main.9ffd9b6f.css.map": "/static/css/main.9ffd9b6f.css.map",
+    "main.be47e595.js.map": "/static/js/main.be47e595.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.9ffd9b6f.css",
+    "static/js/main.be47e595.js"
+  ]
+}
