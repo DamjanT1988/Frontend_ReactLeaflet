@@ -241,78 +241,16 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
         };
     }, []);
 
-/*
-    useEffect(() => {
-        if (featureGroupRef.current) {
-            featureGroupRef.current.clearLayers(); // Clear existing layers first
-    
-            if (geoJsonData) {
-                geoJsonData.features.forEach((feature) => {
-                    if (feature.properties.isCircle) {
-                        // Create a circle for each feature marked as a circle
-                        const circle = L.circle([feature.geometry.coordinates[1], feature.geometry.coordinates[0]], {
-                            color: 'blue', // Initial color
-                            fillColor: '#f03',
-                            fillOpacity: 0.5,
-                            radius: feature.properties.radius
-                        }).on('click', function () {
-                            this.setStyle({
-                                color: 'green', // Change to green on click
-                                fillColor: 'green'
-                            });
-                        });
-    
-                        circle.addTo(featureGroupRef.current);
-                    } else {
-                        // Handle non-circle features
-                        L.geoJSON(feature, {
-                            onEachFeature: (feature, layer) => {
-                                // Bind popup or handle click for non-circle features
-                                const popupContent = generatePopupContent(feature.properties);
-                                layer.bindPopup(popupContent);
-                            }
-                        }).addTo(featureGroupRef.current);
-                    }
-                });
-            }
-        }
-    }, [geoJsonData]);
-*/    
-
-
-
     useEffect(() => {
         if (featureGroupRef.current) {
             featureGroupRef.current.clearLayers(); // Clear existing layers first
             let foundCropRectangle = false;
 
             if (geoJsonData) {
-                
-                L.geoJSON(geoJsonData, {
-                    /*
-                        pointToLayer: (feature, latlng) => {
-                          if (feature.properties.isCircle) {
-                            // Create a circle for each feature marked as a circle
-                            const circle = L.circle(latlng, {
-                              color: 'blue', // Initial color
-                              fillColor: '#f03',
-                              fillOpacity: 0.5,
-                              radius: feature.properties.radius
-                            });
-                
-                            // Add a click event to change the circle's color
-                            circle.on('click', function() {
-                              this.setStyle({
-                                color: 'green', // New color on click
-                                fillColor: 'green'
-                              });
-                            });
-                
-                            return circle;
-                          } 
-                        },
-                    */
 
+
+
+                L.geoJSON(geoJsonData, {
                     pointToLayer: (feature, latlng) => {
                         if (feature.properties.isCircleMarker) {
                             // If the feature has a property indicating it's a circle marker, create a L.CircleMarker
@@ -361,19 +299,6 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
                         });
                         */
 
-                        console.log('feature circle: ', feature.properties.isCircle);
-                        if (feature.properties.isCircle) { // Check if the feature is a circle based on your data's properties
-                            layer.on('click', () => {
-                                //layer.options.color = 'green'; // Change the circle border color to green
-                                //layer.options.fillColor = 'green'; // Change the fill color to green
-                                layer.setStyle({
-                                    color: 'green', // Change the circle border color to green
-                                    fillColor: 'green', // Change the fill color to green
-                                });
-                            });
-                            console.log('layer circle: ', layer);
-                        }
-
                         /*
                         if (feature.properties.shape !== "rectangleCrop") {
                             const popupContent = generatePopupContent(feature.properties);
@@ -407,76 +332,39 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
                         if (feature.properties && feature.properties.isCircle) {
                             // If the feature is a circle, recreate it
                             const center = L.latLng(feature.geometry.coordinates[1], feature.geometry.coordinates[0]);
-                            const circle = L.circle(center, { radius: feature.properties.radius, id: feature.properties.id });
+                            const circle = L.circle(center, {
+                                radius: feature.properties.radius,
+                                id: feature.properties.id,
+                                color: '#3388ff', // Default color
+                                fillColor: '#3388ff', // Default fill color
+                                fillOpacity: 0.2,
+                                radius: feature.properties.radius
 
-                            circle.on('click', () => {
-                                circle.bindPopup(popupContent); // Bind popup to circle
-
-                            /*
-                            setSelectedId(feature.properties.id);
-                            setAttributesObject(feature.properties.attributes);
-                            */
                             });
 
+                            circle.options.id = feature.properties.id; // Assign the unique ID to the circle options for later reference
+
+                            // Add the circle to the feature group
                             circle.addTo(featureGroupRef.current);
 
-                        } else {
-                            /*
-                            layer.on('click', () => {
-                              setSelectedId(feature.properties.id);
-                              setAttributesObject(feature.properties.attributes);
+                            // Directly attach a click event listener to the circle
+                            circle.on('click', () => {
+                                circle.bindPopup(popupContent); // Bind popup to circle
+                                console.log('Circle clicked!'); // Log to confirm the click event is working
+                                circle.setStyle({
+                                    color: 'green', // Change color to green upon click
+                                    fillColor: 'green', // Change fill color to green upon click
+                                    fillOpacity: 0.2,
+                                });
                             });
-                            */
-                            // Add other shapes directly
+                        } else {
                             layer.addTo(featureGroupRef.current);
                         }
                     }
                 });
-
-
-                /*
-                        // Function to compare and remove non-"rectangleCrop" rectangles with duplicate coordinates
-                        const removeDuplicateRectangles = () => {
-                          const layers = featureGroupRef.current.getLayers(); // Get all layers in the FeatureGroup
-                          const rectangles = layers.filter(layer => layer instanceof L.Rectangle); // Filter only rectangle layers
-                  
-                          rectangles.forEach((rect, index) => {
-                            const currentBounds = rect.getBounds();
-                            rectangles.forEach((otherRect, otherIndex) => {
-                              if (index !== otherIndex) { // Avoid comparing the rectangle with itself
-                                const otherBounds = otherRect.getBounds();
-                                // Compare the bounds of the two rectangles to see if they are the same
-                                if (currentBounds.equals(otherBounds)) {
-                                  // Check if one of the rectangles does not have the "rectangleCrop" shape property
-                                  if (rect.feature.properties.shape !== "rectangleCrop") {
-                                    featureGroupRef.current.removeLayer(rect); // Remove the non-"rectangleCrop" rectangle
-                                  } else if (otherRect.feature.properties.shape !== "rectangleCrop") {
-                                    featureGroupRef.current.removeLayer(otherRect); // Remove the non-"rectangleCrop" rectangle
-                                  }
-                                }
-                              }
-                            });
-                          });
-                        };
-                  
-                        removeDuplicateRectangles(); // Call the function to remove duplicate rectangles
-                */
 
 
                 featureGroupRef.current.eachLayer(layer => {
@@ -1672,31 +1560,32 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
     };
 
     const highlightFeature = (featureId) => {
-        setHighlightedId(featureId);
         if (featureGroupRef.current) {
-            const layers = featureGroupRef.current.getLayers();
-            layers.forEach(layer => {
-                if (layer.feature && layer.feature.properties.id === featureId) {
-                    // Check if the layer is a type that supports setStyle
-                    if (typeof layer.setStyle === 'function') {
-                        // Logic to highlight the feature, e.g., changing its style
+            featureGroupRef.current.eachLayer(layer => {
+                // Check if the layer has an ID and is either a circle, polygon, polyline, or marker
+                if (layer.options.id) {
+                    if (layer.options.id === featureId) {
+                        // This is the layer to be highlighted
                         layer.setStyle({
-                            color: '#ff7800', // Example highlight color
-                            weight: 5 // Example weight
+                            color: 'green', // Change to the highlight color
+                            fillColor: 'green',
+                            fillOpacity: 0.5,
+                            weight: 5 // Optional: you can change the weight to make it more noticeable
                         });
-                    }
-                } else {
-                    // Optionally, reset the style for non-highlighted features if they support setStyle
-                    if (typeof layer.setStyle === 'function') {
+                    } else {
+                        // Reset the style of all other layers to their default
                         layer.setStyle({
-                            color: '#3388ff', // Original color
-                            weight: 3 // Original weight
+                            color: '#3388ff', // Default color
+                            fillColor: '#3388ff', // Default fill color, change this as per your default style
+                            fillOpacity: 0.2, // Default fill opacity, change this as per your default style
+                            weight: 2 // Default weight, change this as per your default style
                         });
                     }
                 }
             });
         }
     };
+    
 
 
     const handleAttributeValueChange = (featureIndex, attributeName, newValue) => {
