@@ -289,47 +289,6 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
                         // Bind the popup to the layer
                         layer.bindPopup(popupContent);
 
-                        /*
-                        layer.on('click', () => {
-                          if (feature.properties && feature.properties.id || feature.properties.attributes) {
-                            setSelectedId(feature.properties.id);
-                            setAttributesObject(feature.properties.attributes);
-                          }
-                        });
-                        */
-
-                        /*
-                        if (feature.properties.shape !== "rectangleCrop") {
-                            const popupContent = generatePopupContent(feature.properties);
-                            layer.bindPopup(popupContent);
-                        }
-
-                        layer.on('click', () => {
-                            // Reset the style of the previously highlighted feature, if any
-                            if (highlightedId && featureGroupRef.current) {
-                                const previousLayer = featureGroupRef.current.getLayer(highlightedId);
-                                if (previousLayer) {
-                                    resetLayerStyle(previousLayer);
-                                }
-                            }
-
-                            // Highlight the clicked feature
-                            if (typeof layer.setStyle === 'function') {
-                                layer.setStyle({
-                                    color: 'green', // Change color to green to indicate selection
-                                    weight: 5,      // Increase weight for better visibility
-                                });
-                            }
-
-                            // Update the highlighted feature ID and its properties for the attribute table
-                            setHighlightedId(layer._leaflet_id);
-                            setSelectedId(feature.properties.id);
-                            setAttributesObject(feature.properties.attributes);
-                        });
-                        */
-
-
-
 
                         if (feature.properties && feature.properties.isCircle) {
                             // If the feature is a circle, recreate it
@@ -1182,42 +1141,6 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
 
     const onEdited = (e) => {
 
-        /*
-        e.layers.eachLayer((editedLayer) => {
-          if (editedLayer.feature && editedLayer.feature.properties.shape === "rectangleCrop") {
-            // Remove existing inverted mask
-            let maskToRemove = null;
-            featureGroupRef.current.eachLayer((layer) => {
-              if (layer !== editedLayer && !layer.feature) { // Assuming the mask doesn't have a 'feature' property
-                maskToRemove = layer;
-              }
-            });
-            if (maskToRemove) {
-              featureGroupRef.current.removeLayer(maskToRemove);
-            }
-            // Recreate the inverted mask with new coordinates
-            createInvertedMask(editedLayer);
-          }
-        });
-      
-        // Clone the current state
-        let updatedFeatures = [...shapeLayers];
-      
-        e.layers.eachLayer((editedLayer) => {
-          // Assuming each feature has a unique id
-          const featureIndex = updatedFeatures.findIndex(f =>
-            f.properties.id === editedLayer.feature.properties.id
-          );
-      
-          if (featureIndex !== -1) {
-            // Update the geometry of the feature
-            updatedFeatures[featureIndex].geometry = editedLayer.toGeoJSON().geometry;
-          }
-        });
-      
-        // Update the state
-        setShapeLayers(updatedFeatures);
-        */
 
         updateGeoJsonEditDel(); // Update GeoJSON when shapes are edited
     };
@@ -1235,29 +1158,6 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
 
         updateGeoJsonEditDel(); // Update GeoJSON data if necessary
     };
-
-
-
-    /*
-      const handleFileUploadGeoJSON = async (e) => {
-        const file = e.target.files[0];
-        if (file) {
-          const reader = new FileReader();
-          reader.onload = async (event) => {
-            try {
-              const text = event.target.result;
-              const geojson = JSON.parse(text); // Parse the file content as GeoJSON
-              console.log('geojson: ', geojson);
-              setGeoJsonLayers(geojson.features); // Update the state
-            } catch (error) {
-              console.error('Error parsing GeoJSON:', error);
-            }
-          };
-          reader.readAsText(file); // Read the file as text
-        }
-      };
-    */
-
 
 
     const handleFileUploadShape = async (e) => {
@@ -1312,28 +1212,6 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
             reader.readAsArrayBuffer(file);
         }
     };
-
-    /*  const saveAttributes = () => {
-        const updatedFeatures = geoJsonData.features.map((feature) => {
-          if (feature.properties.id === selectedId) {
-            return {
-              ...feature,
-              properties: {
-                ...feature.properties,
-                attributes: { ...attributesObject },
-              },
-            };
-          }
-          setSelectedId(null)
-          return feature;
-        });
-        setSelectedId(null)
-        setGeoJsonData({ ...geoJsonData, features: updatedFeatures });
-        
-        console.log('geoJsonData after edit attr: ', geoJsonData);
-        featureGroupRef.current.eachLayer(layer => { console.log('layer after edit attr: ', layer); } );
-      };
-      */
 
     const saveAttributes = () => {
         const updatedFeatures = geoJsonData.features.map((feature) => {
@@ -1542,12 +1420,12 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
                         weight: 2 // Default weight
                     });
                 }
-    
+
                 // Reset to default marker icon for non-highlighted markers
                 if (layer instanceof L.Marker) {
                     layer.setIcon(new L.Icon.Default());
                 }
-    
+
                 // Apply the highlight style to the target feature
                 if (layer.options.id === featureId) {
                     if (layer instanceof L.Circle) {
@@ -1566,7 +1444,7 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
                             iconSize: [20, 20],
                             iconAnchor: [10, 10]
                         });
-    
+
                         // Use the custom diamond icon for the highlighted marker
                         layer.setIcon(diamondIcon);
                     }
@@ -1574,8 +1452,8 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
             });
         }
     };
-    
-    
+
+
 
     const handleAttributeValueChange = (featureIndex, attributeName, newValue) => {
         const updatedFeatures = [...geoJsonData.features];
@@ -1590,19 +1468,6 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
             features: updatedFeatures,
         });
     };
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     //      Import (GeoJSON): <input type="file" onChange={handleFileUploadGeoJSON} />
