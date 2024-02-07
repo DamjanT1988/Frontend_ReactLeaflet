@@ -241,6 +241,45 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
         };
     }, []);
 
+/*
+    useEffect(() => {
+        if (featureGroupRef.current) {
+            featureGroupRef.current.clearLayers(); // Clear existing layers first
+    
+            if (geoJsonData) {
+                geoJsonData.features.forEach((feature) => {
+                    if (feature.properties.isCircle) {
+                        // Create a circle for each feature marked as a circle
+                        const circle = L.circle([feature.geometry.coordinates[1], feature.geometry.coordinates[0]], {
+                            color: 'blue', // Initial color
+                            fillColor: '#f03',
+                            fillOpacity: 0.5,
+                            radius: feature.properties.radius
+                        }).on('click', function () {
+                            this.setStyle({
+                                color: 'green', // Change to green on click
+                                fillColor: 'green'
+                            });
+                        });
+    
+                        circle.addTo(featureGroupRef.current);
+                    } else {
+                        // Handle non-circle features
+                        L.geoJSON(feature, {
+                            onEachFeature: (feature, layer) => {
+                                // Bind popup or handle click for non-circle features
+                                const popupContent = generatePopupContent(feature.properties);
+                                layer.bindPopup(popupContent);
+                            }
+                        }).addTo(featureGroupRef.current);
+                    }
+                });
+            }
+        }
+    }, [geoJsonData]);
+*/    
+
+
 
     useEffect(() => {
         if (featureGroupRef.current) {
@@ -249,6 +288,29 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
 
             if (geoJsonData) {
                 L.geoJSON(geoJsonData, {
+                    /*
+                        pointToLayer: (feature, latlng) => {
+                          if (feature.properties.isCircle) {
+                            // Create a circle for each feature marked as a circle
+                            const circle = L.circle(latlng, {
+                              color: 'blue', // Initial color
+                              fillColor: '#f03',
+                              fillOpacity: 0.5,
+                              radius: feature.properties.radius
+                            });
+                
+                            // Add a click event to change the circle's color
+                            circle.on('click', function() {
+                              this.setStyle({
+                                color: 'green', // New color on click
+                                fillColor: 'green'
+                              });
+                            });
+                
+                            return circle;
+                          }
+                        },
+                    */
 
                     pointToLayer: (feature, latlng) => {
                         if (feature.properties.isCircleMarker) {
@@ -263,10 +325,9 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
                     },
 
                     onEachFeature: (feature, layer) => {
-
                         layer.on('click', () => {
                             setHighlightedId(feature.properties.id); // Set the highlighted feature's ID
-                            if (typeof layer.setStyle === 'function') {
+                            if (typeof layer.setStyle === 'function' && feature.properties.shape !== "rectangleCrop") {
                                 layer.setStyle({
                                     color: 'green', // Change the polygon color to green
                                     fillColor: 'green', // Also set fillColor to green for filled polygons
@@ -299,17 +360,19 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
                         });
                         */
 
+                        console.log('feature circle: ', feature.properties.isCircle);
+                        if (feature.properties.isCircle) { // Check if the feature is a circle based on your data's properties
+                            layer.on('click', () => {
+                                //layer.options.color = 'green'; // Change the circle border color to green
+                                //layer.options.fillColor = 'green'; // Change the fill color to green
+                                layer.setStyle({
+                                    color: 'green', // Change the circle border color to green
+                                    fillColor: 'green', // Change the fill color to green
+                                });
+                            });
+                            console.log('layer circle: ', layer);
+                        }
 
-   if (feature.properties.isCircle) { // Check if the feature is a circle based on your data's properties
-        layer.on('click', () => {
-            layer.options.color = 'green'; // Change the circle border color to green
-            layer.options.fillColor = 'green'; // Change the fill color to green
-            layer.setStyle({
-                color: 'green', // Change the circle border color to green
-                fillColor: 'green', // Change the fill color to green
-            });
-        });
-    }
                         /*
                         if (feature.properties.shape !== "rectangleCrop") {
                             const popupContent = generatePopupContent(feature.properties);
@@ -363,10 +426,11 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
 
                             circle.on('click', () => {
                                 circle.bindPopup(popupContent); // Bind popup to circle
-                                                            /*
-                                setSelectedId(feature.properties.id);
-                                setAttributesObject(feature.properties.attributes);
-                                */
+
+                            /*
+                            setSelectedId(feature.properties.id);
+                            setAttributesObject(feature.properties.attributes);
+                            */
                             });
 
                             circle.addTo(featureGroupRef.current);
@@ -795,7 +859,7 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
 
                                 }
                             }
-                        };                            
+                        };
                         features.push(circleFeature);
                         console.log('Layer after 2: ', layer);
                         console.log('Circlefeature after 2: ', circleFeature);
@@ -1079,20 +1143,20 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
         const newLayer = e.layer;
         newLayer.options.id = uuidv4(); // Ensure each layer has a unique ID
 
-
+        /*
         const newType = e.layerType;
         if (newType === 'circle') {
-            newLayer.on('click', function() {
+            newLayer.on('click', function () {
                 this.setStyle({
                     color: 'green',
                     fillColor: 'green'
                 });
             });
         }
-    
+
         // Add the new layer to the featureGroup to ensure it's managed and can be interacted with
         newLayer.addTo(featureGroupRef.current);
-    
+        */
 
 
 
@@ -1135,6 +1199,7 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
                     coordinates: [center.lng, center.lat]
                 }
             };
+
         } else if (newLayer instanceof L.CircleMarker) {
             const center = newLayer.getLatLng();
             feature = {
@@ -1546,12 +1611,13 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
         // Collect all unique attribute names across all features
         const allAttributeNames = new Set();
         geoJsonData.features.forEach(feature => {
-            if (!feature.properties.shape === "rectangleCrop") {
-            Object.keys(feature.properties.attributes).forEach(attrName => {
-                allAttributeNames.add(attrName);
-            
-            });}
+            if (feature.properties && feature.properties.attributes) {
+                Object.keys(feature.properties.attributes).forEach(attrName => {
+                    allAttributeNames.add(attrName);
+                });
+            }
         });
+
 
         // Convert the Set to an array for mapping
         const attributeNames = Array.from(allAttributeNames);
@@ -1570,31 +1636,33 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
                     </thead>
                     <tbody>
                         {geoJsonData.features.map((feature, featureIndex) => (
-                            <tr key={featureIndex} className={highlightedIds.has(feature.properties.id) ? 'highlighted-row' : ''}
-                                onClick={(event) => handleRowClick(feature.properties.id, event)}>
-                                <td>
-                                    <button
+                            feature.properties.attributes ? (
+                                <tr key={featureIndex} className={highlightedIds.has(feature.properties.id) ? 'highlighted-row' : ''}
+                                    onClick={(event) => handleRowClick(feature.properties.id, event)}>
+                                    <td>
+                                        <button
 
-                                        className={highlightedId === feature.properties.id ? 'highlighted' : ''}
-                                        onClick={() => highlightFeature(feature.properties.id)}
+                                            className={highlightedId === feature.properties.id ? 'highlighted' : ''}
+                                            onClick={() => highlightFeature(feature.properties.id)}
 
-                                    >
-                                        Markera
-                                    </button>
+                                        >
+                                            Markera
+                                        </button>
 
-                                </td>
-                                {attributeNames.map((name, index) => (
-                                    <td key={`${featureIndex}-${index}`}>
-                                        <input
-                                            type="text"
-                                            value={feature.properties.attributes[name] || ''}
-                                            onChange={e => handleAttributeValueChange(featureIndex, name, e.target.value)}
-
-
-                                        />
                                     </td>
-                                ))}
-                            </tr>
+                                    {attributeNames.map((name, index) => (
+                                        <td key={`${featureIndex}-${index}`}>
+                                            <input
+                                                type="text"
+                                                value={feature.properties.attributes[name] || ''}
+                                                onChange={e => handleAttributeValueChange(featureIndex, name, e.target.value)}
+
+
+                                            />
+                                        </td>
+                                    ))}
+                                </tr>
+                            ) : null
                         ))}
                     </tbody>
                 </table>
@@ -1630,9 +1698,9 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
     };
 
 
-    // Function to handle attribute value changes
     const handleAttributeValueChange = (featureIndex, attributeName, newValue) => {
         const updatedFeatures = [...geoJsonData.features];
+        // Ensure the attributes object exists for the feature being updated
         if (!updatedFeatures[featureIndex].properties.attributes) {
             updatedFeatures[featureIndex].properties.attributes = {};
         }
