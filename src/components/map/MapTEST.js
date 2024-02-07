@@ -269,7 +269,6 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
                             if (typeof layer.setStyle === 'function' && feature.properties.shape !== "rectangleCrop") {
                                 layer.setStyle({
                                     color: 'green', // Change the polygon color to green
-                                    fillColor: 'green', // Also set fillColor to green for filled polygons
                                     weight: 5,
                                 });
                             }
@@ -335,7 +334,7 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
                         if (feature.properties && feature.properties.isCircle) {
                             // If the feature is a circle, recreate it
                             const center = L.latLng(feature.geometry.coordinates[1], feature.geometry.coordinates[0]);
-                            
+
                             const circle = L.circle(center, {
                                 radius: feature.properties.radius,
                                 id: feature.properties.id,
@@ -1529,66 +1528,54 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
         );
     };
 
-
-    const greenRingIcon = new L.Icon({
-        iconUrl: 'path/to/your/green-ring-icon.png', // Path to your icon with a green ring
-        iconSize: [25, 41], // Size of the icon, adjust as needed
-        iconAnchor: [12, 41], // Point of the icon which will correspond to marker's location
-        popupAnchor: [1, -34], // Point from which the popup should open relative to the iconAnchor
-        shadowUrl: 'path/to/marker-shadow.png', // Optional: Path to your marker's shadow
-        shadowSize: [41, 41] // Size of the shadow, adjust as needed
-    });
-    
-
-
     const highlightFeature = (featureId) => {
+        console.log("highlightFeature called with featureId:", featureId);
         if (featureGroupRef.current) {
             setHighlightedId(featureId); // Set the highlighted feature's ID
             featureGroupRef.current.eachLayer(layer => {
-                // Check if the layer has an ID
-                if (layer.options.id) {
-                    if (layer.options.id === featureId && layer instanceof L.Marker) {
-                        // This is the marker to be highlighted
-                        layer.setIcon(greenRingIcon);
-                    } else if (layer instanceof L.Marker) {
-                        // Reset the icon of all other markers to the default icon
-                        layer.setIcon(new L.Icon.Default());
-                    } else {
-                        // Reset the style of all other layers (not markers) to their default
-                        layer.setStyle({
-                            color: '#3388ff', // Default line color
-                            fillColor: '#3388ff', // Default fill color
-                            fillOpacity: 0.2, // Default fill opacity
-                            weight: 2 // Default line weight
-                        });
-                    }
+                // Reset the style for non-highlighted layers
+                if (layer instanceof L.Path) {
+                    layer.setStyle({
+                        color: '#3388ff', // Default color
+                        fillColor: '#3388ff', // Default fill color
+                        fillOpacity: 0.2, // Default fill opacity
+                        weight: 2 // Default weight
+                    });
                 }
-
-                // Check if the layer has an ID and is either a circle, polygon, polyline, or marker
-                if (layer.options.id) {
-                    if (layer.options.id === featureId) {
-                        // This is the layer to be highlighted
+    
+                // Reset to default marker icon for non-highlighted markers
+                if (layer instanceof L.Marker) {
+                    layer.setIcon(new L.Icon.Default());
+                }
+    
+                // Apply the highlight style to the target feature
+                if (layer.options.id === featureId) {
+                    if (layer instanceof L.Circle) {
+                        // Apply a different style for circles
                         layer.setStyle({
-                            color: 'green', // Change to the highlight color
-                            fillColor: 'green',
-                            fillOpacity: 0.5,
-                            weight: 5 // Optional: you can change the weight to make it more noticeable
+                            color: 'green', // Highlight color
+                            fillColor: 'green', // Highlight fill color
+                            fillOpacity: 0.2,
+                            weight: 5
                         });
-                    } else {
-                        // Reset the style of all other layers to their default
-                        layer.setStyle({
-                            color: '#3388ff', // Default color
-                            fillColor: '#3388ff', // Default fill color, change this as per your default style
-                            fillOpacity: 0.2, // Default fill opacity, change this as per your default style
-                            weight: 2 // Default weight, change this as per your default style
+                    } else if (layer instanceof L.Marker) {
+                        // Define a custom divIcon for the highlighted marker
+                        const diamondIcon = L.divIcon({
+                            className: 'custom-div-icon',
+                            html: '<div style="width: 20px; height: 20px; background-color: green; transform: rotate(45deg); margin-top: -10px; margin-left: -10px;"></div>',
+                            iconSize: [20, 20],
+                            iconAnchor: [10, 10]
                         });
+    
+                        // Use the custom diamond icon for the highlighted marker
+                        layer.setIcon(diamondIcon);
                     }
                 }
             });
         }
     };
-
-
+    
+    
 
     const handleAttributeValueChange = (featureIndex, attributeName, newValue) => {
         const updatedFeatures = [...geoJsonData.features];
