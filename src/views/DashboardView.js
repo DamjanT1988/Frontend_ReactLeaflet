@@ -39,7 +39,7 @@ const DashboardView = () => {
         }
       } catch (error) {
         console.error('Error fetching user info:', error);
-        navigate('/login');
+        //navigate('/login');
       }
     };
 

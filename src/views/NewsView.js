@@ -10,7 +10,7 @@ const NewsView = () => {
     const accessToken = localStorage.getItem('accessToken');
 
     // If the access token doesn't exist, redirect to LoginView
-    if (!accessToken) {
+    if (/*!accessToken*/false) {
       navigate('/login');
     }
 

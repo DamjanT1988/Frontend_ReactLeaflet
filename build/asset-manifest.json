@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "/static/css/main.58e978cc.css",
-    "main.js": "/static/js/main.1859b5bf.js",
+    "main.js": "/static/js/main.f557842d.js",
     "static/media/vagmiljo_logotyp_grey.png": "/static/media/vagmiljo_logotyp_grey.4020f05d3bb685d0430a.png",
     "static/media/spritesheet.svg": "/static/media/spritesheet.a4e0eb7ad904a4858361.svg",
     "index.html": "/index.html",
     "main.58e978cc.css.map": "/static/css/main.58e978cc.css.map",
-    "main.1859b5bf.js.map": "/static/js/main.1859b5bf.js.map"
+    "main.f557842d.js.map": "/static/js/main.f557842d.js.map"
   },
   "entrypoints": [
     "static/css/main.58e978cc.css",
-    "static/js/main.1859b5bf.js"
+    "static/js/main.f557842d.js"
   ]
 }
