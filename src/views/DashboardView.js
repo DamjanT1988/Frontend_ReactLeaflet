@@ -64,8 +64,8 @@ const DashboardView = () => {
       }
     };
   
-    fetchUserInfo();
-    fetchProjects();
+    //fetchUserInfo();
+    //fetchProjects();
   }, [navigate]);
 
   // Render user info or any other content
