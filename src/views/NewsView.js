@@ -10,14 +10,14 @@ const NewsView = () => {
     const accessToken = localStorage.getItem('accessToken');
 
     // If the access token doesn't exist, redirect to LoginView
-    if (/*!accessToken*/false) {
+    if (!accessToken) {
       navigate('/login');
     }
 
     // Dependency array is empty, meaning it will run once on mount
   }, []); // Empty dependency array ensures effect runs once after initial render
 
-  return <div>  <Map /></div>;
+  return <div>  <Map shouldHide={true}/></div>;
 };
 
 export default NewsView;
