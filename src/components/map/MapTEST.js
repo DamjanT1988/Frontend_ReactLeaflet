@@ -300,6 +300,7 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
                                 color: '#3388ff', // Default color
                                 fillColor: '#3388ff', // Default fill color
                                 fillOpacity: 0.2,
+                                weight: 5,
                                 radius: feature.properties.radius
 
                             });
@@ -316,8 +317,9 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
                                 console.log('Circle clicked!'); // Log to confirm the click event is working
                                 circle.setStyle({
                                     color: 'green', // Change color to green upon click
-                                    fillColor: 'green', // Change fill color to green upon click
+                                    //fillColor: 'green', // Change fill color to green upon click
                                     fillOpacity: 0.2,
+                                    weight: 5,
                                 });
                             });
                         } else {
@@ -1407,13 +1409,19 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
     };
 
     const highlightFeature = (featureId) => {
-        console.log("highlightFeature called with featureId:", featureId);
         if (featureGroupRef.current) {
             setHighlightedId(featureId); // Set the highlighted feature's ID
             featureGroupRef.current.eachLayer(layer => {
+
+                // Check if the layer has associated feature properties
+                const properties = layer.feature ? layer.feature.properties : null;
+
+                // Debugging logs
+                console.log("Layer type:", properties, "Layer ID:", layer.options.id);
+                console.log("Layer:", layer);
+
                 // Reset the style for non-highlighted layers
-            
-                if (layer instanceof L.Path) {
+                if (layer instanceof L.Path && (!properties || properties.shape !== "rectangleCrop")) {
                     layer.setStyle({
                         color: '#3388ff', // Default color
                         fillColor: '#3388ff', // Default fill color
@@ -1422,18 +1430,28 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
                     });
                 }
 
+             
+
                 // Reset to default marker icon for non-highlighted markers
-                if (layer instanceof L.Marker) {
+                if (layer instanceof L.Marker && (!properties || properties.shape !== "rectangleCrop")) {
                     layer.setIcon(new L.Icon.Default());
                 }
 
+                console.log("Layer ID:", layer.options.id, "Target Feature ID:", featureId);
+
                 // Apply the highlight style to the target feature
                 if (layer.options.id === featureId) {
-                    if (layer instanceof L.Circle) {
+                    if (properties && properties.shape === "rectangleCrop") {
+                        // Special handling for "rectangleCrop" shapes
+                        layer.setStyle({
+                            color: 'green', // Highlight color for rectangleCrop
+                            fillColor: 'green',
+                            weight: 5 // Highlight weight for rectangleCrop
+                        });
+                    } else if (layer instanceof L.Circle) {
                         // Apply a different style for circles
                         layer.setStyle({
                             color: 'green', // Highlight color
-                            fillColor: 'green', // Highlight fill color
                             fillOpacity: 0.2,
                             weight: 5
                         });
@@ -1445,6 +1463,9 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
                             iconSize: [20, 20],
                             iconAnchor: [10, 10]
                         });
+
+                        // Debugging log to confirm execution of this block
+                        console.log("Setting custom icon for marker");
 
                         // Use the custom diamond icon for the highlighted marker
                         layer.setIcon(diamondIcon);
