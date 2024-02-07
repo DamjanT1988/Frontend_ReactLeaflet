@@ -121,34 +121,6 @@ const DataView = () => {
     );
   }
 
-
-  return (
-
-    <div className="project-container">
-      <h1>Välj projekt för analys</h1>
-
-      <div className="project-controls">
-        <input
-          type="text"
-          placeholder="Sök projekt..."
-          onChange={handleSearchChange}
-        />
-        <button onClick={toggleSortOrder}>
-          Sortera: {sortOrder === 'asc' ? 'äldst' : 'senaste'}
-        </button>
-      </div>
-
-      {
-        filteredProjects.map(project => (
-          <div key={project.id} className='project'>
-            <h2>{project.project_name} - #{project.id}</h2>
-            <p>{project.description}</p>
-            <button className="toggle-form-button" onClick={() => viewProjectDetails(project.id)}>Välj projekt!</button>
-          </div>
-        ))
-      }
-    </div>
-  )
 }
 
 
