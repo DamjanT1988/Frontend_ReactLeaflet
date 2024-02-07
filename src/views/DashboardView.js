@@ -13,7 +13,7 @@ const DashboardView = () => {
     const accessToken = localStorage.getItem('accessToken');
 
     // If no access token is found, redirect to the login page
-    if (/*!accessToken*/false) {
+    if (!accessToken) {
       navigate('/login');
       return;
     }
@@ -39,7 +39,7 @@ const DashboardView = () => {
         }
       } catch (error) {
         console.error('Error fetching user info:', error);
-        //navigate('/login');
+        navigate('/login');
       }
     };
 
@@ -64,8 +64,8 @@ const DashboardView = () => {
       }
     };
   
-    //fetchUserInfo();
-    //fetchProjects();
+    fetchUserInfo();
+    fetchProjects();
   }, [navigate]);
 
   // Render user info or any other content
