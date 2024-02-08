@@ -117,7 +117,51 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
     const [highlightedIds, setHighlightedIds] = useState(new Set());
     const [activeTab, setActiveTab] = useState('tab1');
 
+    // Function to render GeoJSON based on the active tab
+    const renderGeoJsonLayers = () => {
+        if (!geoJsonData || !geoJsonData.features) return null;
 
+        // Filter features based on the active tab
+        let filteredFeatures = [];
+        if (activeTab === 'tab1') {
+            // Points (Markers and CircleMarkers)
+            filteredFeatures = geoJsonData.features.filter(feature => feature.properties.isMarker || feature.properties.isCircleMarker);
+        } else if (activeTab === 'tab2') {
+            // Lines (Polylines)
+            filteredFeatures = geoJsonData.features.filter(feature => feature.properties.isPolyline);
+        } else if (activeTab === 'tab3') {
+            // Polygons (Polygons, Rectangles, Circles)
+            filteredFeatures = geoJsonData.features.filter(feature => feature.properties.isPolygon || feature.properties.isRectangle || feature.properties.isCircle);
+        }
+
+        return filteredFeatures.map((feature, index) => (
+            <GeoJSON key={index} data={feature} />
+        ));
+    };
+
+    const renderTabs = () => (
+        <div className="tabs">
+            <button onClick={() => setActiveTab('tab1')}>Points</button>
+            <button onClick={() => setActiveTab('tab2')}>Lines</button>
+            <button onClick={() => setActiveTab('tab3')}>Polygons</button>
+        </div>
+    );
+
+    const getFilteredFeatures = () => {
+        if (!geoJsonData || !geoJsonData.features) return [];
+    
+        switch (activeTab) {
+            case 'tab1': // Points
+                return geoJsonData.features.filter(feature => feature.geometry.type === 'Point');
+            case 'tab2': // Lines
+                return geoJsonData.features.filter(feature => feature.geometry.type === 'LineString');
+            case 'tab3': // Polygons
+                return geoJsonData.features.filter(feature => ['Polygon', 'MultiPolygon'].includes(feature.geometry.type));
+            default:
+                return [];
+        }
+    };
+    
 
     const RectangleDrawButton = () => {
         const map = useMap();
@@ -227,21 +271,21 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
     };
 
 
-const resetFeatureStyles = () => {
-    featureGroupRef.current.eachLayer(layer => {
-        // Check if the layer is a circle and reset its style
-        if (layer instanceof L.Circle || layer instanceof L.CircleMarker) {
-            layer.setStyle({
-                color: '#3388ff', // Default color
-                fillColor: '#3388ff', // Default fill color
-                fillOpacity: 0.2, // Default fill opacity
-                weight: 2, // Default weight
-            });
-        }
-    });
-};
+    const resetFeatureStyles = () => {
+        featureGroupRef.current.eachLayer(layer => {
+            // Check if the layer is a circle and reset its style
+            if (layer instanceof L.Circle || layer instanceof L.CircleMarker) {
+                layer.setStyle({
+                    color: '#3388ff', // Default color
+                    fillColor: '#3388ff', // Default fill color
+                    fillOpacity: 0.2, // Default fill opacity
+                    weight: 2, // Default weight
+                });
+            }
+        });
+    };
 
-    
+
 
 
     useEffect(() => {
@@ -294,12 +338,12 @@ const resetFeatureStyles = () => {
                             setHighlightedId(null) // Clear existing layers first
                             setHighlightedIds(new Set([feature.properties.id]));
                         });
-/*
-                        layer.on('click', () => {
-                            setHighlightedFeatureId(feature.properties.id); // Update highlighted feature ID
-                            // Existing code to set the selected feature's properties
-                        });
-*/
+                        /*
+                                                layer.on('click', () => {
+                                                    setHighlightedFeatureId(feature.properties.id); // Update highlighted feature ID
+                                                    // Existing code to set the selected feature's properties
+                                                });
+                        */
                         if (feature.properties.shape === "rectangleCrop") {
                             foundCropRectangle = true; // Set the flag if a crop rectangle is found
                         }
@@ -312,7 +356,7 @@ const resetFeatureStyles = () => {
 
 
                         if (feature.properties && feature.properties.isCircle) {
-                            
+
                             // If the feature is a circle, recreate it
                             const center = L.latLng(feature.geometry.coordinates[1], feature.geometry.coordinates[0]);
 
@@ -337,7 +381,7 @@ const resetFeatureStyles = () => {
                                 resetFeatureStyles();
                                 setHighlightedIds(new Set([feature.properties.id]));
                                 //setHighlightedId(null); // Set the highlighted feature's ID
-                                console.log('circle clicked: ', feature.properties.id);                                
+                                console.log('circle clicked: ', feature.properties.id);
                                 setHighlightedId(feature.properties.id); // Set the highlighted feature's ID
                                 circle.setStyle({
                                     color: 'red', // Change color to green upon click
@@ -349,7 +393,7 @@ const resetFeatureStyles = () => {
                         } else {
                             layer.addTo(featureGroupRef.current);
                         }
-                        
+
                     }
                 });
 
@@ -431,7 +475,7 @@ const resetFeatureStyles = () => {
             const id = properties.id;
             const attributesJson = JSON.stringify(properties.attributes);
             content += `<button className='primary-btn' onclick='window.toggleAttributeContainer("${id}", ${attributesJson})'>Redigera objektattribut</button>`;
-        }        
+        }
         content += '</div>';
         return content;
     };
@@ -500,43 +544,43 @@ const resetFeatureStyles = () => {
 
     };
 
-// Function to save GeoJSON data to the server
-const saveDataToServer = async () => {
-    try {
-        setSaveStatus('Sparar...');
-        const response = await fetch(`${API_URLS.PROJECT_FILES_POST}/${userID}/${selectedProjectId}/file`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${accessToken}` // Include the accessToken in the Authorization header
-            },
-            body: JSON.stringify(geoJsonData),
-        });
-        if (response.ok) {
-            setSaveStatus('... kartdata sparad!');
-            console.log('Data saved successfully');
-            console.log('geoJsonData: ', geoJsonData);
-            // Clear the save status message after 2 seconds
-            setTimeout(() => {
-                setSaveStatus('');
-            }, 2500);
-        } else {
-            setSaveStatus('... fel i sparande av kartdata');
-            console.error('Failed to save data');
+    // Function to save GeoJSON data to the server
+    const saveDataToServer = async () => {
+        try {
+            setSaveStatus('Sparar...');
+            const response = await fetch(`${API_URLS.PROJECT_FILES_POST}/${userID}/${selectedProjectId}/file`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${accessToken}` // Include the accessToken in the Authorization header
+                },
+                body: JSON.stringify(geoJsonData),
+            });
+            if (response.ok) {
+                setSaveStatus('... kartdata sparad!');
+                console.log('Data saved successfully');
+                console.log('geoJsonData: ', geoJsonData);
+                // Clear the save status message after 2 seconds
+                setTimeout(() => {
+                    setSaveStatus('');
+                }, 2500);
+            } else {
+                setSaveStatus('... fel i sparande av kartdata');
+                console.error('Failed to save data');
+                // Clear the save status message after 2 seconds
+                setTimeout(() => {
+                    setSaveStatus('');
+                }, 2000);
+            }
+        } catch (error) {
+            setSaveStatus('No data to save');
+            console.error('Error:', error);
             // Clear the save status message after 2 seconds
             setTimeout(() => {
                 setSaveStatus('');
             }, 2000);
         }
-    } catch (error) {
-        setSaveStatus('No data to save');
-        console.error('Error:', error);
-        // Clear the save status message after 2 seconds
-        setTimeout(() => {
-            setSaveStatus('');
-        }, 2000);
-    }
-};
+    };
 
 
     const loadDataFromServer = async () => {
@@ -1408,71 +1452,76 @@ const saveDataToServer = async () => {
         const changeTab = (tabName) => {
             setActiveTab(tabName);
         };
+        
+        //const filteredFeatures = getFilteredFeatures();
+
+        const filteredFeatures = geoJsonData.features.filter(feature => {
+            if (activeTab === 'tab1') {
+                // Only include point features for the "Points" tab
+                return feature.geometry.type === 'Point' || feature.properties.isMarker || feature.properties.isCircleMarker;
+            }
+            // Add conditions for other tabs if necessary
+            return true;
+        });
+    
 
         return (
             <div>
-            {/* Tab navigation */}
+                {/* Tab navigation */}
 
-            {/* Attribute table */}
+                {/* Attribute table */}
 
-            <div className="attributes-container">
-                <h3>Attributtabell - {`flik ${activeTab.charAt(3)}`}</h3>
-                <div className="tabs">
-                {tabs.map(tab => (
-                    <button
-                        key={tab}
-                        onClick={() => changeTab(tab)}
-                        className={activeTab === tab ? 'active' : ''}
-                    >
-                        {`Flik ${tab.charAt(3)}`} {/* Displaying Tab 1, Tab 2, etc. */}
-                    </button>
-                ))}
-            </div>
+                <div className="attributes-container">
+                    <h3>Attributtabell - {`flik ${activeTab.charAt(3)}`}</h3>
+                    <div className="tabs">
+                        <button onClick={() => setActiveTab('tab1')}>Punkter</button>
+                        <button onClick={() => setActiveTab('tab2')}>Linjer</button>
+                        <button onClick={() => setActiveTab('tab3')}>Polygoner</button>
+                    </div>
 
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Kartan</th> {/* Additional column for highlight button */}
-                            {/* Assuming attributeNames is defined and accessible */}
-                            {attributeNames.map((name, index) => (
-                                <th key={index}>{attributeDisplayNameMap[name] || name}</th>
-                            ))}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {/* Mapping through your geoJsonData */}
-                        {geoJsonData.features
-                            .filter(feature => feature.properties.shape !== "rectangleCrop") // Keeping this filter to exclude "rectangleCrop" shapes
-                            .map((feature, featureIndex) => (
-                                feature.properties.attributes ? (
-                                    <tr key={featureIndex} className={highlightedIds.has(feature.properties.id) ? 'highlighted-row' : ''}
-                                        onClick={(event) => handleRowClick(feature.properties.id, event)}>
-                                        <td>
-                                            <button
-                                                className={highlightedId === feature.properties.id ? 'highlighted' : ''}
-                                                onClick={() => highlightFeature(feature.properties.id)}
-                                            >
-                                                Markera
-                                            </button>
-                                        </td>
-                                        {attributeNames.map((name, index) => (
-                                            <td key={`${featureIndex}-${index}`}>
-                                                <input
-                                                    type="text"
-                                                    value={feature.properties.attributes[name] || ''}
-                                                    onChange={e => handleAttributeValueChange(featureIndex, name, e.target.value)}
-                                                />
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Kartan</th> {/* Additional column for highlight button */}
+                                {/* Assuming attributeNames is defined and accessible */}
+                                {attributeNames.map((name, index) => (
+                                    <th key={index}>{attributeDisplayNameMap[name] || name}</th>
+                                ))}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {/* Mapping through your geoJsonData */}
+                            {
+                                filteredFeatures.map((feature, featureIndex) => (
+                                    feature.properties.attributes ? (
+                                        <tr key={featureIndex} className={highlightedIds.has(feature.properties.id) ? 'highlighted-row' : ''}
+                                            onClick={(event) => handleRowClick(feature.properties.id, event)}>
+                                            <td>
+                                                <button
+                                                    className={highlightedId === feature.properties.id ? 'highlighted' : ''}
+                                                    onClick={() => highlightFeature(feature.properties.id)}
+                                                >
+                                                    Markera
+                                                </button>
                                             </td>
-                                        ))}
-                                    </tr>
-                                ) : null
-                            ))}
-                    </tbody>
-                </table>
+                                            {attributeNames.map((name, index) => (
+                                                <td key={`${featureIndex}-${index}`}>
+                                                    <input
+                                                        type="text"
+                                                        value={feature.properties.attributes[name] || ''}
+                                                        onChange={e => handleAttributeValueChange(featureIndex, name, e.target.value)}
+                                                    />
+                                                </td>
+                                            ))}
+                                        </tr>
+                                    ) : null
+                                ))}
+                        </tbody>
+                    </table>
+                </div>
             </div>
-        </div>
-    );
-};
+        );
+    };
 
 
 
@@ -1726,7 +1775,10 @@ const saveDataToServer = async () => {
                 <button className="toggle-form-button-2" onClick={saveDataToServer}>Spara ritning! {saveStatus}</button>
             </div>}
 
+
             <MapContainer center={position} zoom={zoom} style={{ height: '100vh', width: '100%' }} className="full-width-map">
+            
+
                 <LayersControl position="topright">
                     <BaseLayer checked name="Informationskarta">
                         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
