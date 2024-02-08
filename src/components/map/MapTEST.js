@@ -117,52 +117,6 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
     const [highlightedIds, setHighlightedIds] = useState(new Set());
     const [activeTab, setActiveTab] = useState('tab1');
 
-    // Function to render GeoJSON based on the active tab
-    const renderGeoJsonLayers = () => {
-        if (!geoJsonData || !geoJsonData.features) return null;
-
-        // Filter features based on the active tab
-        let filteredFeatures = [];
-        if (activeTab === 'tab1') {
-            // Points (Markers and CircleMarkers)
-            filteredFeatures = geoJsonData.features.filter(feature => feature.properties.isMarker || feature.properties.isCircleMarker);
-        } else if (activeTab === 'tab2') {
-            // Lines (Polylines)
-            filteredFeatures = geoJsonData.features.filter(feature => feature.properties.isPolyline);
-        } else if (activeTab === 'tab3') {
-            // Polygons (Polygons, Rectangles, Circles)
-            filteredFeatures = geoJsonData.features.filter(feature => feature.properties.isPolygon || feature.properties.isRectangle || feature.properties.isCircle);
-        }
-
-        return filteredFeatures.map((feature, index) => (
-            <GeoJSON key={index} data={feature} />
-        ));
-    };
-
-    const renderTabs = () => (
-        <div className="tabs">
-            <button onClick={() => setActiveTab('tab1')}>Points</button>
-            <button onClick={() => setActiveTab('tab2')}>Lines</button>
-            <button onClick={() => setActiveTab('tab3')}>Polygons</button>
-        </div>
-    );
-
-    const getFilteredFeatures = () => {
-        if (!geoJsonData || !geoJsonData.features) return [];
-    
-        switch (activeTab) {
-            case 'tab1': // Points
-                return geoJsonData.features.filter(feature => feature.geometry.type === 'Point');
-            case 'tab2': // Lines
-                return geoJsonData.features.filter(feature => feature.geometry.type === 'LineString');
-            case 'tab3': // Polygons
-                return geoJsonData.features.filter(feature => ['Polygon', 'MultiPolygon'].includes(feature.geometry.type));
-            default:
-                return [];
-        }
-    };
-    
-
     const RectangleDrawButton = () => {
         const map = useMap();
 
@@ -1453,16 +1407,22 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
             setActiveTab(tabName);
         };
         
-        //const filteredFeatures = getFilteredFeatures();
 
         const filteredFeatures = geoJsonData.features.filter(feature => {
-            if (activeTab === 'tab1') {
+            if (activeTab === 'Punkter') {
                 // Only include point features for the "Points" tab
                 return feature.geometry.type === 'Point' || feature.properties.isMarker || feature.properties.isCircleMarker;
+            } else if (activeTab === 'Linjer') {
+                // Only include line features for the "Lines" tab
+                return feature.geometry.type === 'LineString' || feature.geometry.type === 'MultiLineString';
+            } else if (activeTab === 'Polygoner') {
+                // Only include polygon features for the "Polygons" tab
+                return feature.geometry.type === 'Polygon' || feature.geometry.type === 'MultiPolygon';
             }
-            // Add conditions for other tabs if necessary
+            // Default case to include all features if no tab matches
             return true;
         });
+        
     
 
         return (
@@ -1472,11 +1432,11 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
                 {/* Attribute table */}
 
                 <div className="attributes-container">
-                    <h3>Attributtabell - {`flik ${activeTab.charAt(3)}`}</h3>
+                    <h3>Attributtabell - {activeTab}</h3>
                     <div className="tabs">
-                        <button onClick={() => setActiveTab('tab1')}>Punkter</button>
-                        <button onClick={() => setActiveTab('tab2')}>Linjer</button>
-                        <button onClick={() => setActiveTab('tab3')}>Polygoner</button>
+                    <button className={activeTab === 'Punkter' ? 'active' : ''} onClick={() => setActiveTab('Punkter')}>Punkter</button>
+        <button className={activeTab === 'Linjer' ? 'active' : ''} onClick={() => setActiveTab('Linjer')}>Linjer</button>
+        <button className={activeTab === 'Polygoner' ? 'active' : ''} onClick={() => setActiveTab('Polygoner')}>Polygoner</button>
                     </div>
 
                     <table>
