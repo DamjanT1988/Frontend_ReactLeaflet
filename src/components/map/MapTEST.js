@@ -332,8 +332,8 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
                 featureGroupRef.current.eachLayer(layer => {
                     if (layer.feature && layer.feature.properties.shape === "rectangleCrop") {
                         layer.setStyle({
-                            color: 'red',
-                            weight: 10,
+                            //color: 'red',
+                            //weight: 10,
                             fillOpacity: 0
 
                         });
@@ -435,9 +435,9 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
 
         // Create a multi-polygon with the outer large rectangle and inner cut-out rectangle
         const invertedPolygon = L.polygon([outerCoords, innerCoords], {
-            color: 'grey',
-            fillColor: 'black',
-            fillOpacity: 0.5 // Adjust for desired opacity outside the smaller rectangle
+            //color: 'grey',
+            //fillColor: 'black',
+            fillOpacity: 0.2 // Adjust for desired opacity outside the smaller rectangle
         }).addTo(featureGroupRef.current);
 
         // Optionally, bring the original rectangle to front
@@ -1382,9 +1382,14 @@ const saveDataToServer = async () => {
         };
 
         return (
-            <div className="attribute-table-container">
+            <div>
             {/* Tab navigation */}
-            <div className="tabs">
+
+            {/* Attribute table */}
+
+            <div className="attributes-container">
+                <h3>Attributtabell - {`flik ${activeTab.charAt(3)}`}</h3>
+                <div className="tabs">
                 {tabs.map(tab => (
                     <button
                         key={tab}
@@ -1396,9 +1401,6 @@ const saveDataToServer = async () => {
                 ))}
             </div>
 
-            {/* Attribute table */}
-            <div className="attribute-table">
-                <h3>Attributtabell - {`flik ${activeTab.charAt(3)}`}</h3>
                 <table>
                     <thead>
                         <tr>
@@ -1510,6 +1512,9 @@ const saveDataToServer = async () => {
                         layer.setIcon(diamondIcon);
                     }
 
+                    setGeoJsonData({
+                        ...geoJsonData
+                    });
                 }
             });
         }
