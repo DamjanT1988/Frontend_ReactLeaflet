@@ -179,6 +179,17 @@ h3 {
     margin-bottom: 5px; /* Spacing before form or list */
     text-transform: uppercase;
   }
+
+  .toggle-form-button-2 {
+    background-color: #30A875; /* Green background */
+    color: white;
+    padding: 5px 10px;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+    margin-bottom: 0px; /* Spacing before form or list */
+    text-transform: uppercase;
+  }
   
   .form-container {
     display: none; /* Initially hide the form */
@@ -498,6 +509,38 @@ h3 {
     background-color: #999; /* Slightly darker on hover */
   }
   
+/* Tabs container */
+.tabs {
+    display: flex; /* Display tabs in a row */
+    justify-content: center; /* Center tabs horizontally */
+    margin-bottom: -35px; /* Space below the tabs */
+    margin-top: 4px;
+}
+
+/* Individual tab buttons */
+.tabs button {
+    background-color: #f1f1f1; /* Light grey background */
+    border: 1px solid #ccc; /* Grey border */
+    padding: 10px 20px; /* Padding for tab buttons */
+    cursor: pointer; /* Pointer cursor for clickable tabs */
+    transition: background-color 0.3s; /* Smooth background color transition */
+    margin-right: 2px; /* Small space between tabs */
+    font-weight: bold; /* Bold font for tab text */
+}
+
+/* Hover effect for tab buttons */
+.tabs button:hover {
+    background-color: #ddd; /* Slightly darker grey on hover */
+}
+
+/* Active tab button */
+.tabs button.active {
+    background-color: #30A875; /* Green background for active tab, matching your theme */
+    color: white; /* White text for active tab */
+    border-bottom: none; /* No bottom border for the active tab to make it look like it's part of the content box */
+}
+
+
   /* Responsive adjustments for form and buttons */
   @media (max-width: 768px) {
     .editable-field, 
@@ -651,6 +694,34 @@ h3 {
 
 .attributes-container .cancel-btn:hover {
     background-color: #999;
+}
+
+/* Smaller text size for labels and table data */
+.attributes-container label,
+.attributes-container table th,
+.attributes-container table td {
+    font-size: 75%; /* Reduce the font size to 75% of the original size */
+}
+
+/* Shorter width for input fields and textareas */
+.attributes-container input[type="text"],
+.attributes-container textarea,
+.attributes-container select {
+    width: 75%; /* Reduce the width to 75% of the original width */
+    /* Other input styles remain unchanged */
+}
+
+/* Adjust table layout to accommodate smaller text and field sizes */
+.attributes-container table {
+    width: 100%; /* Ensure table uses the full width available */
+    table-layout: fixed; /* Use fixed table layout to control column widths */
+}
+
+.attributes-container table th,
+.attributes-container table td {
+    overflow: hidden; /* Hide overflow text */
+    text-overflow: ellipsis; /* Add an ellipsis to overflow text */
+    white-space: nowrap; /* Keep text in a single line */
 }
 
 /* Ensure the container is responsive and looks good on smaller screens */
