@@ -513,7 +513,7 @@ h3 {
 /* Tabs container */
 .tabs {
     display: flex; /* Display tabs in a row */
-    justify-content: center; /* Center tabs horizontally */
+    justify-content: right; /* Center tabs horizontally */
     margin-bottom: 0px; /* Space below the tabs */
     margin-top: -35px; /* Ensure tabs appear above the content box */
     font-size: 75%;
@@ -748,18 +748,20 @@ h3 {
 
 
 .draw-rectangle-btn {
-    position: absolute;
-    top: 15px; /* Position the button 100px down from the top */
-    left: 60px; /* Position the button to the left side */
+    position: relative;
+    top: 13px; /* Position the button 100px down from the top */
+    left: 0px; /* Position the button to the left side */
+    margin-right: 65px;
+    float:right;
     z-index: 1000; /* Ensure the button is above the map layers */
     background-color: #30A875; /* Use a green background similar to other buttons */
     color: white; /* White text color */
     font-weight: bold;
     border: none; /* Remove the default border */
-    padding: 10px 20px; /* Add some padding for better visibility */
+    padding: 2px 8px; /* Add some padding for better visibility */
     cursor: pointer; /* Change the cursor to a pointer to indicate it's clickable */
     border-radius: 4px; /* Optionally, round the corners of the button */
-    font-size: 14px; /* Adjust the font size as needed */
+    font-size: 12px; /* Adjust the font size as needed */
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5); /* Optional: add a shadow for depth */
     transition: background-color 0.3s; /* Smooth transition for hover effect */
   }

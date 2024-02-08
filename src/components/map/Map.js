@@ -96,7 +96,6 @@ window.toggleAttributeContainer = (id, attributes) => {
 };
 
 
-
 // Define the Map component
 const Map = ({ selectedProjectId, onSave, userID, shouldHide }) => {
     const featureGroupRef = useRef(null);
@@ -116,7 +115,7 @@ const Map = ({ selectedProjectId, onSave, userID, shouldHide }) => {
     const [highlightedFeatureId, setHighlightedFeatureId] = useState(null);
     const [selectedRowIds, setSelectedRowIds] = useState(new Set());
     const [highlightedIds, setHighlightedIds] = useState(new Set());
-
+    const [activeTab, setActiveTab] = useState('tab1');
 
 
     const RectangleDrawButton = () => {
@@ -241,78 +240,16 @@ const Map = ({ selectedProjectId, onSave, userID, shouldHide }) => {
         };
     }, []);
 
-/*
-    useEffect(() => {
-        if (featureGroupRef.current) {
-            featureGroupRef.current.clearLayers(); // Clear existing layers first
-    
-            if (geoJsonData) {
-                geoJsonData.features.forEach((feature) => {
-                    if (feature.properties.isCircle) {
-                        // Create a circle for each feature marked as a circle
-                        const circle = L.circle([feature.geometry.coordinates[1], feature.geometry.coordinates[0]], {
-                            color: 'blue', // Initial color
-                            fillColor: '#f03',
-                            fillOpacity: 0.5,
-                            radius: feature.properties.radius
-                        }).on('click', function () {
-                            this.setStyle({
-                                color: 'green', // Change to green on click
-                                fillColor: 'green'
-                            });
-                        });
-    
-                        circle.addTo(featureGroupRef.current);
-                    } else {
-                        // Handle non-circle features
-                        L.geoJSON(feature, {
-                            onEachFeature: (feature, layer) => {
-                                // Bind popup or handle click for non-circle features
-                                const popupContent = generatePopupContent(feature.properties);
-                                layer.bindPopup(popupContent);
-                            }
-                        }).addTo(featureGroupRef.current);
-                    }
-                });
-            }
-        }
-    }, [geoJsonData]);
-*/    
-
-
-
     useEffect(() => {
         if (featureGroupRef.current) {
             featureGroupRef.current.clearLayers(); // Clear existing layers first
             let foundCropRectangle = false;
 
             if (geoJsonData) {
-                
-                L.geoJSON(geoJsonData, {
-                    /*
-                        pointToLayer: (feature, latlng) => {
-                          if (feature.properties.isCircle) {
-                            // Create a circle for each feature marked as a circle
-                            const circle = L.circle(latlng, {
-                              color: 'blue', // Initial color
-                              fillColor: '#f03',
-                              fillOpacity: 0.5,
-                              radius: feature.properties.radius
-                            });
-                
-                            // Add a click event to change the circle's color
-                            circle.on('click', function() {
-                              this.setStyle({
-                                color: 'green', // New color on click
-                                fillColor: 'green'
-                              });
-                            });
-                
-                            return circle;
-                          } 
-                        },
-                    */
 
+
+
+                L.geoJSON(geoJsonData, {
                     pointToLayer: (feature, latlng) => {
                         if (feature.properties.isCircleMarker) {
                             // If the feature has a property indicating it's a circle marker, create a L.CircleMarker
@@ -326,12 +263,12 @@ const Map = ({ selectedProjectId, onSave, userID, shouldHide }) => {
                     },
 
                     onEachFeature: (feature, layer) => {
+
                         layer.on('click', () => {
                             setHighlightedId(feature.properties.id); // Set the highlighted feature's ID
                             if (typeof layer.setStyle === 'function' && feature.properties.shape !== "rectangleCrop") {
                                 layer.setStyle({
                                     color: 'green', // Change the polygon color to green
-                                    fillColor: 'green', // Also set fillColor to green for filled polygons
                                     weight: 5,
                                 });
                             }
@@ -352,138 +289,51 @@ const Map = ({ selectedProjectId, onSave, userID, shouldHide }) => {
                         // Bind the popup to the layer
                         layer.bindPopup(popupContent);
 
-                        /*
-                        layer.on('click', () => {
-                          if (feature.properties && feature.properties.id || feature.properties.attributes) {
-                            setSelectedId(feature.properties.id);
-                            setAttributesObject(feature.properties.attributes);
-                          }
-                        });
-                        */
-
-                        console.log('feature circle: ', feature.properties.isCircle);
-                        if (feature.properties.isCircle) { // Check if the feature is a circle based on your data's properties
-                            layer.on('click', () => {
-                                //layer.options.color = 'green'; // Change the circle border color to green
-                                //layer.options.fillColor = 'green'; // Change the fill color to green
-                                layer.setStyle({
-                                    color: 'green', // Change the circle border color to green
-                                    fillColor: 'green', // Change the fill color to green
-                                });
-                            });
-                            console.log('layer circle: ', layer);
-                        }
-
-                        /*
-                        if (feature.properties.shape !== "rectangleCrop") {
-                            const popupContent = generatePopupContent(feature.properties);
-                            layer.bindPopup(popupContent);
-                        }
-
-                        layer.on('click', () => {
-                            // Reset the style of the previously highlighted feature, if any
-                            if (highlightedId && featureGroupRef.current) {
-                                const previousLayer = featureGroupRef.current.getLayer(highlightedId);
-                                if (previousLayer) {
-                                    resetLayerStyle(previousLayer);
-                                }
-                            }
-
-                            // Highlight the clicked feature
-                            if (typeof layer.setStyle === 'function') {
-                                layer.setStyle({
-                                    color: 'green', // Change color to green to indicate selection
-                                    weight: 5,      // Increase weight for better visibility
-                                });
-                            }
-
-                            // Update the highlighted feature ID and its properties for the attribute table
-                            setHighlightedId(layer._leaflet_id);
-                            setSelectedId(feature.properties.id);
-                            setAttributesObject(feature.properties.attributes);
-                        });
-                        */
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
                         if (feature.properties && feature.properties.isCircle) {
                             // If the feature is a circle, recreate it
                             const center = L.latLng(feature.geometry.coordinates[1], feature.geometry.coordinates[0]);
-                            const circle = L.circle(center, { radius: feature.properties.radius, id: feature.properties.id });
 
-                            circle.on('click', () => {
-                                circle.bindPopup(popupContent); // Bind popup to circle
+                            const circle = L.circle(center, {
+                                radius: feature.properties.radius,
+                                id: feature.properties.id,
+                                color: '#3388ff', // Default color
+                                fillColor: '#3388ff', // Default fill color
+                                fillOpacity: 0.2,
+                                weight: 5,
+                                radius: feature.properties.radius
 
-                            /*
-                            setSelectedId(feature.properties.id);
-                            setAttributesObject(feature.properties.attributes);
-                            */
                             });
 
+                            circle.options.id = feature.properties.id; // Assign the unique ID to the circle options for later reference
+
+                            // Add the circle to the feature group
                             circle.addTo(featureGroupRef.current);
 
-                        } else {
-                            /*
-                            layer.on('click', () => {
-                              setSelectedId(feature.properties.id);
-                              setAttributesObject(feature.properties.attributes);
+                            // Directly attach a click event listener to the circle
+                            circle.on('click', () => {
+                                setHighlightedId(feature.properties.id); // Set the highlighted feature's ID
+                                circle.bindPopup(popupContent); // Bind popup to circle
+                                console.log('Circle clicked!'); // Log to confirm the click event is working
+                                circle.setStyle({
+                                    color: 'green', // Change color to green upon click
+                                    fillColor: 'green', // Change fill color to green upon click
+                                    fillOpacity: 0.2,
+                                    weight: 5,
+                                });
                             });
-                            */
-                            // Add other shapes directly
+                        } else {
                             layer.addTo(featureGroupRef.current);
                         }
                     }
                 });
 
 
-                /*
-                        // Function to compare and remove non-"rectangleCrop" rectangles with duplicate coordinates
-                        const removeDuplicateRectangles = () => {
-                          const layers = featureGroupRef.current.getLayers(); // Get all layers in the FeatureGroup
-                          const rectangles = layers.filter(layer => layer instanceof L.Rectangle); // Filter only rectangle layers
-                  
-                          rectangles.forEach((rect, index) => {
-                            const currentBounds = rect.getBounds();
-                            rectangles.forEach((otherRect, otherIndex) => {
-                              if (index !== otherIndex) { // Avoid comparing the rectangle with itself
-                                const otherBounds = otherRect.getBounds();
-                                // Compare the bounds of the two rectangles to see if they are the same
-                                if (currentBounds.equals(otherBounds)) {
-                                  // Check if one of the rectangles does not have the "rectangleCrop" shape property
-                                  if (rect.feature.properties.shape !== "rectangleCrop") {
-                                    featureGroupRef.current.removeLayer(rect); // Remove the non-"rectangleCrop" rectangle
-                                  } else if (otherRect.feature.properties.shape !== "rectangleCrop") {
-                                    featureGroupRef.current.removeLayer(otherRect); // Remove the non-"rectangleCrop" rectangle
-                                  }
-                                }
-                              }
-                            });
-                          });
-                        };
-                  
-                        removeDuplicateRectangles(); // Call the function to remove duplicate rectangles
-                */
-
-
                 featureGroupRef.current.eachLayer(layer => {
                     if (layer.feature && layer.feature.properties.shape === "rectangleCrop") {
                         layer.setStyle({
-                            color: 'red',
-                            weight: 10,
+                            //color: 'red',
+                            //weight: 10,
                             fillOpacity: 0
 
                         });
@@ -507,38 +357,6 @@ const Map = ({ selectedProjectId, onSave, userID, shouldHide }) => {
             }
         }
     }, [geoJsonData]);
-
-
-
-    /*
-    // Function to reset the style of a layer to its default
-    const resetLayerStyle = (layer) => {
-        // Define the default style for different types of layers
-        const defaultStyle = {
-            color: '#3388ff',  // Default blue color for Leaflet
-            weight: 2,         // Default weight
-            fillColor: '#3388ff', // Default fill color for polygons
-            fillOpacity: 0.2,  // Default fill opacity for polygons
-        };
-
-        // Reset the style if the layer supports setStyle method
-        if (typeof layer.setStyle === 'function') {
-            layer.setStyle(defaultStyle);
-        }
-    };
-
-    // Update the useEffect hook for highlightedId to reset the style when it changes
-    useEffect(() => {
-        if (highlightedId && featureGroupRef.current) {
-            const layer = featureGroupRef.current.getLayer(highlightedId);
-            if (layer) {
-                resetLayerStyle(layer);
-            }
-        }
-    }, [highlightedId]);
-*/
-
-
 
 
     // Function to generate popup content from feature properties
@@ -617,9 +435,9 @@ const Map = ({ selectedProjectId, onSave, userID, shouldHide }) => {
 
         // Create a multi-polygon with the outer large rectangle and inner cut-out rectangle
         const invertedPolygon = L.polygon([outerCoords, innerCoords], {
-            color: 'grey',
-            fillColor: 'black',
-            fillOpacity: 0.5 // Adjust for desired opacity outside the smaller rectangle
+            //color: 'grey',
+            //fillColor: 'black',
+            fillOpacity: 0.2 // Adjust for desired opacity outside the smaller rectangle
         }).addTo(featureGroupRef.current);
 
         // Optionally, bring the original rectangle to front
@@ -654,31 +472,44 @@ const Map = ({ selectedProjectId, onSave, userID, shouldHide }) => {
 
     };
 
-    // Function to save GeoJSON data to the server
-    const saveDataToServer = async () => {
-        try {
-            setSaveStatus('Sparar...');
-            const response = await fetch(`${API_URLS.PROJECT_FILES_POST}/${userID}/${selectedProjectId}/file`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${accessToken}` // Include the accessToken in the Authorization header
-                },
-                body: JSON.stringify(geoJsonData),
-            });
-            if (response.ok) {
-                setSaveStatus('Kartdata sparad!')
-                console.log('Data saved successfully');
-                console.log('geoJsonData: ', geoJsonData);
-            } else {
-                setSaveStatus('Fel i sparande av kartdata')
-                console.error('Failed to save data');
-            }
-        } catch (error) {
-            setSaveStatus('No data to save');
-            console.error('Error:', error);
+// Function to save GeoJSON data to the server
+const saveDataToServer = async () => {
+    try {
+        setSaveStatus('Sparar...');
+        const response = await fetch(`${API_URLS.PROJECT_FILES_POST}/${userID}/${selectedProjectId}/file`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${accessToken}` // Include the accessToken in the Authorization header
+            },
+            body: JSON.stringify(geoJsonData),
+        });
+        if (response.ok) {
+            setSaveStatus('... kartdata sparad!');
+            console.log('Data saved successfully');
+            console.log('geoJsonData: ', geoJsonData);
+            // Clear the save status message after 2 seconds
+            setTimeout(() => {
+                setSaveStatus('');
+            }, 2500);
+        } else {
+            setSaveStatus('... fel i sparande av kartdata');
+            console.error('Failed to save data');
+            // Clear the save status message after 2 seconds
+            setTimeout(() => {
+                setSaveStatus('');
+            }, 2000);
         }
-    };
+    } catch (error) {
+        setSaveStatus('No data to save');
+        console.error('Error:', error);
+        // Clear the save status message after 2 seconds
+        setTimeout(() => {
+            setSaveStatus('');
+        }, 2000);
+    }
+};
+
 
     const loadDataFromServer = async () => {
         try {
@@ -1304,6 +1135,8 @@ const Map = ({ selectedProjectId, onSave, userID, shouldHide }) => {
         }
 
 
+
+
         if (feature) {
             setGeoJsonData((prevData) => ({
                 // Use a fallback for prevData in case it's null or undefined
@@ -1325,42 +1158,6 @@ const Map = ({ selectedProjectId, onSave, userID, shouldHide }) => {
 
     const onEdited = (e) => {
 
-        /*
-        e.layers.eachLayer((editedLayer) => {
-          if (editedLayer.feature && editedLayer.feature.properties.shape === "rectangleCrop") {
-            // Remove existing inverted mask
-            let maskToRemove = null;
-            featureGroupRef.current.eachLayer((layer) => {
-              if (layer !== editedLayer && !layer.feature) { // Assuming the mask doesn't have a 'feature' property
-                maskToRemove = layer;
-              }
-            });
-            if (maskToRemove) {
-              featureGroupRef.current.removeLayer(maskToRemove);
-            }
-            // Recreate the inverted mask with new coordinates
-            createInvertedMask(editedLayer);
-          }
-        });
-      
-        // Clone the current state
-        let updatedFeatures = [...shapeLayers];
-      
-        e.layers.eachLayer((editedLayer) => {
-          // Assuming each feature has a unique id
-          const featureIndex = updatedFeatures.findIndex(f =>
-            f.properties.id === editedLayer.feature.properties.id
-          );
-      
-          if (featureIndex !== -1) {
-            // Update the geometry of the feature
-            updatedFeatures[featureIndex].geometry = editedLayer.toGeoJSON().geometry;
-          }
-        });
-      
-        // Update the state
-        setShapeLayers(updatedFeatures);
-        */
 
         updateGeoJsonEditDel(); // Update GeoJSON when shapes are edited
     };
@@ -1378,29 +1175,6 @@ const Map = ({ selectedProjectId, onSave, userID, shouldHide }) => {
 
         updateGeoJsonEditDel(); // Update GeoJSON data if necessary
     };
-
-
-
-    /*
-      const handleFileUploadGeoJSON = async (e) => {
-        const file = e.target.files[0];
-        if (file) {
-          const reader = new FileReader();
-          reader.onload = async (event) => {
-            try {
-              const text = event.target.result;
-              const geojson = JSON.parse(text); // Parse the file content as GeoJSON
-              console.log('geojson: ', geojson);
-              setGeoJsonLayers(geojson.features); // Update the state
-            } catch (error) {
-              console.error('Error parsing GeoJSON:', error);
-            }
-          };
-          reader.readAsText(file); // Read the file as text
-        }
-      };
-    */
-
 
 
     const handleFileUploadShape = async (e) => {
@@ -1455,28 +1229,6 @@ const Map = ({ selectedProjectId, onSave, userID, shouldHide }) => {
             reader.readAsArrayBuffer(file);
         }
     };
-
-    /*  const saveAttributes = () => {
-        const updatedFeatures = geoJsonData.features.map((feature) => {
-          if (feature.properties.id === selectedId) {
-            return {
-              ...feature,
-              properties: {
-                ...feature.properties,
-                attributes: { ...attributesObject },
-              },
-            };
-          }
-          setSelectedId(null)
-          return feature;
-        });
-        setSelectedId(null)
-        setGeoJsonData({ ...geoJsonData, features: updatedFeatures });
-        
-        console.log('geoJsonData after edit attr: ', geoJsonData);
-        featureGroupRef.current.eachLayer(layer => { console.log('layer after edit attr: ', layer); } );
-      };
-      */
 
     const saveAttributes = () => {
         const updatedFeatures = geoJsonData.features.map((feature) => {
@@ -1609,6 +1361,8 @@ const Map = ({ selectedProjectId, onSave, userID, shouldHide }) => {
             return <div>Loading data...</div>; // Or any other placeholder content
         }
 
+        const tabs = ['tab1', 'tab2', 'tab3'];
+
         // Collect all unique attribute names across all features
         const allAttributeNames = new Set();
         geoJsonData.features.forEach(feature => {
@@ -1619,84 +1373,153 @@ const Map = ({ selectedProjectId, onSave, userID, shouldHide }) => {
             }
         });
 
-
         // Convert the Set to an array for mapping
         const attributeNames = Array.from(allAttributeNames);
 
+        // Function to change active tab
+        const changeTab = (tabName) => {
+            setActiveTab(tabName);
+        };
+
         return (
-            <div className="attribute-table">
-                <h3>Attributtabell</h3>
+            <div>
+            {/* Tab navigation */}
+
+            {/* Attribute table */}
+
+            <div className="attributes-container">
+                <h3>Attributtabell - {`flik ${activeTab.charAt(3)}`}</h3>
+                <div className="tabs">
+                {tabs.map(tab => (
+                    <button
+                        key={tab}
+                        onClick={() => changeTab(tab)}
+                        className={activeTab === tab ? 'active' : ''}
+                    >
+                        {`Flik ${tab.charAt(3)}`} {/* Displaying Tab 1, Tab 2, etc. */}
+                    </button>
+                ))}
+            </div>
+
                 <table>
                     <thead>
                         <tr>
                             <th>Kartan</th> {/* Additional column for highlight button */}
+                            {/* Assuming attributeNames is defined and accessible */}
                             {attributeNames.map((name, index) => (
-                                <th key={index}>{attributeDisplayNameMap[name] || name}</th> // Use display names from the map
+                                <th key={index}>{attributeDisplayNameMap[name] || name}</th>
                             ))}
                         </tr>
                     </thead>
                     <tbody>
-                        {geoJsonData.features.map((feature, featureIndex) => (
-                            feature.properties.attributes ? (
-                                <tr key={featureIndex} className={highlightedIds.has(feature.properties.id) ? 'highlighted-row' : ''}
-                                    onClick={(event) => handleRowClick(feature.properties.id, event)}>
-                                    <td>
-                                        <button
-
-                                            className={highlightedId === feature.properties.id ? 'highlighted' : ''}
-                                            onClick={() => highlightFeature(feature.properties.id)}
-
-                                        >
-                                            Markera
-                                        </button>
-
-                                    </td>
-                                    {attributeNames.map((name, index) => (
-                                        <td key={`${featureIndex}-${index}`}>
-                                            <input
-                                                type="text"
-                                                value={feature.properties.attributes[name] || ''}
-                                                onChange={e => handleAttributeValueChange(featureIndex, name, e.target.value)}
-
-
-                                            />
+                        {/* Mapping through your geoJsonData */}
+                        {geoJsonData.features
+                            .filter(feature => feature.properties.shape !== "rectangleCrop") // Keeping this filter to exclude "rectangleCrop" shapes
+                            .map((feature, featureIndex) => (
+                                feature.properties.attributes ? (
+                                    <tr key={featureIndex} className={highlightedIds.has(feature.properties.id) ? 'highlighted-row' : ''}
+                                        onClick={(event) => handleRowClick(feature.properties.id, event)}>
+                                        <td>
+                                            <button
+                                                className={highlightedId === feature.properties.id ? 'highlighted' : ''}
+                                                onClick={() => highlightFeature(feature.properties.id)}
+                                            >
+                                                Markera
+                                            </button>
                                         </td>
-                                    ))}
-                                </tr>
-                            ) : null
-                        ))}
+                                        {attributeNames.map((name, index) => (
+                                            <td key={`${featureIndex}-${index}`}>
+                                                <input
+                                                    type="text"
+                                                    value={feature.properties.attributes[name] || ''}
+                                                    onChange={e => handleAttributeValueChange(featureIndex, name, e.target.value)}
+                                                />
+                                            </td>
+                                        ))}
+                                    </tr>
+                                ) : null
+                            ))}
                     </tbody>
                 </table>
             </div>
-        );
-    };
+        </div>
+    );
+};
+
+
 
     const highlightFeature = (featureId) => {
-        setHighlightedId(featureId);
         if (featureGroupRef.current) {
-            const layers = featureGroupRef.current.getLayers();
-            layers.forEach(layer => {
-                if (layer.feature && layer.feature.properties.id === featureId) {
-                    // Check if the layer is a type that supports setStyle
-                    if (typeof layer.setStyle === 'function') {
-                        // Logic to highlight the feature, e.g., changing its style
+            setHighlightedId(featureId); // Set the highlighted feature's ID
+            featureGroupRef.current.eachLayer(layer => {
+
+                // Check if the layer has associated feature properties
+                const properties = layer.feature ? layer.feature.properties : null;
+
+                // Debugging logs
+                console.log("Layer type:", properties, "Layer ID:", layer.options.id);
+                console.log("Layer:", layer);
+
+
+                // Reset the style for non-highlighted layers
+                if (layer instanceof L.Path && (!properties || properties.shape !== "rectangleCrop")) {
+                    layer.setStyle({
+                        color: '#3388ff', // Default color
+                        fillColor: '#3388ff', // Default fill color
+                        fillOpacity: 0.2, // Default fill opacity
+                        weight: 4  // Default weight
+                    });
+                }
+
+
+
+                // Reset to default marker icon for non-highlighted markers
+                if (layer instanceof L.Marker && (!properties || properties.shape !== "rectangleCrop")) {
+                    layer.setIcon(new L.Icon.Default());
+                }
+
+                console.log("Layer ID:", layer.options.id, "Target Feature ID:", featureId);
+
+                // Apply the highlight style to the target feature
+                if (layer.options.id === featureId) {
+                    if (properties && properties.shape === "rectangleCrop") {
+                        // Special handling for "rectangleCrop" shapes
                         layer.setStyle({
-                            color: '#ff7800', // Example highlight color
-                            weight: 5 // Example weight
+                            color: 'green', // Highlight color for rectangleCrop
+                            fillColor: 'green',
+                            weight: 5 // Highlight weight for rectangleCrop
                         });
-                    }
-                } else {
-                    // Optionally, reset the style for non-highlighted features if they support setStyle
-                    if (typeof layer.setStyle === 'function') {
+                    } else if (layer instanceof L.Circle) {
+                        // Apply a different style for circles
                         layer.setStyle({
-                            color: '#3388ff', // Original color
-                            weight: 3 // Original weight
+                            color: 'green', // Highlight color
+                            fillOpacity: 0.2,
+                            weight: 5
                         });
+                    } else if (layer instanceof L.Marker) {
+                        // Define a custom divIcon for the highlighted marker
+                        const diamondIcon = L.divIcon({
+                            className: 'custom-div-icon',
+                            html: '<div style="width: 20px; height: 20px; background-color: green; transform: rotate(45deg); margin-top: -10px; margin-left: -10px;"></div>',
+                            iconSize: [20, 20],
+                            iconAnchor: [10, 10]
+                        });
+
+                        // Debugging log to confirm execution of this block
+                        console.log("Setting custom icon for marker");
+
+                        // Use the custom diamond icon for the highlighted marker
+                        layer.setIcon(diamondIcon);
                     }
+
+                    setGeoJsonData({
+                        ...geoJsonData
+                    });
                 }
             });
         }
     };
+
 
 
     const handleAttributeValueChange = (featureIndex, attributeName, newValue) => {
@@ -1712,19 +1535,6 @@ const Map = ({ selectedProjectId, onSave, userID, shouldHide }) => {
             features: updatedFeatures,
         });
     };
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     //      Import (GeoJSON): <input type="file" onChange={handleFileUploadGeoJSON} />
@@ -1888,6 +1698,10 @@ const Map = ({ selectedProjectId, onSave, userID, shouldHide }) => {
 
                 </div>
             }
+            {shouldHide && <div className="elementToHide">
+                <button className="toggle-form-button-2" onClick={saveDataToServer}>Spara ritning! {saveStatus}</button>
+            </div>}
+
             <MapContainer center={position} zoom={zoom} style={{ height: '100vh', width: '100%' }} className="full-width-map">
                 <LayersControl position="topright">
                     <BaseLayer checked name="Informationskarta">
@@ -1911,8 +1725,6 @@ const Map = ({ selectedProjectId, onSave, userID, shouldHide }) => {
                 <RectangleDrawButton isRectangleDrawn={isRectangleDrawn} setIsRectangleDrawn={setIsRectangleDrawn} />
             </MapContainer>
             {shouldHide && <div className="elementToHide">
-                <button className="toggle-form-button" onClick={saveDataToServer}>Spara ritning!</button>
-                <span className="save-status">{saveStatus}</span>
                 {renderAttributeTable()}
             </div>}
         </div>

@@ -226,6 +226,21 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
     };
 
 
+    const resetFeatureStyles = () => {
+        featureGroupRef.current.eachLayer(layer => {
+            // Check if the layer is a circle and reset its style
+            if (layer instanceof L.Circle || layer instanceof L.CircleMarker) {
+                layer.setStyle({
+                    color: '#3388ff', // Default color
+                    fillColor: '#3388ff', // Default fill color
+                    fillOpacity: 0.2, // Default fill opacity
+                    weight: 2, // Default weight
+                });
+            }
+        });
+    };
+    
+    
 
 
     useEffect(() => {
@@ -268,17 +283,22 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
                             setHighlightedId(feature.properties.id); // Set the highlighted feature's ID
                             if (typeof layer.setStyle === 'function' && feature.properties.shape !== "rectangleCrop") {
                                 layer.setStyle({
-                                    color: 'green', // Change the polygon color to green
+                                    color: 'red', // Change the polygon color to green
                                     weight: 5,
                                 });
                             }
                         });
 
                         layer.on('click', () => {
+                            setHighlightedId(null) // Clear existing layers first
+                            setHighlightedIds(new Set([feature.properties.id]));
+                        });
+/*
+                        layer.on('click', () => {
                             setHighlightedFeatureId(feature.properties.id); // Update highlighted feature ID
                             // Existing code to set the selected feature's properties
                         });
-
+*/
                         if (feature.properties.shape === "rectangleCrop") {
                             foundCropRectangle = true; // Set the flag if a crop rectangle is found
                         }
@@ -291,6 +311,7 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
 
 
                         if (feature.properties && feature.properties.isCircle) {
+                            
                             // If the feature is a circle, recreate it
                             const center = L.latLng(feature.geometry.coordinates[1], feature.geometry.coordinates[0]);
 
@@ -305,19 +326,22 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
 
                             });
 
+                            circle.bindPopup(popupContent); // Bind popup to circle
                             circle.options.id = feature.properties.id; // Assign the unique ID to the circle options for later reference
 
                             // Add the circle to the feature group
                             circle.addTo(featureGroupRef.current);
 
-                            // Directly attach a click event listener to the circle
                             circle.on('click', () => {
+                                resetFeatureStyles();
+                                setHighlightedId(null) // Clear existing layers first
+                                setHighlightedIds(new Set([feature.properties.id]));
+                                //setHighlightedId(null); // Set the highlighted feature's ID
+                                console.log('circle clicked: ', feature.properties.id);                                
                                 setHighlightedId(feature.properties.id); // Set the highlighted feature's ID
-                                circle.bindPopup(popupContent); // Bind popup to circle
-                                console.log('Circle clicked!'); // Log to confirm the click event is working
                                 circle.setStyle({
-                                    color: 'green', // Change color to green upon click
-                                    fillColor: 'green', // Change fill color to green upon click
+                                    color: 'red', // Change color to green upon click
+                                    //fillColor: 'red', // Change fill color to green upon click
                                     fillOpacity: 0.2,
                                     weight: 5,
                                 });
@@ -325,6 +349,7 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
                         } else {
                             layer.addTo(featureGroupRef.current);
                         }
+                        
                     }
                 });
 
@@ -1310,7 +1335,7 @@ const saveDataToServer = async () => {
                         if (highlightedIds.has(layer.feature.properties.id)) {
                             // Highlight the layer
                             layer.setStyle({
-                                color: 'green', // Example highlight color
+                                color: 'red', // Example highlight color
                                 weight: 5, // Example weight
                             });
                         } else {
@@ -1485,14 +1510,14 @@ const saveDataToServer = async () => {
                     if (properties && properties.shape === "rectangleCrop") {
                         // Special handling for "rectangleCrop" shapes
                         layer.setStyle({
-                            color: 'green', // Highlight color for rectangleCrop
+                            color: 'red', // Highlight color for rectangleCrop
                             fillColor: 'green',
                             weight: 5 // Highlight weight for rectangleCrop
                         });
                     } else if (layer instanceof L.Circle) {
                         // Apply a different style for circles
                         layer.setStyle({
-                            color: 'green', // Highlight color
+                            color: 'red', // Highlight color
                             fillOpacity: 0.2,
                             weight: 5
                         });
@@ -1511,10 +1536,6 @@ const saveDataToServer = async () => {
                         // Use the custom diamond icon for the highlighted marker
                         layer.setIcon(diamondIcon);
                     }
-
-                    setGeoJsonData({
-                        ...geoJsonData
-                    });
                 }
             });
         }
