@@ -96,17 +96,7 @@ const ReportView = () => {
       })
       .catch(error => console.error('Error fetching project details:', error)); // Log any errors
   };
-
-
-/*
-  const handleAttributeValueChange = (featureIndex, attributeName, newValue) => {
-    const updatedGeoJsonData = { ...geoJsonData };
-    updatedGeoJsonData.features[featureIndex].properties[attributeName] = newValue;
-    setGeoJsonData(updatedGeoJsonData);
-    console.log(geoJsonData);
-  };
-*/
-
+  
   if (selectedProject) {
     return (
             <div className='parent-one'>

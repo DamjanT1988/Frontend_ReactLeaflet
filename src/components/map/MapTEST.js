@@ -118,6 +118,7 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
     const [activeTab, setActiveTab] = useState('tab1');
 
 
+
     const RectangleDrawButton = () => {
         const map = useMap();
 
@@ -226,20 +227,20 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
     };
 
 
-    const resetFeatureStyles = () => {
-        featureGroupRef.current.eachLayer(layer => {
-            // Check if the layer is a circle and reset its style
-            if (layer instanceof L.Circle || layer instanceof L.CircleMarker) {
-                layer.setStyle({
-                    color: '#3388ff', // Default color
-                    fillColor: '#3388ff', // Default fill color
-                    fillOpacity: 0.2, // Default fill opacity
-                    weight: 2, // Default weight
-                });
-            }
-        });
-    };
-    
+const resetFeatureStyles = () => {
+    featureGroupRef.current.eachLayer(layer => {
+        // Check if the layer is a circle and reset its style
+        if (layer instanceof L.Circle || layer instanceof L.CircleMarker) {
+            layer.setStyle({
+                color: '#3388ff', // Default color
+                fillColor: '#3388ff', // Default fill color
+                fillOpacity: 0.2, // Default fill opacity
+                weight: 2, // Default weight
+            });
+        }
+    });
+};
+
     
 
 
@@ -334,7 +335,6 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
 
                             circle.on('click', () => {
                                 resetFeatureStyles();
-                                setHighlightedId(null) // Clear existing layers first
                                 setHighlightedIds(new Set([feature.properties.id]));
                                 //setHighlightedId(null); // Set the highlighted feature's ID
                                 console.log('circle clicked: ', feature.properties.id);                                
@@ -427,8 +427,11 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
         // Generate content based on properties...
         const id = properties.id; // Assume each feature has a unique ID
         const attributesJson = JSON.stringify(properties.attributes); // Convert attributes to a JSON string for passing in the onclick handler
-
-        content += `<button className='primary-btn' onclick='window.toggleAttributeContainer("${id}", ${attributesJson})'>Redigera objektattribut</button>`;
+        if (!shouldHide) {
+            const id = properties.id;
+            const attributesJson = JSON.stringify(properties.attributes);
+            content += `<button className='primary-btn' onclick='window.toggleAttributeContainer("${id}", ${attributesJson})'>Redigera objektattribut</button>`;
+        }        
         content += '</div>';
         return content;
     };
