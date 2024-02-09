@@ -463,7 +463,7 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
                                 circle.setStyle({
                                     color: 'red', // Change color to green upon click
                                     fillColor: 'red', // Change fill color to green upon click
-                                    fillOpacity: 0.2,
+                                    fillOpacity: 0.1,
                                     weight: 5,
                                 });
                             });
