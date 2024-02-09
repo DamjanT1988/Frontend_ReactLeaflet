@@ -178,18 +178,21 @@ h3 {
     width: 100%;
     margin-bottom: 5px; /* Spacing before form or list */
     text-transform: uppercase;
+    font-weight: bold;
   }
 
   .toggle-form-button-2 {
     background-color: #30A875; /* Green background */
     color: white;
-    padding: 3px 5px;
+    padding: 2px 5px;
+    padding-bottom: 2px;
     border: none;
     cursor: pointer;
     width: 100%;
-    margin-top: -15px;
-    margin-bottom: -2px; /* Spacing before form or list */
+    margin-top: 0px;
+    /* Spacing before form or list */
     text-transform: uppercase;
+    font-weight: bold;
   }
   
   .form-container {
