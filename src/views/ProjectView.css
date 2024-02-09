@@ -627,6 +627,15 @@ h3 {
     }
 }
 
+.th-index {
+    width: 0.5%;
+    text-align: left;
+}
+
+.th-karta {
+    width: 4%;
+    padding: 0px;
+}
 
 /* Container for the attribute information window */
 .attributes-container {
@@ -649,6 +658,12 @@ h3 {
     margin-bottom: 8px;
     color: #30A875;
     text-align: left;
+}
+
+.attributes-container h4 {
+    margin-bottom: 8px;
+    color: #30A875;
+    text-align: center;
 }
 
 /* Style for attribute labels */
@@ -717,6 +732,11 @@ h3 {
     text-align: center;
     color: white;
     background-color: #30A875;
+}
+
+.td-markera button {
+    width: 100%;
+    transition: all 0.3s;
 }
 
 /* Shorter width for input fields and textareas */

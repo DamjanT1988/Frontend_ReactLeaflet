@@ -1559,17 +1559,19 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
                 {/* Attribute table */}
 
                 <div className="attributes-container">
-                    <h3>Attributtabell - {activeTab}</h3>
+                    <h3>{activeTab}</h3> 
+
                     <div className="tabs">
                         <button className={activeTab === 'Punkter' ? 'active' : ''} onClick={() => setActiveTab('Punkter')}>Punkter</button>
                         <button className={activeTab === 'Linjer' ? 'active' : ''} onClick={() => setActiveTab('Linjer')}>Linjer</button>
                         <button className={activeTab === 'Polygoner' ? 'active' : ''} onClick={() => setActiveTab('Polygoner')}>Polygoner</button>
                     </div>
-
+                   
                     <table>
                         <thead>
                             <tr>
-                                <th>Kartan</th> {/* Additional column for highlight button */}
+                            <th className='th-index'>#</th>
+                                <th className='th-karta'>Kartan</th> {/* Additional column for highlight button */}
                                 {/* Assuming attributeNames is defined and accessible */}
                                 {attributeNames.map((name, index) => (
                                     <th key={index}>{attributeDisplayNameMap[name] || name}</th>
@@ -1584,12 +1586,17 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
                                         <tr key={featureIndex} className={highlightedIds.has(feature.properties.id) ? 'highlighted-row' : ''}
                                             onClick={(event) => handleRowClick(feature.properties.id, event)}>
                                             <td>
+                                            <span style={{ marginLeft: '0px' }}>{featureIndex + 1}</span>
+                                            </td>
+
+                                            <td className='td-markera'>
                                                 <button
                                                     className={highlightedId === feature.properties.id ? 'highlighted' : ''}
                                                     onClick={() => highlightFeature(feature.properties.id)}
                                                 >
                                                     Markera
                                                 </button>
+
                                             </td>
                                             {attributeNames.map((name, index) => (
                                                 <td key={`${featureIndex}-${index}`}>
