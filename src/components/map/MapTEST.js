@@ -115,7 +115,7 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
     const [highlightedFeatureId, setHighlightedFeatureId] = useState(null);
     const [selectedRowIds, setSelectedRowIds] = useState(new Set());
     const [highlightedIds, setHighlightedIds] = useState(new Set());
-    const [activeTab, setActiveTab] = useState('tab1');
+    const [activeTab, setActiveTab] = useState('Punkter');
 
     const RectangleDrawButton = () => {
         const map = useMap();
@@ -1387,7 +1387,6 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
             return <div>Loading data...</div>; // Or any other placeholder content
         }
 
-        const tabs = ['tab1', 'tab2', 'tab3'];
 
         // Collect all unique attribute names across all features
         const allAttributeNames = new Set();
@@ -1402,12 +1401,6 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
         // Convert the Set to an array for mapping
         const attributeNames = Array.from(allAttributeNames);
 
-        // Function to change active tab
-        const changeTab = (tabName) => {
-            setActiveTab(tabName);
-        };
-        
-
         const filteredFeatures = geoJsonData.features.filter(feature => {
             if (activeTab === 'Punkter') {
                 // Only include point features for the "Points" tab
@@ -1417,13 +1410,13 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
                 return feature.geometry.type === 'LineString' || feature.geometry.type === 'MultiLineString';
             } else if (activeTab === 'Polygoner') {
                 // Only include polygon features for the "Polygons" tab
-                return feature.geometry.type === 'Polygon' || feature.geometry.type === 'MultiPolygon';
+                return feature.geometry.type === 'Polygon' || feature.geometry.type === 'MultiPolygon' || feature.properties.isMarker || feature.properties.isCircleMarker;
             }
             // Default case to include all features if no tab matches
             return true;
         });
-        
-    
+
+
 
         return (
             <div>
@@ -1434,9 +1427,9 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
                 <div className="attributes-container">
                     <h3>Attributtabell - {activeTab}</h3>
                     <div className="tabs">
-                    <button className={activeTab === 'Punkter' ? 'active' : ''} onClick={() => setActiveTab('Punkter')}>Punkter</button>
-        <button className={activeTab === 'Linjer' ? 'active' : ''} onClick={() => setActiveTab('Linjer')}>Linjer</button>
-        <button className={activeTab === 'Polygoner' ? 'active' : ''} onClick={() => setActiveTab('Polygoner')}>Polygoner</button>
+                        <button className={activeTab === 'Punkter' ? 'active' : ''} onClick={() => setActiveTab('Punkter')}>Punkter</button>
+                        <button className={activeTab === 'Linjer' ? 'active' : ''} onClick={() => setActiveTab('Linjer')}>Linjer</button>
+                        <button className={activeTab === 'Polygoner' ? 'active' : ''} onClick={() => setActiveTab('Polygoner')}>Polygoner</button>
                     </div>
 
                     <table>
@@ -1466,11 +1459,13 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
                                             </td>
                                             {attributeNames.map((name, index) => (
                                                 <td key={`${featureIndex}-${index}`}>
-                                                    <input
-                                                        type="text"
-                                                        value={feature.properties.attributes[name] || ''}
-                                                        onChange={e => handleAttributeValueChange(featureIndex, name, e.target.value)}
-                                                    />
+                                                <input
+    type="text"
+    value={feature.properties.attributes[name] || ''}
+    onChange={(e) => handleAttributeValueChange(feature.properties.id, name, e.target.value)}
+/>
+
+
                                                 </td>
                                             ))}
                                         </tr>
@@ -1553,24 +1548,23 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
         }
     };
 
-
-
-    const handleAttributeValueChange = (featureIndex, attributeName, newValue) => {
-        const updatedFeatures = [...geoJsonData.features];
-        // Ensure the attributes object exists for the feature being updated
-        if (!updatedFeatures[featureIndex].properties.attributes) {
-            updatedFeatures[featureIndex].properties.attributes = {};
+    
+    const handleAttributeValueChange = (featureId, attributeName, newValue) => {
+        // Create a deep copy of the geoJsonData to avoid direct state mutation
+        const updatedGeoJsonData = JSON.parse(JSON.stringify(geoJsonData));
+    
+        // Find the feature by its ID and update the attribute value
+        const featureToUpdate = updatedGeoJsonData.features.find(feature => feature.properties.id === featureId);
+        if (featureToUpdate && featureToUpdate.properties.attributes) {
+            featureToUpdate.properties.attributes[attributeName] = newValue;
         }
-        updatedFeatures[featureIndex].properties.attributes[attributeName] = newValue;
-
-        setGeoJsonData({
-            ...geoJsonData,
-            features: updatedFeatures,
-        });
+    
+        // Update the state with the modified geoJsonData
+        setGeoJsonData(updatedGeoJsonData);
     };
+    
+    
 
-
-    //      Import (GeoJSON): <input type="file" onChange={handleFileUploadGeoJSON} />
     return (
         <div>
             {!shouldHide &&
@@ -1737,7 +1731,7 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
 
 
             <MapContainer center={position} zoom={zoom} style={{ height: '100vh', width: '100%' }} className="full-width-map">
-            
+
 
                 <LayersControl position="topright">
                     <BaseLayer checked name="Informationskarta">
