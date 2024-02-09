@@ -2,31 +2,40 @@
 
 /* Container for the entire project view */
 .project-container {
-    background-color: #d3d3d3; /* Medium grey background */
-    color: #666; /* Dark grey text */
-    width: 768px; /* Consistent width */
-    margin: 50px auto; /* Center the container */
-    padding: 20px; /* Padding for the container */
+    background-color: #d3d3d3;
+    /* Medium grey background */
+    color: #666;
+    /* Dark grey text */
+    width: 768px;
+    /* Consistent width */
+    margin: 50px auto;
+    /* Center the container */
+    padding: 20px;
+    /* Padding for the container */
     box-sizing: border-box;
-    
+
 }
 
 /* Style for the main title */
-.project-container > h1 {
-    color: #30A875; /* Green color for main heading */
-    margin-bottom: 20px; /* Space after the main title */
-    text-align: center; /* Center the main title */
+.project-container>h1 {
+    color: #30A875;
+    /* Green color for main heading */
+    margin-bottom: 20px;
+    /* Space after the main title */
+    text-align: center;
+    /* Center the main title */
 }
 
 .project-details-container {
     padding: 10px;
     width: 768px;
-    margin: 50px auto; /* Center the container */
+    margin: 50px auto;
+    /* Center the container */
     border-radius: 8px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
 }
 
-.project-details-container > h1 {
+.project-details-container>h1 {
     text-align: left;
 }
 
@@ -37,71 +46,87 @@
 .highlighted {
     background-color: green;
     color: white;
-  }
-
-  .highlighted-row {
-    border: 2px solid green !important;
-  }
-  .highlighted-row, .selected {
-    background-color: green; 
-  }  
-  
-  .highlighted-button {
-    background-color: #4CAF50; /* Green background */
-    color: white; /* White text */
-    /* Other styling as needed */
-  }
-  
-/* Style for each project */
-.project {
-    background-color: #fff; /* White background for each project */
-    border: 1px solid #ccc; /* Border for each project */
-    padding: 15px; /* Padding inside each project */
-    margin-bottom: 15px; /* Space between projects */
 }
 
-.project > p {
+.highlighted-row {
+    border: 2px solid green !important;
+}
+
+.highlighted-row, .selected {
+    background-color: green;
+}
+
+.highlighted-button {
+    background-color: #4CAF50;
+    /* Green background */
+    color: white;
+    /* White text */
+    /* Other styling as needed */
+}
+
+/* Style for each project */
+.project {
+    background-color: #fff;
+    /* White background for each project */
+    border: 1px solid #ccc;
+    /* Border for each project */
+    padding: 15px;
+    /* Padding inside each project */
+    margin-bottom: 15px;
+    /* Space between projects */
+}
+
+.project>p {
     overflow-x: auto;
     height: 100px;
 }
 
 .map-container {
     width: 768px;
-    margin: 50px auto; /* Center the container */
+    margin: 50px auto;
+    /* Center the container */
     padding: 10px;
     border-radius: 8px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
-    display: block!important;
+    display: block !important;
 }
 
 .survey-container {
     width: 768px;
-    margin: 50px auto; /* Center the container */
+    margin: 50px auto;
+    /* Center the container */
     padding: 10px;
     border-radius: 8px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
 }
 
 .full-width-map {
-    width: 100vw; /* Sets the width to 100% of the viewport width */
-    height: 100vh; /* Optional: Adjust the height as needed */
-    position: relative; /* Adjust as needed based on your layout */
-  }
+    width: 100vw;
+    /* Sets the width to 100% of the viewport width */
+    height: 100vh;
+    /* Optional: Adjust the height as needed */
+    position: relative;
+    /* Adjust as needed based on your layout */
+}
 
 
 /* Style for project titles */
 
 h2 {
-    color: #30A875; /* Green color for project titles */
+    color: #30A875;
+    /* Green color for project titles */
     font-weight: bolder;
-    margin-bottom: 10px; /* Space after the project title */
+    margin-bottom: 10px;
+    /* Space after the project title */
     font-size: 150%;
 }
 
 h3 {
-    color: #30A875; /* Green color for project titles */
+    color: #30A875;
+    /* Green color for project titles */
     font-weight: bold;
-    margin-bottom: 10px; /* Space after the project title */
+    margin-bottom: 10px;
+    /* Space after the project title */
     font-size: 135%;
     font-style: italic;
 }
@@ -109,15 +134,20 @@ h3 {
 
 
 /* Style for project descriptions */
-.project > p {
-    margin-bottom: 10px; /* Space after the project description */
+.project>p {
+    margin-bottom: 10px;
+    /* Space after the project description */
 }
 
 .project-back {
-    background-color: #30A875; /* Green color for the back link */
-    color: white; /* White text for the back link */
-    text-decoration: none; /* Remove link underlines */
-    margin-right: 20px; /* Space after the back link */
+    background-color: #30A875;
+    /* Green color for the back link */
+    color: white;
+    /* White text for the back link */
+    text-decoration: none;
+    /* Remove link underlines */
+    margin-right: 20px;
+    /* Space after the back link */
     float: right;
     display: flex;
     padding: 6px;
@@ -126,63 +156,83 @@ h3 {
 
 
 .project-import-button {
-    background-color: #30A875; /* Green color for the back link */
-    color: white; /* White text for the back link */
-    text-decoration: none; /* Remove link underlines */
-    margin-right: 20px; /* Space after the back link */
+    background-color: #30A875;
+    /* Green color for the back link */
+    color: white;
+    /* White text for the back link */
+    text-decoration: none;
+    /* Remove link underlines */
+    margin-right: 20px;
+    /* Space after the back link */
     float: right;
     display: flex;
     padding: 6px;
 }
 
 /* Style for the 'View Details' button */
-.project > button {
-    background-color: #30A875; /* Green background for consistency */
+.project>button {
+    background-color: #30A875;
+    /* Green background for consistency */
     color: white;
     border: none;
     padding: 8px 16px;
     cursor: pointer;
-    display: inline-block; /* So it doesn't take the full width */
-    margin-bottom: 10px; /* Space after the button */
+    display: inline-block;
+    /* So it doesn't take the full width */
+    margin-bottom: 10px;
+    /* Space after the button */
 }
 
 .custom-file-upload, .show-attribute-btn {
     display: flex;
-    padding: 6px 12px; /* Similar to button padding */
+    padding: 6px 12px;
+    /* Similar to button padding */
     cursor: pointer;
-    width: 160px; /* Full width */
-    background-color: #30A875; /* Button color */
-    color: white; /* Text color */
+    width: 160px;
+    /* Full width */
+    background-color: #30A875;
+    /* Button color */
+    color: white;
+    /* Text color */
     border: 1px solid transparent;
-    border-radius: 4px; /* Button border-radius */
-    font-size: 16px; /* Text size */
-    font-weight: bold; /* Text weight */
+    border-radius: 4px;
+    /* Button border-radius */
+    font-size: 16px;
+    /* Text size */
+    font-weight: bold;
+    /* Text weight */
     text-align: center;
-    margin: auto; /* Adjust spacing around the button */
-    transition: all 0.3s; /* Smooth transition for hover effect */
-  }
-  
-  .custom-file-upload:hover {
-    background-color: #45a049; /* Darker shade for hover effect */
-  }
+    margin: auto;
+    /* Adjust spacing around the button */
+    transition: all 0.3s;
+    /* Smooth transition for hover effect */
+}
+
+.custom-file-upload:hover {
+    background-color: #45a049;
+    /* Darker shade for hover effect */
+}
 
 /* ProjectView.css */
 
-  
-  .toggle-form-button {
-    background-color: #30A875; /* Green background */
+
+.toggle-form-button {
+    background-color: #30A875;
+    /* Green background */
     color: white;
     padding: 10px 20px;
     border: none;
     cursor: pointer;
     width: 100%;
-    margin-bottom: 5px; /* Spacing before form or list */
+    margin-bottom: 5px;
+    /* Spacing before form or list */
     text-transform: uppercase;
     font-weight: bold;
-  }
+}
 
-  .toggle-form-button-2 {
-    background-color: #30A875; /* Green background */
+.toggle-form-button-2 {
+    background-color: #30A875;
+    /* Green background */
     color: white;
     padding: 2px 5px;
     padding-bottom: 2px;
@@ -193,228 +243,309 @@ h3 {
     /* Spacing before form or list */
     text-transform: uppercase;
     font-weight: bold;
-  }
-  
-  .form-container {
-    display: none; /* Initially hide the form */
-    /* Other styles */
-  }
-  
-  /* When form is visible */
-  .form-container.visible {
-    display: block; /* Show the form */
-  }
-  
-
-  .save-status {
-    color: red; /* Consistent color for messages */
-    font-weight: bold;
-    margin-left: 10px;
-  }
-  
-/* Form for creating a new project */
-.form-container, .form-survey {
-    margin-top: 40px; /* Space before the form */
 }
 
-.form-container > h2 {
-    color: #30A875; /* Green color for form heading */
-    margin-bottom: 20px; /* Space after the form title */
+.form-container {
+    display: none;
+    /* Initially hide the form */
+    /* Other styles */
+}
+
+/* When form is visible */
+.form-container.visible {
+    display: block;
+    /* Show the form */
+}
+
+
+.save-status {
+    color: red;
+    /* Consistent color for messages */
+    font-weight: bold;
+    margin-left: 10px;
+}
+
+/* Form for creating a new project */
+.form-container, .form-survey {
+    margin-top: 40px;
+    /* Space before the form */
+}
+
+.form-container>h2 {
+    color: #30A875;
+    /* Green color for form heading */
+    margin-bottom: 20px;
+    /* Space after the form title */
 }
 
 .form-container label {
-    display: block; /* Ensure the label goes on a new line */
-    margin-bottom: 5px; /* Small space between label and input */
-    font-weight: bold; /* Make labels bold for clarity */
+    display: block;
+    /* Ensure the label goes on a new line */
+    margin-bottom: 5px;
+    /* Small space between label and input */
+    font-weight: bold;
+    /* Make labels bold for clarity */
 }
 
 .form-container input[type="text"],
 .form-container textarea {
-    width: 95%; /* Make input take full width of form - accounting for padding */
+    width: 95%;
+    /* Make input take full width of form - accounting for padding */
     padding: 10px;
-    margin-bottom: 15px; /* Space between each form field */
+    margin-bottom: 15px;
+    /* Space between each form field */
     border: 1px solid #ccc;
 }
 
 /* Style specifically for text area to input descriptions */
 .form-container textarea {
-    height: 100px; /* Default height for the textarea */
-    resize: vertical; /* Allow only vertical resizing */
+    height: 100px;
+    /* Default height for the textarea */
+    resize: vertical;
+    /* Allow only vertical resizing */
 }
 
 /* Submit button for creating a new project */
 .form-container button {
-    background-color: #30A875; /* Green background like other buttons */
-    color: white; /* Text color */
-    padding: 10px 20px; /* Padding for button */
-    border: none; /* No border */
-    cursor: pointer; /* Cursor pointer */
-    display: block; /* Make the button a block to fill width if needed */
-    width: 100%; /* Full width */
-    margin-top: 10px; /* Space from the last input field */
+    background-color: #30A875;
+    /* Green background like other buttons */
+    color: white;
+    /* Text color */
+    padding: 10px 20px;
+    /* Padding for button */
+    border: none;
+    /* No border */
+    cursor: pointer;
+    /* Cursor pointer */
+    display: block;
+    /* Make the button a block to fill width if needed */
+    width: 100%;
+    /* Full width */
+    margin-top: 10px;
+    /* Space from the last input field */
 }
 
 .toggle-additional-fields {
-    background-color: #309a75; /* Adjust the background color to fit your design */
-    color: #fff; /* White text color */
-    padding: 8px 15px; /* Padding around the text */
-    margin-top: 10px; /* Margin from the top to separate it from other elements */
-    border: none; /* No border for a cleaner look */
-    border-radius: 4px; /* Rounded corners */
-    cursor: pointer; /* Cursor changes to a pointer to indicate it's clickable */
-    font-size: 14px; /* Font size, adjust as needed */
-    transition: background-color 0.3s; /* Smooth transition for hover effect */
-    float: right; /* Float to the right to align it with other elements */
-  }
-  
-  .toggle-additional-fields:hover {
-    background-color: #26724d; /* Darker shade on hover for interaction feedback */
-  }
+    background-color: #309a75;
+    /* Adjust the background color to fit your design */
+    color: #fff;
+    /* White text color */
+    padding: 8px 15px;
+    /* Padding around the text */
+    margin-top: 10px;
+    /* Margin from the top to separate it from other elements */
+    border: none;
+    /* No border for a cleaner look */
+    border-radius: 4px;
+    /* Rounded corners */
+    cursor: pointer;
+    /* Cursor changes to a pointer to indicate it's clickable */
+    font-size: 14px;
+    /* Font size, adjust as needed */
+    transition: background-color 0.3s;
+    /* Smooth transition for hover effect */
+    float: right;
+    /* Float to the right to align it with other elements */
+}
+
+.toggle-additional-fields:hover {
+    background-color: #26724d;
+    /* Darker shade on hover for interaction feedback */
+}
 
 /* Responsive adjustments for smaller screens */
 @media (max-width: 768px) {
+
     .project-container,
     .form-container input[type="text"],
     .form-container textarea {
-        width: 95%; /* Make container and input fields slightly narrower on smaller screens */
+        width: 95%;
+        /* Make container and input fields slightly narrower on smaller screens */
     }
 }
 
 /* Add any additional styles for hover, focus, or active states as desired */
-.project > button:hover,
+.project>button:hover,
 .form-container button:hover {
-    background-color: #26724d; /* Slightly darker green on hover */
+    background-color: #26724d;
+    /* Slightly darker green on hover */
 }
 
 /* Survey form */
 .survey-container {
-    margin-top: 40px; /* Space before the form */
+    margin-top: 40px;
+    /* Space before the form */
 }
 
-.survey-container > h2 {
-    color: #30A875; /* Green color for form heading */
-    margin-bottom: 20px; /* Space after the form title */
+.survey-container>h2 {
+    color: #30A875;
+    /* Green color for form heading */
+    margin-bottom: 20px;
+    /* Space after the form title */
 }
 
 .survey-container label {
-    display: block; /* Ensure the label goes on a new line */
-    margin-bottom: 5px; /* Small space between label and input */
-    font-weight: bold; /* Make labels bold for clarity */
+    display: block;
+    /* Ensure the label goes on a new line */
+    margin-bottom: 5px;
+    /* Small space between label and input */
+    font-weight: bold;
+    /* Make labels bold for clarity */
 }
 
 .survey-container input[type="text"],
 .survey-container textarea {
-    width: 95%; /* Make input take full width of form - accounting for padding */
+    width: 95%;
+    /* Make input take full width of form - accounting for padding */
     padding: 10px;
-    margin-bottom: 15px; /* Space between each form field */
+    margin-bottom: 15px;
+    /* Space between each form field */
     border: 1px solid #ccc;
 }
 
 /* Style specifically for text area to input descriptions */
 .survey-container textarea {
-    height: 100px; /* Default height for the textarea */
-    resize: vertical; /* Allow only vertical resizing */
+    height: 100px;
+    /* Default height for the textarea */
+    resize: vertical;
+    /* Allow only vertical resizing */
 }
 
 /* Submit button for submitting the survey */
 .survey-container button {
-    background-color: #30A875; /* Green background like other buttons */
-    color: white; /* Text color */
-    padding: 10px 20px; /* Padding for button */
-    border: none; /* No border */
-    cursor: pointer; /* Cursor pointer */
-    display: block; /* Make the button a block to fill width if needed */
-    width: 100%; /* Full width */
-    margin-top: 10px; /* Space from the last input field */
+    background-color: #30A875;
+    /* Green background like other buttons */
+    color: white;
+    /* Text color */
+    padding: 10px 20px;
+    /* Padding for button */
+    border: none;
+    /* No border */
+    cursor: pointer;
+    /* Cursor pointer */
+    display: block;
+    /* Make the button a block to fill width if needed */
+    width: 100%;
+    /* Full width */
+    margin-top: 10px;
+    /* Space from the last input field */
 }
 
 /* Responsive adjustments for smaller screens */
 @media (max-width: 768px) {
+
     .survey-container,
     .survey-container input[type="text"],
     .survey-container textarea {
-        width: 95%; /* Make container and input fields slightly narrower on smaller screens */
+        width: 95%;
+        /* Make container and input fields slightly narrower on smaller screens */
     }
 }
 
 /* Add any additional styles for hover, focus, or active states as desired */
 .survey-container button:hover {
-    background-color: #26724d; /* Slightly darker green on hover */
+    background-color: #26724d;
+    /* Slightly darker green on hover */
 }
 
 /* UserSpecies.css */
 
 /* Container for the entire user species view, similar to project-container */
 .user-species-container {
-    color: black; /* Dark grey text */
-    margin: 25px auto; /* Center the container */
-    padding: 10px; /* Padding for the container */
+    color: black;
+    /* Dark grey text */
+    margin: 25px auto;
+    /* Center the container */
+    padding: 10px;
+    /* Padding for the container */
     box-sizing: border-box;
     border-radius: 8px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
 }
 
 /* Style for the main title, similar to project-container > h1 */
-.user-species-container > h3 {
-    color: #30A875; /* Green color for main heading */
-    margin-bottom: 20px; /* Space after the main title */
-    text-align: center; /* Center the main title */
+.user-species-container>h3 {
+    color: #30A875;
+    /* Green color for main heading */
+    margin-bottom: 20px;
+    /* Space after the main title */
+    text-align: center;
+    /* Center the main title */
     margin-top: 0px;
 }
 
 /* Style for each species item in the list */
 .species-list li {
-    background-color: #fff; /* White background for each species item */
-    border: 1px solid #ccc; /* Border for each species item */
-    padding: 15px; /* Padding inside each species item */
-    margin-bottom: 15px; /* Space between species items */
-    box-shadow: 0px 2px 5px rgba(0,0,0,0.1); /* Optional: add shadow for depth */
-    list-style-type: none; /* Remove list bullets */
+    background-color: #fff;
+    /* White background for each species item */
+    border: 1px solid #ccc;
+    /* Border for each species item */
+    padding: 15px;
+    /* Padding inside each species item */
+    margin-bottom: 15px;
+    /* Space between species items */
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+    /* Optional: add shadow for depth */
+    list-style-type: none;
+    /* Remove list bullets */
 }
 
 /* Adjusting the form layout */
 .user-species-container .form-container {
     display: grid;
-    grid-template-columns: repeat(3, 1fr); /* Three columns */
-    grid-gap: 20px; /* Space between grid items */
-    margin-bottom: 20px; /* Space below the form */
+    grid-template-columns: repeat(3, 1fr);
+    /* Three columns */
+    grid-gap: 20px;
+    /* Space between grid items */
+    margin-bottom: 20px;
+    /* Space below the form */
 }
 
 .user-species-container .form-container input[type="text"],
 .user-species-container .form-container textarea {
-    width: 100%; /* Adjust width to fit grid columns */
-    margin-bottom: 15px; /* Vertical space between fields */
+    width: 100%;
+    /* Adjust width to fit grid columns */
+    margin-bottom: 15px;
+    /* Vertical space between fields */
 }
 
 /* Adjust the textarea to span two rows vertically */
 .user-species-container .form-container textarea {
-    grid-row: span 2; /* Span two rows */
+    grid-row: span 2;
+    /* Span two rows */
 }
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
     .user-species-container .form-container {
-        grid-template-columns: 1fr; /* One column on smaller screens */
+        grid-template-columns: 1fr;
+        /* One column on smaller screens */
     }
+
     .user-species-container .form-container textarea {
-        grid-row: auto; /* Reset row span for smaller screens */
+        grid-row: auto;
+        /* Reset row span for smaller screens */
     }
 }
 
 /* Hover effect for buttons */
 .user-species-container button:hover {
-    background-color: #26724d; /* Slightly darker green on hover */
+    background-color: #26724d;
+    /* Slightly darker green on hover */
 }
 
 /* Style for the 'Add Species' button, similar to project > button */
 .user-species-container button {
-    background-color: #30A875; /* Green background for consistency */
+    background-color: #30A875;
+    /* Green background for consistency */
     color: white;
     border: none;
     padding: 8px 16px;
     cursor: pointer;
-    display: inline-block; /* So it doesn't take the full width */
-    margin-bottom: 10px; /* Space after the button */
+    display: inline-block;
+    /* So it doesn't take the full width */
+    margin-bottom: 10px;
+    /* Space after the button */
 }
 
 /* Reusing styles for form fields and labels from ProjectView.css */
@@ -422,9 +553,12 @@ h3 {
 .user-species-container input[type="text"],
 .user-species-container textarea {
     /* Styles are inherited from ProjectView.css */
-    display: block; /* Ensure the label goes on a new line */
-    margin-bottom: 5px; /* Small space between label and input */
-    font-weight: bold; /* Make labels bold for clarity */
+    display: block;
+    /* Ensure the label goes on a new line */
+    margin-bottom: 5px;
+    /* Small space between label and input */
+    font-weight: bold;
+    /* Make labels bold for clarity */
 }
 
 .species-search {
@@ -458,16 +592,19 @@ h3 {
     color: white;
     padding: 10px 20px;
     border-radius: 5px;
-    display: none; /* Initially hidden */
+    display: none;
+    /* Initially hidden */
     opacity: 0;
     transition: opacity 0.5s, bottom 0.5s;
-    z-index: 1000; /* Ensure it's above other elements */
+    z-index: 1000;
+    /* Ensure it's above other elements */
 }
 
 .status-popup.show {
     display: block;
     opacity: 1;
-    bottom: 20px; /* Adjust as needed for visibility */
+    bottom: 20px;
+    /* Adjust as needed for visibility */
 }
 
 /* ProjectView.css */
@@ -476,154 +613,227 @@ h3 {
 
 /* Style for editable project name and description fields */
 .editable-field {
-    border: 1px solid #ccc; /* Consistent border */
-    padding: 10px; /* Padding for comfortable editing */
-    width: 35%; /* Expand to full width on focus */    
-    margin-bottom: 10px; /* Space between fields */
-  }
-  
-  .editable-field:focus {
-    outline: none; /* Remove default focus outline */
+    border: 1px solid #ccc;
+    /* Consistent border */
+    padding: 10px;
+    /* Padding for comfortable editing */
+    width: 35%;
+    /* Expand to full width on focus */
+    margin-bottom: 10px;
+    /* Space between fields */
+}
 
-    border-color: #30A875; /* Highlight with green border on focus */
-  }
-  
-  /* Style for the 'Edit' and 'Save Changes' buttons */
-  .edit-button, .save-changes-button {
-    background-color: #30A875; /* Consistent green background */
-    color: white; /* White text for visibility */
-    border: none; /* No border for a cleaner look */
-    padding: 8px 16px; /* Comfortable padding */
-    margin-top: 10px; /* Space from the last field or button */
-    cursor: pointer; /* Pointer to indicate clickability */
-    font-size: 90%; /* Slightly smaller font size for subtlety */
-  }
-  
-  .edit-button:hover, .save-changes-button:hover {
-    background-color: #26724d; /* Darker green on hover for interaction feedback */
-  }
-  
-  /* Style for canceling edit mode */
-  .cancel-edit-button {
-    background-color: #bbb; /* Neutral grey for cancel button */
-    margin-left: 10px; /* Space from the save button */
-  }
-  
-  .cancel-edit-button:hover {
-    background-color: #999; /* Slightly darker on hover */
-  }
-  
+.editable-field:focus {
+    outline: none;
+    /* Remove default focus outline */
+
+    border-color: #30A875;
+    /* Highlight with green border on focus */
+}
+
+/* Style for the 'Edit' and 'Save Changes' buttons */
+.edit-button, .save-changes-button {
+    background-color: #30A875;
+    /* Consistent green background */
+    color: white;
+    /* White text for visibility */
+    border: none;
+    /* No border for a cleaner look */
+    padding: 8px 16px;
+    /* Comfortable padding */
+    margin-top: 10px;
+    /* Space from the last field or button */
+    cursor: pointer;
+    /* Pointer to indicate clickability */
+    font-size: 90%;
+    /* Slightly smaller font size for subtlety */
+}
+
+.edit-button:hover, .save-changes-button:hover {
+    background-color: #26724d;
+    /* Darker green on hover for interaction feedback */
+}
+
+/* Style for canceling edit mode */
+.cancel-edit-button {
+    background-color: #bbb;
+    /* Neutral grey for cancel button */
+    margin-left: 10px;
+    /* Space from the save button */
+}
+
+.cancel-edit-button:hover {
+    background-color: #999;
+    /* Slightly darker on hover */
+}
+
 /* Tabs container */
 .tabs {
-    display: flex; /* Display tabs in a row */
-    justify-content: right; /* Center tabs horizontally */
-    margin-bottom: 0px; /* Space below the tabs */
-    margin-top: -35px; /* Ensure tabs appear above the content box */
+    display: flex;
+    /* Display tabs in a row */
+    justify-content: right;
+    /* Center tabs horizontally */
+    margin-bottom: 0px;
+    /* Space below the tabs */
+    margin-top: -35px;
+    /* Ensure tabs appear above the content box */
     font-size: 75%;
 }
 
 
 /* Individual tab buttons */
 .tabs button {
-    background-color: #f1f1f1; /* Light grey background */
-    border: 1px solid #ccc; /* Grey border */
-    padding: 5px 10px; /* Padding for tab buttons */
-    cursor: pointer; /* Pointer cursor for clickable tabs */
-    transition: background-color 0.3s; /* Smooth background color transition */
-    margin-right: 2px; /* Small space between tabs */
-    font-weight: bold; /* Bold font for tab text */
-    
+    background-color: #f1f1f1;
+    /* Light grey background */
+    border: 1px solid #ccc;
+    /* Grey border */
+    padding: 5px 10px;
+    /* Padding for tab buttons */
+    cursor: pointer;
+    /* Pointer cursor for clickable tabs */
+    transition: background-color 0.3s;
+    /* Smooth background color transition */
+    margin-right: 2px;
+    /* Small space between tabs */
+    font-weight: bold;
+    /* Bold font for tab text */
+
 }
 
 /* Hover effect for tab buttons */
 .tabs button:hover {
-    background-color: #ddd; /* Slightly darker grey on hover */
+    background-color: #ddd;
+    /* Slightly darker grey on hover */
 }
 
 /* Active tab button */
 .tabs button.active {
-    background-color: #30A875; /* Green background for active tab, matching your theme */
-    color: white; /* White text for active tab */
-    border-bottom: none; /* No bottom border for the active tab to make it look like it's part of the content box */
+    background-color: #30A875;
+    /* Green background for active tab, matching your theme */
+    color: white;
+    /* White text for active tab */
+    border-bottom: none;
+    /* No bottom border for the active tab to make it look like it's part of the content box */
 }
 
 
-  /* Responsive adjustments for form and buttons */
-  @media (max-width: 768px) {
-    .editable-field, 
-    .edit-button, 
-    .save-changes-button, 
+/* Responsive adjustments for form and buttons */
+@media (max-width: 768px) {
+
+    .editable-field,
+    .edit-button,
+    .save-changes-button,
     .cancel-edit-button {
-      width: 100%; /* Full width for smaller screens */
+        width: 100%;
+        /* Full width for smaller screens */
     }
-  }
-  
+}
+
 /* Project Controls for Search and Sort */
 .project-controls {
-    display: flex; /* Aligns items in a row */
-    justify-content: space-between; /* Spaces items evenly */
-    align-items: center; /* Vertically centers items */
-    padding: 10px; /* Padding for the container */
-    margin-bottom: 20px; /* Space below the controls */
+    display: flex;
+    /* Aligns items in a row */
+    justify-content: space-between;
+    /* Spaces items evenly */
+    align-items: center;
+    /* Vertically centers items */
+    padding: 10px;
+    /* Padding for the container */
+    margin-bottom: 20px;
+    /* Space below the controls */
     margin-top: 20px;
-    background-color: #fff; /* White background */
-    border: 1px solid #ccc; /* Border for distinction */
-    border-radius: 5px; /* Rounded corners */
-    box-shadow: 0px 2px 5px rgba(0,0,0,0.1); /* Subtle shadow for depth */
+    background-color: #fff;
+    /* White background */
+    border: 1px solid #ccc;
+    /* Border for distinction */
+    border-radius: 5px;
+    /* Rounded corners */
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+    /* Subtle shadow for depth */
 }
 
 /* Style for the search input */
 .project-controls input[type="text"] {
-    flex-grow: 1; /* Allows input to take available space */
-    padding: 8px; /* Padding for the input */
-    margin-right: 10px; /* Space between input and button */
-    border: 1px solid #ccc; /* Consistent border */
-    border-radius: 4px; /* Rounded corners for input */
-    font-size: 100%; /* Default font size */
+    flex-grow: 1;
+    /* Allows input to take available space */
+    padding: 8px;
+    /* Padding for the input */
+    margin-right: 10px;
+    /* Space between input and button */
+    border: 1px solid #ccc;
+    /* Consistent border */
+    border-radius: 4px;
+    /* Rounded corners for input */
+    font-size: 100%;
+    /* Default font size */
 }
 
 /* Style for the sort button */
 .project-controls button {
-    background-color: #30A875; /* Green background */
-    color: white; /* White text */
-    border: none; /* No border */
-    padding: 8px 16px; /* Padding for the button */
-    border-radius: 4px; /* Rounded corners for button */
-    cursor: pointer; /* Pointer cursor */
-    font-size: 100%; /* Consistent font size */
+    background-color: #30A875;
+    /* Green background */
+    color: white;
+    /* White text */
+    border: none;
+    /* No border */
+    padding: 8px 16px;
+    /* Padding for the button */
+    border-radius: 4px;
+    /* Rounded corners for button */
+    cursor: pointer;
+    /* Pointer cursor */
+    font-size: 100%;
+    /* Consistent font size */
 }
 
 /* Hover effect for the sort button */
 .project-controls button:hover {
-    background-color: #26724d; /* Slightly darker green on hover */
+    background-color: #26724d;
+    /* Slightly darker green on hover */
 }
 
 .project-textarea {
-    width: 50%; /* Sets the width to occupy the full width of its container */
-    min-height: 50px; /* Sets a minimum height */
-    max-height: 200px; /* Sets a maximum height */
-    resize: none; /* Disables resizing of the textarea */
-    border: 1px solid #ccc; /* Adds a border */
-    padding: 10px; /* Adds some padding inside the textarea */
-    margin-bottom: 15px; /* Adds some space below the textarea */
-    background-color: #f9f9f9; /* Sets a background color */
-    color: #333; /* Sets the text color */
-  }
-  
-  .project-details-container > label {
-    display: block; /* Labels on a new line */
-    margin-bottom: 5px; /* Space between label and field */
-    font-weight: bold; /* Bold labels */
+    width: 50%;
+    /* Sets the width to occupy the full width of its container */
+    min-height: 50px;
+    /* Sets a minimum height */
+    max-height: 200px;
+    /* Sets a maximum height */
+    resize: none;
+    /* Disables resizing of the textarea */
+    border: 1px solid #ccc;
+    /* Adds a border */
+    padding: 10px;
+    /* Adds some padding inside the textarea */
+    margin-bottom: 15px;
+    /* Adds some space below the textarea */
+    background-color: #f9f9f9;
+    /* Sets a background color */
+    color: #333;
+    /* Sets the text color */
 }
+
+.project-details-container>label {
+    display: block;
+    /* Labels on a new line */
+    margin-bottom: 5px;
+    /* Space between label and field */
+    font-weight: bold;
+    /* Bold labels */
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
     .project-controls {
-        flex-direction: column; /* Stack items vertically on smaller screens */
-        align-items: stretch; /* Stretch items to fill width */
+        flex-direction: column;
+        /* Stack items vertically on smaller screens */
+        align-items: stretch;
+        /* Stretch items to fill width */
     }
 
     .project-controls input[type="text"] {
-        margin-bottom: 10px; /* Space between input and button on small screens */
+        margin-bottom: 10px;
+        /* Space between input and button on small screens */
     }
 }
 
@@ -647,10 +857,12 @@ h3 {
     padding: 5px;
     padding-top: 0px;
     margin-bottom: 10px;
-    margin-top: -15px;;
+    margin-top: -15px;
+    ;
     border-radius: 8px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
-    z-index: 1000; /* Ensure it appears above the map */
+    z-index: 1000;
+    /* Ensure it appears above the map */
 }
 
 /* Style for the title of the attribute window */
@@ -724,7 +936,9 @@ h3 {
 .attributes-container table th,
 .attributes-container table td {
     font-size: 70%;
-    font-weight: bold; /* Reduce the font size to 75% of the original size */;
+    font-weight: bold;
+    /* Reduce the font size to 75% of the original size */
+    ;
 }
 
 .attributes-container button {
@@ -744,21 +958,27 @@ h3 {
 .attributes-container textarea,
 .attributes-container select {
     width: 100%;
-    font-size: 85%; /* Reduce the width to 75% of the original width */
+    font-size: 85%;
+    /* Reduce the width to 75% of the original width */
     /* Other input styles remain unchanged */
 }
 
 /* Adjust table layout to accommodate smaller text and field sizes */
 .attributes-container table {
-    width: 100%; /* Ensure table uses the full width available */
-    table-layout: fixed; /* Use fixed table layout to control column widths */
+    width: 100%;
+    /* Ensure table uses the full width available */
+    table-layout: fixed;
+    /* Use fixed table layout to control column widths */
 }
 
 .attributes-container table th,
 .attributes-container table td {
-    overflow: hidden; /* Hide overflow text */
-    text-overflow: ellipsis; /* Add an ellipsis to overflow text */
-    white-space: nowrap; /* Keep text in a single line */
+    overflow: hidden;
+    /* Hide overflow text */
+    text-overflow: ellipsis;
+    /* Add an ellipsis to overflow text */
+    white-space: nowrap;
+    /* Keep text in a single line */
 }
 
 /* Ensure the container is responsive and looks good on smaller screens */
@@ -773,50 +993,73 @@ h3 {
 
 .draw-rectangle-btn {
     position: relative;
-    top: 13px; /* Position the button 100px down from the top */
-    left: 0px; /* Position the button to the left side */
+    top: 13px;
+    /* Position the button 100px down from the top */
+    left: 0px;
+    /* Position the button to the left side */
     margin-right: 65px;
-    float:right;
-    z-index: 1000; /* Ensure the button is above the map layers */
-    background-color: #30A875; /* Use a green background similar to other buttons */
-    color: white; /* White text color */
+    float: right;
+    z-index: 1000;
+    /* Ensure the button is above the map layers */
+    background-color: #30A875;
+    /* Use a green background similar to other buttons */
+    color: white;
+    /* White text color */
     font-weight: bold;
-    border: none; /* Remove the default border */
-    padding: 2px 8px; /* Add some padding for better visibility */
-    cursor: pointer; /* Change the cursor to a pointer to indicate it's clickable */
-    border-radius: 4px; /* Optionally, round the corners of the button */
-    font-size: 12px; /* Adjust the font size as needed */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5); /* Optional: add a shadow for depth */
-    transition: background-color 0.3s; /* Smooth transition for hover effect */
-  }
-  
-  .draw-rectangle-btn:hover {
-    background-color: #26724d; /* Darker shade on hover for interaction feedback */
-  }
-  
+    border: none;
+    /* Remove the default border */
+    padding: 2px 8px;
+    /* Add some padding for better visibility */
+    cursor: pointer;
+    /* Change the cursor to a pointer to indicate it's clickable */
+    border-radius: 4px;
+    /* Optionally, round the corners of the button */
+    font-size: 12px;
+    /* Adjust the font size as needed */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    /* Optional: add a shadow for depth */
+    transition: background-color 0.3s;
+    /* Smooth transition for hover effect */
+}
+
+.draw-rectangle-btn:hover {
+    background-color: #26724d;
+    /* Darker shade on hover for interaction feedback */
+}
+
 /* Existing styles... */
 
 /* Media query for screens wider than 1250 pixels */
 @media (min-width: 1900px) {
 
     .project-details-container, .survey-container, .user-species-container {
-        width: 32%; /* Each child takes up half of the container's width */
-        margin: 0; /* Resets margin for these elements */
-        box-sizing: border-box; /* Ensures padding is included in the element's total width and height */
+        width: 32%;
+        /* Each child takes up half of the container's width */
+        margin: 0;
+        /* Resets margin for these elements */
+        box-sizing: border-box;
+        /* Ensures padding is included in the element's total width and height */
         float: left;
     }
 
     .map-container {
-        width: 67%; /* Adjusts the map container to take up the other half */
-        margin: 0; /* Resets margin for the map container */
-        padding: 10px; /* Adjusts padding to ensure some space inside the container */
-        box-sizing: border-box; /* Ensures padding is included in the element's total width and height */
-        float: right; /* Floats the map container to the right */
+        width: 67%;
+        /* Adjusts the map container to take up the other half */
+        margin: 0;
+        /* Resets margin for the map container */
+        padding: 10px;
+        /* Adjusts padding to ensure some space inside the container */
+        box-sizing: border-box;
+        /* Ensures padding is included in the element's total width and height */
+        float: right;
+        /* Floats the map container to the right */
     }
 
     .full-width-map {
-        width: 100%; /* Ensures the map takes up the full width of its container */
-        height: calc(100vh - 120px); /* Adjusts the height based on the viewport height and subtracts the vertical margins */
-    
+        width: 100%;
+        /* Ensures the map takes up the full width of its container */
+        height: calc(100vh - 120px);
+        /* Adjusts the height based on the viewport height and subtracts the vertical margins */
+
     }
 }

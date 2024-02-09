@@ -394,7 +394,7 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
                             if (layer instanceof L.Marker) {
                                 // Change the clicked marker's icon to red
                                 layer.setIcon(dotIconRed);
-                            
+
                             }
                             setHighlightedIds(null);
                             setHighlightedId(null) // Clear existing layers first
@@ -1548,18 +1548,18 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
                 {/* Attribute table */}
 
                 <div className="attributes-container">
-                    <h3>{activeTab}</h3> 
+                    <h3>{activeTab}</h3>
 
                     <div className="tabs">
                         <button className={activeTab === 'Punkter' ? 'active' : ''} onClick={() => setActiveTab('Punkter')}>Punkter</button>
                         <button className={activeTab === 'Linjer' ? 'active' : ''} onClick={() => setActiveTab('Linjer')}>Linjer</button>
                         <button className={activeTab === 'Polygoner' ? 'active' : ''} onClick={() => setActiveTab('Polygoner')}>Polygoner</button>
                     </div>
-                   
+
                     <table>
                         <thead>
                             <tr>
-                            <th className='th-index'>#</th>
+                                <th className='th-index'>#</th>
                                 <th className='th-karta'>Kartan</th> {/* Additional column for highlight button */}
                                 {/* Assuming attributeNames is defined and accessible */}
                                 {attributeNames.map((name, index) => (
@@ -1575,7 +1575,7 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
                                         <tr key={featureIndex} className={highlightedIds.has(feature.properties.id) ? 'highlighted-row' : ''}
                                             onClick={(event) => handleRowClick(feature.properties.id, event)}>
                                             <td>
-                                            <span style={{ marginLeft: '0px' }}>{featureIndex + 1}</span>
+                                                <span style={{ marginLeft: '0px' }}>{featureIndex + 1}</span>
                                             </td>
 
                                             <td className='td-markera'>
@@ -1649,10 +1649,10 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
 
                 // Apply the highlight style to the target feature
                 if (layer.options.id === featureId || layer.feature && layer.feature.properties.id === featureId) {
-            
-    
+
+
                     if (layer instanceof L.Marker) {
-                    // Use the custom diamond icon for the highlighted marker
+                        // Use the custom diamond icon for the highlighted marker
                         layer.setIcon(dotIconRed);
                     } else if (properties && properties.shape === "rectangleCrop") {
                         // Special handling for "rectangleCrop" shapes
