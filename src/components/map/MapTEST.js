@@ -935,7 +935,44 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
                         console.log('circleMarker 1: ', circleMarkerFeature);
 
                     }
+
+
+                } else  if (layer instanceof L.Marker) {
+                    let featureMarker;
+                    // Handle L.Marker specifically
+                    const position = layer.getLatLng();
+                    featureMarker = {
+                        type: 'Feature',
+                        geometry: {
+                            type: 'Point',
+                            coordinates: [position.lng, position.lat]
+                        },
+                        properties: {
+                            isMarker: true,
+                            id: layer.options.id || uuidv4(), // Ensure each feature has a unique ID
+                            attributes: layer.options.attributes || {
+                                // Default attributes, can be customized
+                                objectNumber: ' ',
+                                inventoryLevel: ' ',
+                                natureValueClass: ' ',
+                                preliminaryAssessment: ' ',
+                                reason: ' ',
+                                natureType: ' ',
+                                habitat: ' ',
+                                date: ' ',
+                                executor: ' ',
+                                organization: ' ',
+                                projectName: ' ',
+                                area: ' ',
+                                species: ' ',
+                                habitatQualities: ' ',
+                                valueElements: ' ',
+                            }
+                        }
+                    };
+                    features.push(featureMarker);
                 }
+                
 
 
                 else {
@@ -979,17 +1016,6 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
 
             setGeoJsonData(geoJson);
 
-            /*
-            if (geoJson.features.properties == null || geoJson.features.properties == undefined || geoJson.features.properties.id == null || geoJson.features.properties.id == undefined || geoJson.features.properties.id == '') {
-              const feature = {
-                type: 'Feature',
-                properties: {
-                  id: uuidv4	(),
-                }
-              };
-              features.push(feature);
-            }
-            */
 
             console.log('updateGeojson: ', geoJson);
 
@@ -1000,24 +1026,6 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
     const onCreate = (e) => {
         const newLayer = e.layer;
         newLayer.options.id = uuidv4(); // Ensure each layer has a unique ID
-
-        /*
-        const newType = e.layerType;
-        if (newType === 'circle') {
-            newLayer.on('click', function () {
-                this.setStyle({
-                    color: 'green',
-                    fillColor: 'green'
-                });
-            });
-        }
-
-        // Add the new layer to the featureGroup to ensure it's managed and can be interacted with
-        newLayer.addTo(featureGroupRef.current);
-        */
-
-
-
 
         // Default attributes for all shapes
         newLayer.options.attributes = {
@@ -1404,13 +1412,13 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
         const filteredFeatures = geoJsonData.features.filter(feature => {
             if (activeTab === 'Punkter') {
                 // Only include point features for the "Points" tab
-                return feature.geometry.type === 'Point' || feature.properties.isMarker || feature.properties.isCircleMarker;
+                return feature.properties.isMarker || feature.properties.isPoint;
             } else if (activeTab === 'Linjer') {
                 // Only include line features for the "Lines" tab
                 return feature.geometry.type === 'LineString' || feature.geometry.type === 'MultiLineString';
             } else if (activeTab === 'Polygoner') {
                 // Only include polygon features for the "Polygons" tab
-                return feature.geometry.type === 'Polygon' || feature.geometry.type === 'MultiPolygon' || feature.properties.isMarker || feature.properties.isCircleMarker;
+                return feature.geometry.type === 'Polygon' || feature.geometry.type === 'MultiPolygon' || feature.properties.isCircleMarker;
             }
             // Default case to include all features if no tab matches
             return true;
@@ -1489,8 +1497,9 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
                 const properties = layer.feature ? layer.feature.properties : null;
 
                 // Debugging logs
-                console.log("Layer type:", properties, "Layer ID:", layer.options.id);
-                console.log("Layer:", layer);
+                console.log("highlight: layer type:", properties, "Layer ID:", layer.options.id);
+                console.log("highlight: layer:", layer);
+                console.log("highlight: feature id:", featureId);
 
 
                 // Reset the style for non-highlighted layers
@@ -1506,15 +1515,31 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
 
 
                 // Reset to default marker icon for non-highlighted markers
+                /*
                 if (layer instanceof L.Marker && (!properties || properties.shape !== "rectangleCrop")) {
                     layer.setIcon(new L.Icon.Default());
                 }
+                */
 
-                console.log("Layer ID:", layer.options.id, "Target Feature ID:", featureId);
+                
 
                 // Apply the highlight style to the target feature
                 if (layer.options.id === featureId) {
-                    if (properties && properties.shape === "rectangleCrop") {
+                    if (layer instanceof L.Marker) {
+                        // Define a custom divIcon for the highlighted marker
+                        const diamondIcon = L.divIcon({
+                            className: 'custom-div-icon',
+                            html: '<div style="width: 20px; height: 20px; background-color: red; transform: rotate(45deg); margin-top: -10px; margin-left: -10px;"></div>',
+                            iconSize: [20, 40],
+                            iconAnchor: [10, 10]
+                        });
+    
+                        // Debugging log to confirm execution of this block
+                        console.log("Setting custom icon for marker");
+    
+                        // Use the custom diamond icon for the highlighted marker
+                        layer.setIcon(diamondIcon);
+                    } else if (properties && properties.shape === "rectangleCrop") {
                         // Special handling for "rectangleCrop" shapes
                         layer.setStyle({
                             color: 'red', // Highlight color for rectangleCrop
@@ -1528,21 +1553,10 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
                             fillOpacity: 0.2,
                             weight: 5
                         });
-                    } else if (layer instanceof L.Marker) {
-                        // Define a custom divIcon for the highlighted marker
-                        const diamondIcon = L.divIcon({
-                            className: 'custom-div-icon',
-                            html: '<div style="width: 20px; height: 20px; background-color: green; transform: rotate(45deg); margin-top: -10px; margin-left: -10px;"></div>',
-                            iconSize: [20, 20],
-                            iconAnchor: [10, 10]
-                        });
+                    } 
+                    
+                    
 
-                        // Debugging log to confirm execution of this block
-                        console.log("Setting custom icon for marker");
-
-                        // Use the custom diamond icon for the highlighted marker
-                        layer.setIcon(diamondIcon);
-                    }
                 }
             });
         }
