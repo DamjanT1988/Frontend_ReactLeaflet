@@ -1656,19 +1656,7 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
             
     
                     if (layer instanceof L.Marker) {
-                        // Define a custom divIcon for the highlighted marker
-                        /*
-                        const diamondIcon = L.divIcon({
-                            className: 'custom-div-icon',
-                            html: '<div style="width: 20px; height: 20px; background-color: red; transform: rotate(45deg); margin-top: -10px; margin-left: -10px;"></div>',
-                            iconSize: [20, 40],
-                            iconAnchor: [10, 10]
-                        });
-                        */
-                        // Debugging log to confirm execution of this block
-                        console.log("Setting custom icon for marker");
-
-                        // Use the custom diamond icon for the highlighted marker
+                    // Use the custom diamond icon for the highlighted marker
                         layer.setIcon(dotIconRed);
                     } else if (properties && properties.shape === "rectangleCrop") {
                         // Special handling for "rectangleCrop" shapes
