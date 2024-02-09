@@ -239,8 +239,8 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
         });
     };
 
-
-
+  
+    
 
     useEffect(() => {
         window.toggleAttributeContainer = (id, attributes) => {
@@ -1459,11 +1459,11 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
                                             </td>
                                             {attributeNames.map((name, index) => (
                                                 <td key={`${featureIndex}-${index}`}>
-                                                <input
-    type="text"
-    value={feature.properties.attributes[name] || ''}
-    onChange={(e) => handleAttributeValueChange(feature.properties.id, name, e.target.value)}
-/>
+                                                    <input
+                                                        type="text"
+                                                        value={feature.properties.attributes[name] || ''}
+                                                        onChange={(e) => handleAttributeValueChange(feature.properties.id, name, e.target.value)}
+                                                    />
 
 
                                                 </td>
@@ -1548,22 +1548,25 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
         }
     };
 
-    
+
     const handleAttributeValueChange = (featureId, attributeName, newValue) => {
+        setHighlightedIds(prev => new Set(prev).add(featureId));
         // Create a deep copy of the geoJsonData to avoid direct state mutation
         const updatedGeoJsonData = JSON.parse(JSON.stringify(geoJsonData));
-    
+
+        //highlightFeature(featureId); // Highlight the feature when its attribute is being edited
+
         // Find the feature by its ID and update the attribute value
         const featureToUpdate = updatedGeoJsonData.features.find(feature => feature.properties.id === featureId);
         if (featureToUpdate && featureToUpdate.properties.attributes) {
             featureToUpdate.properties.attributes[attributeName] = newValue;
         }
-    
+
         // Update the state with the modified geoJsonData
         setGeoJsonData(updatedGeoJsonData);
     };
-    
-    
+
+
 
     return (
         <div>
