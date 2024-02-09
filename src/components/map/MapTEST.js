@@ -1634,7 +1634,7 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
                         color: '#3388ff', // Default color
                         fillColor: '#3388ff', // Default fill color
                         fillOpacity: 0.2, // Default fill opacity
-                        weight: 4  // Default weight
+                        weight: 3  // Default weight
                     });
                 }
 
