@@ -408,14 +408,7 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
                             if (layer instanceof L.Marker) {
                                 // Change the clicked marker's icon to red
                                 layer.setIcon(dotIconRed);
-                            } else if (layer instanceof L.Circle) {
-                                // Change the clicked circle's style
-                                layer.setStyle({
-                                    color: 'red',
-                                    fillColor: 'red',
-                                    fillOpacity: 0.2,
-                                    weight: 5,
-                                });
+                            
                             }
                             setHighlightedIds(null);
                             setHighlightedId(null) // Clear existing layers first
