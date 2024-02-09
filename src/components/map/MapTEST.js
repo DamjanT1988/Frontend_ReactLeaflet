@@ -153,20 +153,6 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
     };
 
 
-    const resetFeatureStyles = () => {
-        featureGroupRef.current.eachLayer(layer => {
-            // Check if the layer is a circle and reset its style
-            if (layer instanceof L.Circle || layer instanceof L.CircleMarker) {
-                layer.setStyle({
-                    color: '#3388ff', // Default color
-                    fillColor: '#3388ff', // Default fill color
-                    fillOpacity: 0.2, // Default fill opacity
-                    weight: 2, // Default weight
-                });
-            }
-        });
-    };
-
     const RectangleDrawButton = () => {
         const map = useMap();
 
@@ -1536,6 +1522,9 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
         const attributeNames = Array.from(allAttributeNames);
 
         const filteredFeatures = geoJsonData.features.filter(feature => {
+            if (feature.properties.shape === "rectangleCrop") {
+                return false;
+            }
             if (activeTab === 'Punkter') {
                 // Only include point features for the "Points" tab
                 return feature.properties.isMarker || feature.properties.isPoint;
