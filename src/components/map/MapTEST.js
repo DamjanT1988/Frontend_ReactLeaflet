@@ -113,7 +113,7 @@ window.toggleAttributeContainer = (id, attributes) => {
 const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
     const featureGroupRef = useRef(null);
     const position = [51.505, -0.09];
-    const zoom = 12;
+    const zoom = 11;
     const [geoJsonData, setGeoJsonData] = useState(null);
     const [saveStatus, setSaveStatus] = useState('');
     const accessToken = localStorage.getItem('accessToken'); // Get the access token from local storage
@@ -455,7 +455,7 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
                             circle.addTo(featureGroupRef.current);
 
                             circle.on('click', () => {
-                                resetFeatureStyles();
+                                resetAllLayerStyles();
                                 setHighlightedIds(new Set([feature.properties.id]));
                                 //setHighlightedId(null); // Set the highlighted feature's ID
                                 console.log('circle clicked: ', feature.properties.id);
@@ -1642,8 +1642,10 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
 
                 // Reset to default marker icon for non-highlighted markers
 
-                if (layer instanceof L.Marker && (!properties || properties.shape !== "rectangleCrop")) {
+                if (layer instanceof L.Marker && !(highlightedIds.size > 1)) {
                     layer.setIcon(dotIconBlue);
+                    console.log("highlightedIds", highlightedIds);
+                    console.log("selectedRowIds", selectedRowIds);
                 }
 
 
@@ -1651,6 +1653,8 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
 
                 // Apply the highlight style to the target feature
                 if (layer.options.id === featureId || layer.feature && layer.feature.properties.id === featureId) {
+            
+    
                     if (layer instanceof L.Marker) {
                         // Define a custom divIcon for the highlighted marker
                         /*
@@ -1681,9 +1685,6 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
                             weight: 5
                         });
                     }
-
-
-
                 }
             });
         }
