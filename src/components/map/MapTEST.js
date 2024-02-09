@@ -132,6 +132,41 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
     const [selectedMarkerId, setSelectedMarkerId] = useState(null);
     const [lastClickedMarker, setLastClickedMarker] = useState(null);
 
+
+
+    // Function to reset styles for all layers
+    const resetAllLayerStyles = () => {
+        featureGroupRef.current.eachLayer(layer => {
+            if (layer.options.icon === dotIconRed) {
+                // Reset marker icons to blue
+                layer.setIcon(dotIconBlue);
+            } else if (layer instanceof L.Circle) {
+                // Reset circle styles to default
+                layer.setStyle({
+                    color: '#3388ff', // Default color
+                    fillColor: '#3388ff', // Default fill color
+                    fillOpacity: 0.2,
+                    weight: 2,
+                });
+            }
+        });
+    };
+
+
+    const resetFeatureStyles = () => {
+        featureGroupRef.current.eachLayer(layer => {
+            // Check if the layer is a circle and reset its style
+            if (layer instanceof L.Circle || layer instanceof L.CircleMarker) {
+                layer.setStyle({
+                    color: '#3388ff', // Default color
+                    fillColor: '#3388ff', // Default fill color
+                    fillOpacity: 0.2, // Default fill opacity
+                    weight: 2, // Default weight
+                });
+            }
+        });
+    };
+
     const RectangleDrawButton = () => {
         const map = useMap();
 
@@ -240,19 +275,6 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
     };
 
 
-    const resetFeatureStyles = () => {
-        featureGroupRef.current.eachLayer(layer => {
-            // Check if the layer is a circle and reset its style
-            if (layer instanceof L.Circle || layer instanceof L.CircleMarker) {
-                layer.setStyle({
-                    color: '#3388ff', // Default color
-                    fillColor: '#3388ff', // Default fill color
-                    fillOpacity: 0.2, // Default fill opacity
-                    weight: 2, // Default weight
-                });
-            }
-        });
-    };
 
 
 
@@ -293,7 +315,7 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
                                         layer.setIcon(dotIconBlue);
                                     }
                                 });
-
+                                resetAllLayerStyles()
                                 // Change the clicked marker's icon to dotIconRed
                                 marker.setIcon(dotIconRed);
                                 console.log('marker clicked: ', feature.properties.id);
@@ -380,6 +402,21 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
                         });
                         */
                         layer.on('click', () => {
+
+                            resetAllLayerStyles();
+                            // Your existing click event logic...
+                            if (layer instanceof L.Marker) {
+                                // Change the clicked marker's icon to red
+                                layer.setIcon(dotIconRed);
+                            } else if (layer instanceof L.Circle) {
+                                // Change the clicked circle's style
+                                layer.setStyle({
+                                    color: 'red',
+                                    fillColor: 'red',
+                                    fillOpacity: 0.2,
+                                    weight: 5,
+                                });
+                            }
                             setHighlightedIds(null);
                             setHighlightedId(null) // Clear existing layers first
                             setHighlightedIds(new Set([feature.properties.id]));
@@ -403,6 +440,7 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
 
                         if (feature.properties && feature.properties.isCircle) {
 
+
                             // If the feature is a circle, recreate it
                             const center = L.latLng(feature.geometry.coordinates[1], feature.geometry.coordinates[0]);
 
@@ -412,7 +450,7 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
                                 color: '#3388ff', // Default color
                                 fillColor: '#3388ff', // Default fill color
                                 fillOpacity: 0.2,
-                                weight: 5,
+                                weight: 3,
                                 radius: feature.properties.radius
 
                             });
@@ -439,6 +477,7 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
                         } else {
                             layer.addTo(featureGroupRef.current);
                         }
+
 
                     }
                 })//.addTo(featureGroupRef.current);
@@ -468,6 +507,7 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
 
                 setIsRectangleDrawn(foundCropRectangle); // Update the state based on the presence of a crop rectangle
                 setShowRectangleButton(!foundCropRectangle); // Hide or show the button based on the presence of a crop rectangle
+
 
             }
         }
