@@ -17,6 +17,19 @@ L.Icon.Default.mergeOptions({
     shadowUrl: require('leaflet/dist/images/marker-shadow.png')
 });
 
+const dotIconBlue = L.divIcon({
+    className: 'custom-dot-icon',
+    html: '<svg width="20" height="20" viewBox="0 0 8 8"><circle cx="4" cy="4" r="3" fill="#3388ff"/></svg>',
+    iconSize: [8, 8], // Size of the icon
+    iconAnchor: [4, 4] // Anchor point of the icon
+});
+const dotIconRed = L.divIcon({
+    className: 'custom-dot-icon',
+    html: '<svg width="20" height="20" viewBox="0 0 8 8"><circle cx="4" cy="4" r="3" fill="red"/></svg>',
+    iconSize: [8, 8], // Size of the icon
+    iconAnchor: [4, 4] // Anchor point of the icon
+});
+
 
 // Destructure BaseLayer from LayersControl
 const { BaseLayer } = LayersControl;
@@ -116,6 +129,8 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
     const [selectedRowIds, setSelectedRowIds] = useState(new Set());
     const [highlightedIds, setHighlightedIds] = useState(new Set());
     const [activeTab, setActiveTab] = useState('Punkter');
+    const [selectedMarkerId, setSelectedMarkerId] = useState(null);
+    const [lastClickedMarker, setLastClickedMarker] = useState(null);
 
     const RectangleDrawButton = () => {
         const map = useMap();
@@ -253,6 +268,8 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
             window.toggleAttributeContainer = undefined; // Clean up
         };
     }, []);
+    
+
 
     useEffect(() => {
         if (featureGroupRef.current) {
@@ -265,6 +282,68 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
 
                 L.geoJSON(geoJsonData, {
                     pointToLayer: (feature, latlng) => {
+                          // For points that are not circle markers, use a custom dot icon
+                    if (!feature.properties.isCircleMarker) {
+                        const marker = L.marker(latlng, { icon: dotIconBlue });
+
+                        marker.on('click', () => {
+                            // If there is a last clicked marker, revert its icon to dotIconBlue
+                            if (lastClickedMarker) {
+                                lastClickedMarker.setIcon(dotIconBlue);
+                            }
+
+                            // Change the clicked marker's icon to dotIconRed
+                            marker.setIcon(dotIconRed);
+
+                            // Update the last clicked marker
+                            setLastClickedMarker(marker);
+                        });
+
+                        return marker;
+                    }
+
+                    // For circle markers, return a L.circleMarker
+                    return L.circleMarker(latlng, {
+                        radius: feature.properties.radius // Use the radius from the feature properties
+                    });
+                
+                        /*
+                        // Use L.marker with the custom dot icon
+                        const marker = L.marker(latlng, { icon: dotIconBlue, id: feature.properties.id });
+
+                        marker.on('click', () => {
+                            // Update the state with the currently selected marker's ID
+                            setSelectedMarkerId(feature.properties.id);
+
+                            // Iterate through all markers to update their icons
+                            featureGroupRef.current.eachLayer(layer => {
+                                if (layer instanceof L.Marker && !(layer instanceof L.CircleMarker)) {
+                                    if (layer.options.id === feature.properties.id) {
+                                        // Change the clicked marker's icon to red
+                                        layer.setIcon(dotIconRed);
+                                    } else {
+                                        // Revert other markers' icons back to blue
+                                        layer.setIcon(dotIconBlue);
+                                    }
+                                }
+                            });
+                        });
+
+                        return marker;
+                        */
+    
+                        /*                 
+                        return L.circleMarker(latlng, {
+                            radius: 8, // Radius of the circle marker (dot size)
+                            fillColor: "#3388ff", // Default fill color
+                            color: "#3388ff", // Border color
+                            weight: 4, // Border width
+                            opacity: 1,
+                            fillOpacity: 5
+                        });
+                        */
+                        
+                        /*  
                         if (feature.properties.isCircleMarker) {
                             // If the feature has a property indicating it's a circle marker, create a L.CircleMarker
                             return L.circleMarker(latlng, {
@@ -272,8 +351,10 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
                             });
                         } else {
                             // For other points, return a default marker
-                            return L.marker(latlng);
+                            return L.marker(latlng, { icon: dotIconBlue });
                         }
+                        */
+                        
                     },
 
                     onEachFeature: (feature, layer) => {
@@ -287,7 +368,15 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
                                 });
                             }
                         });
-
+                        /*
+                        layer.on('click', () => {
+                            setHighlightedId(feature.properties.id); // Set the highlighted feature's ID
+                            if (feature.properties.isMarker && feature.properties.shape !== "rectangleCrop") {
+                                console.log('marker clicked: ', feature.properties.id);
+                                return L.marker({ icon: dotIconRed });
+                            }
+                        });
+                        */
                         layer.on('click', () => {
                             setHighlightedId(null) // Clear existing layers first
                             setHighlightedIds(new Set([feature.properties.id]));
@@ -379,7 +468,7 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
 
             }
         }
-    }, [geoJsonData]);
+    }, [geoJsonData, selectedMarkerId]);
 
 
     // Function to generate popup content from feature properties
@@ -1154,6 +1243,7 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
 
         if (newLayer instanceof L.Marker) {
             const position = newLayer.getLatLng();
+            newLayer.options.id = newLayer.options.id || uuidv4();
             feature = {
                 type: 'Feature',
                 properties: {
@@ -1497,9 +1587,9 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
                 const properties = layer.feature ? layer.feature.properties : null;
 
                 // Debugging logs
-                console.log("highlight: layer type:", properties, "Layer ID:", layer.options.id);
+                console.log("highlight: layer type:", properties);
                 console.log("highlight: layer:", layer);
-                console.log("highlight: feature id:", featureId);
+                console.log("highlight: feature id:", featureId, "Layer ID:", layer.options.id);
 
 
                 // Reset the style for non-highlighted layers
@@ -1515,30 +1605,31 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
 
 
                 // Reset to default marker icon for non-highlighted markers
-                /*
+                
                 if (layer instanceof L.Marker && (!properties || properties.shape !== "rectangleCrop")) {
-                    layer.setIcon(new L.Icon.Default());
+                    layer.setIcon(dotIconBlue);
                 }
-                */
+                
 
                 
 
                 // Apply the highlight style to the target feature
-                if (layer.options.id === featureId) {
+                if (layer.options.id === featureId || layer.feature && layer.feature.properties.id === featureId) {
                     if (layer instanceof L.Marker) {
                         // Define a custom divIcon for the highlighted marker
+                        /*
                         const diamondIcon = L.divIcon({
                             className: 'custom-div-icon',
                             html: '<div style="width: 20px; height: 20px; background-color: red; transform: rotate(45deg); margin-top: -10px; margin-left: -10px;"></div>',
                             iconSize: [20, 40],
                             iconAnchor: [10, 10]
                         });
-    
+                        */
                         // Debugging log to confirm execution of this block
                         console.log("Setting custom icon for marker");
     
                         // Use the custom diamond icon for the highlighted marker
-                        layer.setIcon(diamondIcon);
+                        layer.setIcon(dotIconRed);
                     } else if (properties && properties.shape === "rectangleCrop") {
                         // Special handling for "rectangleCrop" shapes
                         layer.setStyle({
