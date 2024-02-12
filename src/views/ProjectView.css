@@ -1063,3 +1063,156 @@ h3 {
 
     }
 }
+
+/* General Layout */
+.data-analysis-page {
+    display: grid;
+    grid-template-columns: 20% auto 30%;
+    gap: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #f0f0f0;
+}
+
+/* Top Bar Styles */
+.top-bar {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background-color: #d3d3d3;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.top-bar .left, .top-bar .middle, .top-bar .right {
+    display: flex;
+    align-items: center;
+}
+
+.top-bar .middle button {
+    margin: 0 10px;
+    padding: 5px 15px;
+    background-color: #30A875;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.top-bar .right select {
+    padding: 5px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+/* Left Section Styles */
+.left-section {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background-color: #fff;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.left-section .buttons button {
+    padding: 5px 10px;
+    background-color: #30A875;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.left-section .additional {
+    margin-top: 20px;
+}
+
+.left-section .additional button {
+    margin-top: 5px;
+}
+
+/* Map Container Styles */
+.map-container {
+    grid-column: 2 / 3;
+    height: 500px;
+    background-color: #e0e0e0;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Right Section Styles */
+.right-section {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    background-color: #fff;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.right-section .project-info, .right-section .project-pictures, .right-section .attribute-table {
+    padding: 10px;
+    border-radius: 4px;
+}
+
+.right-section .project-pictures img {
+    width: 100%;
+    height: auto;
+    margin-bottom: 10px;
+    border-radius: 4px;
+}
+
+.right-section .project-pictures button {
+    padding: 5px 10px;
+    background-color: #30A875;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+/* Attribute Table Styles */
+.attribute-table {
+    overflow-x: auto;
+}
+
+.attribute-table table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.attribute-table th, .attribute-table td {
+    text-align: left;
+    padding: 8px;
+    border-bottom: 1px solid #ddd;
+}
+
+.attribute-table tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+.attribute-table tr:hover {
+    background-color: #ddd;
+}
+
+/* Responsive Layout */
+@media (max-width: 768px) {
+    .data-analysis-page {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .top-bar, .map-container, .left-section, .right-section {
+        grid-column: 1 / -1;
+    }
+
+    .map-container {
+        height: 300px;
+    }
+}

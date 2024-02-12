@@ -110,7 +110,7 @@ window.toggleAttributeContainer = (id, attributes) => {
 
 
 // Define the Map component
-const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
+const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHide }) => {
     const featureGroupRef = useRef(null);
     const position = [51.505, -0.09];
     const zoom = 11;
@@ -1501,6 +1501,172 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
         // Add more mappings as needed
     };
 
+    const renderAttributeList = () => {
+
+        return (
+            <div>
+                {!shouldHide &&
+                    <div className='map-container elementToHide'>
+                        <h3>Projektkarta</h3>
+                        <button className="toggle-form-button" onClick={saveDataToServer}>Spara ritning!</button>
+                        <span className="save-status">{saveStatus}</span>
+                        <p>Tryck på kartobjekt för att se attribut.</p>
+                        {selectedId && attributesObject && showAttributeTable && (
+                            <div className="attributes-container">
+                                <h3>Objektattribut</h3>
+                                <label>
+                                    Objektnummer:
+                                    <input
+                                        type="text"
+                                        value={attributesObject.objectNumber || ''}
+                                        onChange={(e) => setAttributesObject({ ...attributesObject, objectNumber: e.target.value })}
+                                    />
+                                </label>
+                                <label>
+                                    Inventeringsnivå:
+                                    <input
+                                        type="text"
+                                        value={attributesObject.inventoryLevel || ''}
+                                        onChange={(e) => setAttributesObject({ ...attributesObject, inventoryLevel: e.target.value })}
+                                    />
+                                </label>
+                                <label>
+                                    Naturvärdesklass:
+                                    <input
+                                        type="text"
+                                        value={attributesObject.natureValueClass || ''}
+                                        onChange={(e) => setAttributesObject({ ...attributesObject, natureValueClass: e.target.value })}
+                                    />
+                                </label>
+                                <label>
+                                    Preliminär bedömning:
+                                    <input
+                                        type="text"
+                                        value={attributesObject.preliminaryAssessment || ''}
+                                        onChange={(e) => setAttributesObject({ ...attributesObject, preliminaryAssessment: e.target.value })}
+                                    />
+                                </label>
+                                <label>
+                                    Motivering:
+                                    <input
+                                        type="text"
+                                        value={attributesObject.reason || ''}
+                                        onChange={(e) => setAttributesObject({ ...attributesObject, reason: e.target.value })}
+                                    />
+                                </label>
+                                <label>
+                                    Naturtyp:
+                                    <input
+                                        type="text"
+                                        value={attributesObject.natureType || ''}
+                                        onChange={(e) => setAttributesObject({ ...attributesObject, natureType: e.target.value })}
+                                    />
+                                </label>
+                                <label>
+                                    Biotop:
+                                    <input
+                                        type="text"
+                                        value={attributesObject.habitat || ''}
+                                        onChange={(e) => setAttributesObject({ ...attributesObject, habitat: e.target.value })}
+                                    />
+                                </label>
+                                <label>
+                                    Datum:
+                                    <input
+                                        type="date"
+                                        value={attributesObject.date || ''}
+                                        onChange={(e) => setAttributesObject({ ...attributesObject, date: e.target.value })}
+                                    />
+                                </label>
+                                <label>
+                                    Utförare:
+                                    <input
+                                        type="text"
+                                        value={attributesObject.executor || ''}
+                                        onChange={(e) => setAttributesObject({ ...attributesObject, executor: e.target.value })}
+                                    />
+                                </label>
+                                <label>
+                                    Organisation:
+                                    <input
+                                        type="text"
+                                        value={attributesObject.organization || ''}
+                                        onChange={(e) => setAttributesObject({ ...attributesObject, organization: e.target.value })}
+                                    />
+                                </label>
+                                <label>
+                                    Projektnamn:
+                                    <input
+                                        type="text"
+                                        value={attributesObject.projectName || ''}
+                                        onChange={(e) => setAttributesObject({ ...attributesObject, projectName: e.target.value })}
+                                    />
+                                </label>
+                                <label>
+                                    Area:
+                                    <input
+                                        type="number"
+                                        value={attributesObject.area || ''}
+                                        onChange={(e) => setAttributesObject({ ...attributesObject, area: e.target.value })}
+                                    />
+                                </label>
+
+
+                                <button
+                                    className="toggle-additional-fields"
+                                    onClick={() => setShowAdditionalFields(!showAdditionalFields)}
+                                >
+                                    Tillägg
+                                </button>
+
+                                {showAdditionalFields && (
+                                    <>
+                                        <label>
+                                            Arter:
+                                            <input
+                                                type="text"
+                                                value={attributesObject.species || ''}
+                                                onChange={(e) => setAttributesObject({ ...attributesObject, species: e.target.value })}
+                                            />
+                                        </label>
+                                        <label>
+                                            Habitatkvaliteter:
+                                            <input
+                                                type="text"
+                                                value={attributesObject.habitatQualities || ''}
+                                                onChange={(e) => setAttributesObject({ ...attributesObject, habitatQualities: e.target.value })}
+                                            />
+                                        </label>
+                                        <label>
+                                            Värdeelement:
+                                            <input
+                                                type="text"
+                                                value={attributesObject.valueElements || ''}
+                                                onChange={(e) => setAttributesObject({ ...attributesObject, valueElements: e.target.value })}
+                                            />
+                                        </label>
+                                    </>
+                                )}
+
+                                {/* Additional attributes like Species, Habitat Qualities, Value Elements can be added similarly */}
+                                <button className="save-attributes-btn" onClick={saveAttributes}>Spara</button>
+                                <button className="cancel-btn" onClick={() => setSelectedId(null)}>Avbryt</button>
+                            </div>
+                        )}
+
+
+
+                        <label htmlFor="file-upload" className="custom-file-upload">
+                            Importera shapefil
+                        </label>
+                        <input id="file-upload" className="project-import-input" type="file" onChange={handleFileUploadShape} style={{ display: 'none' }} />
+
+                    </div>
+                }
+            </div>
+        )
+    }
+
     const renderAttributeTable = () => {
         // Ensure geoJsonData is not null and has features before proceeding
         if (!geoJsonData || !geoJsonData.features) {
@@ -1541,11 +1707,98 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
 
 
 
+
+        const highlightFeature = (featureId) => {
+            if (featureGroupRef.current) {
+                setHighlightedId(featureId); // Set the highlighted feature's ID
+                featureGroupRef.current.eachLayer(layer => {
+
+                    // Check if the layer has associated feature properties
+                    const properties = layer.feature ? layer.feature.properties : null;
+
+                    // Debugging logs
+                    console.log("highlight: layer type:", properties);
+                    console.log("highlight: layer:", layer);
+                    console.log("highlight: feature id:", featureId, "Layer ID:", layer.options.id);
+
+
+                    // Reset the style for non-highlighted layers
+                    if (layer instanceof L.Path && (!properties || properties.shape !== "rectangleCrop")) {
+                        layer.setStyle({
+                            color: '#3388ff', // Default color
+                            fillColor: '#3388ff', // Default fill color
+                            fillOpacity: 0.2, // Default fill opacity
+                            weight: 3  // Default weight
+                        });
+                    }
+
+
+
+                    // Reset to default marker icon for non-highlighted markers
+
+                    if (layer instanceof L.Marker && !(highlightedIds.size > 1)) {
+                        layer.setIcon(dotIconBlue);
+                        console.log("highlightedIds", highlightedIds);
+                        console.log("selectedRowIds", selectedRowIds);
+                    }
+
+
+
+
+                    // Apply the highlight style to the target feature
+                    if (layer.options.id === featureId || layer.feature && layer.feature.properties.id === featureId) {
+
+
+                        if (layer instanceof L.Marker) {
+                            // Use the custom diamond icon for the highlighted marker
+                            layer.setIcon(dotIconRed);
+                        } else if (properties && properties.shape === "rectangleCrop") {
+                            // Special handling for "rectangleCrop" shapes
+                            layer.setStyle({
+                                color: 'red', // Highlight color for rectangleCrop
+                                fillColor: 'green',
+                                weight: 5 // Highlight weight for rectangleCrop
+                            });
+                        } else if (layer instanceof L.Circle) {
+                            // Apply a different style for circles
+                            layer.setStyle({
+                                color: 'red', // Highlight color
+                                fillOpacity: 0.2,
+                                weight: 5
+                            });
+                        }
+                    }
+                });
+            }
+        };
+
+
+        const handleAttributeValueChange = (featureId, attributeName, newValue) => {
+            setHighlightedIds(prev => new Set(prev).add(featureId));
+            // Create a deep copy of the geoJsonData to avoid direct state mutation
+            const updatedGeoJsonData = JSON.parse(JSON.stringify(geoJsonData));
+
+            //highlightFeature(featureId); // Highlight the feature when its attribute is being edited
+
+            // Find the feature by its ID and update the attribute value
+            const featureToUpdate = updatedGeoJsonData.features.find(feature => feature.properties.id === featureId);
+            if (featureToUpdate && featureToUpdate.properties.attributes) {
+                featureToUpdate.properties.attributes[attributeName] = newValue;
+            }
+
+            // Update the state with the modified geoJsonData
+            setGeoJsonData(updatedGeoJsonData);
+        };
+
+
+        console.log(selectedProject);
+
+
         return (
             <div>
-                {/* Tab navigation */}
-
-                {/* Attribute table */}
+                {shouldHide && <div className="elementToHide">
+                    <button className="toggle-form-button-2" onClick={saveDataToServer}>Spara ritning! {saveStatus}</button>
+                </div>}
 
                 <div className="attributes-container">
                     <h3>{activeTab}</h3>
@@ -1609,280 +1862,46 @@ const MapTest = ({ selectedProjectId, onSave, userID, shouldHide }) => {
     };
 
 
+    const renderMap = () => {
+        return (
+            <div>
+                <MapContainer center={position} zoom={zoom} style={{ height: '100vh', width: '100%' }} className="full-width-map">
 
-    const highlightFeature = (featureId) => {
-        if (featureGroupRef.current) {
-            setHighlightedId(featureId); // Set the highlighted feature's ID
-            featureGroupRef.current.eachLayer(layer => {
+                    <LayersControl position="topright">
+                        <BaseLayer checked name="Informationskarta">
+                            <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                        </BaseLayer>
+                        <BaseLayer name="Satellitkarta">
+                            <TileLayer url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}" />
+                        </BaseLayer>
+                    </LayersControl>
+                    <FeatureGroup ref={featureGroupRef}>
+                        <EditControl
+                            position="topright"
+                            onCreated={onCreate}
+                            onEdited={onEdited}
+                            onDeleted={onDeleted}
+                        />
+                        {shapeLayers && shapeLayers.map((feature, index) => (
+                            <GeoJSON key={index} data={feature} />
+                        ))}
+                    </FeatureGroup>
+                    <RectangleDrawButton isRectangleDrawn={isRectangleDrawn} setIsRectangleDrawn={setIsRectangleDrawn} />
+                </MapContainer>
 
-                // Check if the layer has associated feature properties
-                const properties = layer.feature ? layer.feature.properties : null;
-
-                // Debugging logs
-                console.log("highlight: layer type:", properties);
-                console.log("highlight: layer:", layer);
-                console.log("highlight: feature id:", featureId, "Layer ID:", layer.options.id);
-
-
-                // Reset the style for non-highlighted layers
-                if (layer instanceof L.Path && (!properties || properties.shape !== "rectangleCrop")) {
-                    layer.setStyle({
-                        color: '#3388ff', // Default color
-                        fillColor: '#3388ff', // Default fill color
-                        fillOpacity: 0.2, // Default fill opacity
-                        weight: 3  // Default weight
-                    });
-                }
-
-
-
-                // Reset to default marker icon for non-highlighted markers
-
-                if (layer instanceof L.Marker && !(highlightedIds.size > 1)) {
-                    layer.setIcon(dotIconBlue);
-                    console.log("highlightedIds", highlightedIds);
-                    console.log("selectedRowIds", selectedRowIds);
-                }
+            </div>
+        )
+    }
 
 
 
-
-                // Apply the highlight style to the target feature
-                if (layer.options.id === featureId || layer.feature && layer.feature.properties.id === featureId) {
-
-
-                    if (layer instanceof L.Marker) {
-                        // Use the custom diamond icon for the highlighted marker
-                        layer.setIcon(dotIconRed);
-                    } else if (properties && properties.shape === "rectangleCrop") {
-                        // Special handling for "rectangleCrop" shapes
-                        layer.setStyle({
-                            color: 'red', // Highlight color for rectangleCrop
-                            fillColor: 'green',
-                            weight: 5 // Highlight weight for rectangleCrop
-                        });
-                    } else if (layer instanceof L.Circle) {
-                        // Apply a different style for circles
-                        layer.setStyle({
-                            color: 'red', // Highlight color
-                            fillOpacity: 0.2,
-                            weight: 5
-                        });
-                    }
-                }
-            });
-        }
-    };
-
-
-    const handleAttributeValueChange = (featureId, attributeName, newValue) => {
-        setHighlightedIds(prev => new Set(prev).add(featureId));
-        // Create a deep copy of the geoJsonData to avoid direct state mutation
-        const updatedGeoJsonData = JSON.parse(JSON.stringify(geoJsonData));
-
-        //highlightFeature(featureId); // Highlight the feature when its attribute is being edited
-
-        // Find the feature by its ID and update the attribute value
-        const featureToUpdate = updatedGeoJsonData.features.find(feature => feature.properties.id === featureId);
-        if (featureToUpdate && featureToUpdate.properties.attributes) {
-            featureToUpdate.properties.attributes[attributeName] = newValue;
-        }
-
-        // Update the state with the modified geoJsonData
-        setGeoJsonData(updatedGeoJsonData);
-    };
-
-
-
+    // MAIN RENDER
     return (
         <div>
-            {!shouldHide &&
-                <div className='map-container elementToHide'>
-                    <h3>Projektkarta</h3>
-                    <button className="toggle-form-button" onClick={saveDataToServer}>Spara ritning!</button>
-                    <span className="save-status">{saveStatus}</span>
-                    <p>Tryck på kartobjekt för att se attribut.</p>
-                    {selectedId && attributesObject && showAttributeTable && (
-                        <div className="attributes-container">
-                            <h3>Objektattribut</h3>
-                            <label>
-                                Objektnummer:
-                                <input
-                                    type="text"
-                                    value={attributesObject.objectNumber || ''}
-                                    onChange={(e) => setAttributesObject({ ...attributesObject, objectNumber: e.target.value })}
-                                />
-                            </label>
-                            <label>
-                                Inventeringsnivå:
-                                <input
-                                    type="text"
-                                    value={attributesObject.inventoryLevel || ''}
-                                    onChange={(e) => setAttributesObject({ ...attributesObject, inventoryLevel: e.target.value })}
-                                />
-                            </label>
-                            <label>
-                                Naturvärdesklass:
-                                <input
-                                    type="text"
-                                    value={attributesObject.natureValueClass || ''}
-                                    onChange={(e) => setAttributesObject({ ...attributesObject, natureValueClass: e.target.value })}
-                                />
-                            </label>
-                            <label>
-                                Preliminär bedömning:
-                                <input
-                                    type="text"
-                                    value={attributesObject.preliminaryAssessment || ''}
-                                    onChange={(e) => setAttributesObject({ ...attributesObject, preliminaryAssessment: e.target.value })}
-                                />
-                            </label>
-                            <label>
-                                Motivering:
-                                <input
-                                    type="text"
-                                    value={attributesObject.reason || ''}
-                                    onChange={(e) => setAttributesObject({ ...attributesObject, reason: e.target.value })}
-                                />
-                            </label>
-                            <label>
-                                Naturtyp:
-                                <input
-                                    type="text"
-                                    value={attributesObject.natureType || ''}
-                                    onChange={(e) => setAttributesObject({ ...attributesObject, natureType: e.target.value })}
-                                />
-                            </label>
-                            <label>
-                                Biotop:
-                                <input
-                                    type="text"
-                                    value={attributesObject.habitat || ''}
-                                    onChange={(e) => setAttributesObject({ ...attributesObject, habitat: e.target.value })}
-                                />
-                            </label>
-                            <label>
-                                Datum:
-                                <input
-                                    type="date"
-                                    value={attributesObject.date || ''}
-                                    onChange={(e) => setAttributesObject({ ...attributesObject, date: e.target.value })}
-                                />
-                            </label>
-                            <label>
-                                Utförare:
-                                <input
-                                    type="text"
-                                    value={attributesObject.executor || ''}
-                                    onChange={(e) => setAttributesObject({ ...attributesObject, executor: e.target.value })}
-                                />
-                            </label>
-                            <label>
-                                Organisation:
-                                <input
-                                    type="text"
-                                    value={attributesObject.organization || ''}
-                                    onChange={(e) => setAttributesObject({ ...attributesObject, organization: e.target.value })}
-                                />
-                            </label>
-                            <label>
-                                Projektnamn:
-                                <input
-                                    type="text"
-                                    value={attributesObject.projectName || ''}
-                                    onChange={(e) => setAttributesObject({ ...attributesObject, projectName: e.target.value })}
-                                />
-                            </label>
-                            <label>
-                                Area:
-                                <input
-                                    type="number"
-                                    value={attributesObject.area || ''}
-                                    onChange={(e) => setAttributesObject({ ...attributesObject, area: e.target.value })}
-                                />
-                            </label>
+            {renderAttributeList()}
 
-
-                            <button
-                                className="toggle-additional-fields"
-                                onClick={() => setShowAdditionalFields(!showAdditionalFields)}
-                            >
-                                Tillägg
-                            </button>
-
-                            {showAdditionalFields && (
-                                <>
-                                    <label>
-                                        Arter:
-                                        <input
-                                            type="text"
-                                            value={attributesObject.species || ''}
-                                            onChange={(e) => setAttributesObject({ ...attributesObject, species: e.target.value })}
-                                        />
-                                    </label>
-                                    <label>
-                                        Habitatkvaliteter:
-                                        <input
-                                            type="text"
-                                            value={attributesObject.habitatQualities || ''}
-                                            onChange={(e) => setAttributesObject({ ...attributesObject, habitatQualities: e.target.value })}
-                                        />
-                                    </label>
-                                    <label>
-                                        Värdeelement:
-                                        <input
-                                            type="text"
-                                            value={attributesObject.valueElements || ''}
-                                            onChange={(e) => setAttributesObject({ ...attributesObject, valueElements: e.target.value })}
-                                        />
-                                    </label>
-                                </>
-                            )}
-
-                            {/* Additional attributes like Species, Habitat Qualities, Value Elements can be added similarly */}
-                            <button className="save-attributes-btn" onClick={saveAttributes}>Spara</button>
-                            <button className="cancel-btn" onClick={() => setSelectedId(null)}>Avbryt</button>
-                        </div>
-                    )}
-
-
-
-                    <label htmlFor="file-upload" className="custom-file-upload">
-                        Importera shapefil
-                    </label>
-                    <input id="file-upload" className="project-import-input" type="file" onChange={handleFileUploadShape} style={{ display: 'none' }} />
-
-                </div>
-            }
-            {shouldHide && <div className="elementToHide">
-                <button className="toggle-form-button-2" onClick={saveDataToServer}>Spara ritning! {saveStatus}</button>
-            </div>}
-
-
-            <MapContainer center={position} zoom={zoom} style={{ height: '100vh', width: '100%' }} className="full-width-map">
-
-
-                <LayersControl position="topright">
-                    <BaseLayer checked name="Informationskarta">
-                        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-                    </BaseLayer>
-                    <BaseLayer name="Satellitkarta">
-                        <TileLayer url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}" />
-                    </BaseLayer>
-                </LayersControl>
-                <FeatureGroup ref={featureGroupRef}>
-                    <EditControl
-                        position="topright"
-                        onCreated={onCreate}
-                        onEdited={onEdited}
-                        onDeleted={onDeleted}
-                    />
-                    {shapeLayers && shapeLayers.map((feature, index) => (
-                        <GeoJSON key={index} data={feature} />
-                    ))}
-                </FeatureGroup>
-                <RectangleDrawButton isRectangleDrawn={isRectangleDrawn} setIsRectangleDrawn={setIsRectangleDrawn} />
-            </MapContainer>
+            {renderMap()}
+            
             {shouldHide && <div className="elementToHide">
                 {renderAttributeTable()}
             </div>}
