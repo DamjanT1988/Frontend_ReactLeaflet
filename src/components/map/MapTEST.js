@@ -209,12 +209,12 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
         };
 
         if (!shouldHide) {
-        // Conditionally render the button based on showRectangleButton state
-        return showRectangleButton ? (
-            <button onClick={startRectangleDraw} className='draw-rectangle-btn'>
-                Beskär karta
-            </button>
-        ) : null;
+            // Conditionally render the button based on showRectangleButton state
+            return showRectangleButton ? (
+                <button onClick={startRectangleDraw} className='draw-rectangle-btn'>
+                    Beskär karta
+                </button>
+            ) : null;
         }
     };
 
@@ -435,7 +435,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                                 radius: feature.properties.radius
 
                             });
-                            
+
                             if (!shouldHide) {
                                 const popupContent = generatePopupContent(feature.properties);
                                 circle.bindPopup(popupContent); // Bind popup to circle
@@ -1545,7 +1545,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                     </div>
 
                 ))}
-                    <button onClick={() => saveAttributes()}>Spara</button>
+                <button onClick={() => saveAttributes()}>Spara</button>
             </div>
         );
     };
@@ -1946,31 +1946,36 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
 
     // Top Bar JSX
     const renderTopBar = () => {
-        return (
-            <div className="top-bar">
-                <div className="top-bar-left"><h2>Projekt: {selectedProject.project_name}</h2></div>
-                <div className="top-bar-center">
-                    <button className="top-bar-button">Filter</button>
-                    <button className="top-bar-button">Rapport</button>
-                    <button className="top-bar-button">Export</button>
-                </div>
-                <div className="top-bar-right">
-                    <div className="user-dropdown">
-                        <span className="user-icon">👤</span>
-                        <select>
-                            <option>User Info</option>
-                            <option>Logout</option>
-                        </select>
+        /*
+                return (
+                    <div className="top-bar">
+                        <div className="top-bar-left"><h2>Projekt: {selectedProject.project_name}</h2></div>
+                        <div className="top-bar-center">
+                            <button className="top-bar-button">Filter</button>
+                            <button className="top-bar-button">Rapport</button>
+                            <button className="top-bar-button">Export</button>
+                        </div>
+                        <div className="top-bar-right">
+                            
+                            <div className="user-dropdown">
+                                <span className="user-icon">👤</span>
+                                <select>
+                                    <option>User Info</option>
+                                    <option>Logout</option>
+                                </select>
+                            </div>
+                            
+                        </div>
                     </div>
-                </div>
-            </div>
-        );
+                );
+                */
     };
 
     // Left Section JSX
     const renderLeftSection = () => {
         return (
             <div className="left-section">
+                <div className="top-left"><h3>{selectedProject.project_name}</h3></div>
                 <div className="buttons-group">
                     <button>Kartläggning biologisk mångfald</button>
                     <button>Naturvärdesbiologi</button>
@@ -1989,6 +1994,11 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
     const renderRightSection = () => {
         return (
             <div className="right-section">
+                <div className="top-right">
+                    <button className="top-bar-button">Filter</button>
+                    <button className="top-bar-button">Rapport</button>
+                    <button className="top-bar-button">Export</button>
+                </div>
                 <div className="project-info">
                     <h3>Projektinformation</h3>
                     <p>Example project information text...</p>

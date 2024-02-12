@@ -87,6 +87,7 @@
 
 .top-bar {
   display: flex;
+  text-align: center;
   justify-content: space-between;
   padding: 10px;
   background-color: #f3f3f3;
@@ -118,13 +119,13 @@
 
 .content-area {
   display: flex;
-  height: calc(100vh - 50px); /* Adjust height as needed */
+  height: auto; /* Adjust height as needed */
 }
 
 .left-section {
   flex-basis: 8%;
   padding: 8px;
-  overflow-y: auto;
+  /*overflow-y: auto;*/
 }
 .right-section {
   flex-basis: 18%;
@@ -133,7 +134,11 @@
 }
 
 .project-info > h3 {
-  margin-top: 0px;
+  margin-top: 5px;
+}
+
+.top-left > h3 {
+  margin-top: -5px;
 }
 
 
