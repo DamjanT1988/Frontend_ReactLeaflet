@@ -1435,9 +1435,12 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
 
 
     // Function to handle row clicks and feature highlighting
-    const handleRowClick = (featureId, event) => {
+    const handleRowClick = (featureId, attributes, event) => {
         setHighlightedIds(prevHighlightedIds => {
             const newHighlightedIds = new Set(prevHighlightedIds);
+            setSelectedId(featureId);
+            setAttributesObject(attributes || {});
+            setShowAttributeTable(true); // Show the attribute table
 
             if (event.ctrlKey) {
                 if (newHighlightedIds.has(featureId)) {
@@ -1542,7 +1545,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                     </div>
 
                 ))}
-                <button onClick={() => saveAttributes()}>Spara</button>
+                    <button onClick={() => saveAttributes()}>Spara</button>
             </div>
         );
     };
@@ -1874,7 +1877,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                                 filteredFeatures.map((feature, featureIndex) => (
                                     feature.properties.attributes ? (
                                         <tr key={featureIndex} className={highlightedIds.has(feature.properties.id) ? 'highlighted-row' : ''}
-                                            onClick={(event) => handleRowClick(feature.properties.id, event)}>
+                                            onClick={(event) => handleRowClick(feature.properties.id, feature.properties.attributes, event)}>
                                             <td>
                                                 <span style={{ marginLeft: '0px' }}>{featureIndex + 1}</span>
                                             </td>
