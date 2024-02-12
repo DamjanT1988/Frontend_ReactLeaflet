@@ -137,8 +137,11 @@
   margin-top: 5px;
 }
 
-.top-left > h3 {
+.top-left > h2 {
   margin-top: -5px;
+  font-size: 100%;
+  font-weight: 700;
+  border-bottom: 4px solid #30A875
 }
 
 
@@ -146,7 +149,7 @@
   flex-grow: 1;
 }
 
-.buttons-group button {
+.top-left > button {
   display: block;
   width: 100%;
   margin-bottom: 10px;

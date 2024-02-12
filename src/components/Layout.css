@@ -12,7 +12,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between; /* Space between logo and navigation */
-    border-bottom: 10px solid #30A875; /* Thick green line at the bottom */
+    border-bottom: 8px solid #30A875; /* Thick green line at the bottom */
     
 }
 
@@ -23,6 +23,7 @@
     display: flex; /* Maintain the flex layout of the header contents */
     align-items: center; /* Center items vertically */
     justify-content: space-between; /* Maintain spacing between items */
+    max-height: 60px; /* Set the height of the header */
 }
 
 
@@ -32,7 +33,7 @@
 }
 
 .logo {
-    width: 225px; /* Adjust size accordingly */
+    width: 200px; /* Adjust size accordingly */
     margin-right: -175px;
 }
 

@@ -1975,16 +1975,16 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
     const renderLeftSection = () => {
         return (
             <div className="left-section">
-                <div className="top-left"><h3>{selectedProject.project_name}</h3></div>
-                <div className="buttons-group">
+                <div className="top-left">
+                <h2>{selectedProject.project_name}</h2>
                     <button>Kartläggning biologisk mångfald</button>
                     <button>Naturvärdesbiologi</button>
                     <button>Landskapsområden</button>
-                </div>
                 <div className="additional-section">
                     <h3>Tillägg:</h3>
                     <button>Example Button 1</button>
                     <button>Example Button 2</button>
+                </div>
                 </div>
             </div>
         )
