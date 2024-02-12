@@ -123,14 +123,16 @@
 }
 
 .left-section {
-  flex-basis: 8%;
-  padding: 8px;
-  /*overflow-y: auto;*/
+  flex-basis: 7%; /* Adjust width as needed */
+  height: 100vh; /* Full viewport height or adjust as needed */
+  overflow-y: auto; /* Enables vertical scrolling if content overflows */
+  padding: 10px;
 }
 .right-section {
-  flex-basis: 18%;
-  padding: 8px;
-  overflow-y: auto;
+  flex-basis: 22%; /* Adjust width as needed */
+  height: 100vh; /* Full viewport height or adjust as needed */
+  overflow-y: auto; /* Enables vertical scrolling if content overflows */
+  padding: 10px;
 }
 
 .project-info > h3 {
@@ -147,6 +149,7 @@
 
 .map-container {
   flex-grow: 1;
+  overflow-y: auto; /* Enables vertical scrolling if content overflows */
 }
 
 .top-left > button {

@@ -2001,8 +2001,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                 </div>
                 <div className="project-info">
                     <h3>Projektinformation</h3>
-                    <p>Example project information text...</p>
-                </div>
+                 </div>
                 <div className="project-images">
                     <img src="{projectImageURL}" alt="Project" />
                     {/* Implement image selection and viewing logic */}
