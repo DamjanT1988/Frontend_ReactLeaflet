@@ -865,9 +865,6 @@ h3 {
     /* Ensure it appears above the map */
 }
 
-.attribute-field {
-    font-size: 115%;
-}
 
 /* Style for the title of the attribute window */
 .attributes-container h3 {
@@ -962,7 +959,8 @@ h3 {
 .attributes-container textarea,
 .attributes-container select {
     width: 100%;
-    font-size: 85%;
+    font-size: 100%;
+    font-weight: bold;
     /* Reduce the width to 75% of the original width */
     /* Other input styles remain unchanged */
 }
@@ -997,12 +995,12 @@ h3 {
 
 .draw-rectangle-btn {
     position: relative;
-    top: 13px;
+    top: 12px;
     /* Position the button 100px down from the top */
-    left: 0px;
+    left: 50px;
     /* Position the button to the left side */
     margin-right: 65px;
-    float: right;
+    float: left;
     z-index: 1000;
     /* Ensure the button is above the map layers */
     background-color: #30A875;
@@ -1067,89 +1065,3 @@ h3 {
 
     }
 }
-
-/* Data Analysis Page Styles */
-.data-analysis-page {
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .top-bar {
-    display: flex;
-    justify-content: space-between;
-    padding: 10px;
-    background-color: #f3f3f3;
-  }
-  
-  .top-bar-left, .top-bar-center, .top-bar-right {
-    display: flex;
-    align-items: center;
-    height: 25px;
-  }
-  
-  .top-bar-button {
-    margin: 0 5px;
-    padding: 5px 10px;
-    background-color: #30A875;
-    color: white;
-    border: none;
-    cursor: pointer;
-  }
-  
-  .user-dropdown {
-    display: flex;
-    align-items: center;
-  }
-  
-  .user-icon {
-    margin-right: 5px;
-  }
-  
-  .content-area {
-    display: flex;
-    height: calc(100vh - 50px); /* Adjust height as needed */
-  }
-  
-  .left-section {
-    flex-basis: 8%;
-    padding: 8px;
-    overflow-y: auto;
-  }
-  .right-section {
-    flex-basis: 18%;
-    padding: 8px;
-    overflow-y: auto;
-  }
-
-  .map-container {
-    flex-grow: 1;
-  }
-  
-  .buttons-group button {
-    display: block;
-    width: 100%;
-    margin-bottom: 10px;
-    padding: 10px;
-    background-color: #e7e7e7;
-    border: none;
-    cursor: pointer;
-  }
-  
-  .additional-section h3 {
-    margin-top: 20px;
-  }
-  
-  .project-info, .project-images {
-    margin-bottom: 20px;
-  }
-  
-  .project-images img {
-    width: 100%;
-    height: auto;
-    margin-bottom: 10px;
-  }
-  
-  .attribute-edit-table {
-    /* Styles for the attribute edit table */
-  }
-  

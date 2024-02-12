@@ -208,12 +208,14 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
             map.once(L.Draw.Event.CREATED, onRectangleCreated);
         };
 
+        if (!shouldHide) {
         // Conditionally render the button based on showRectangleButton state
         return showRectangleButton ? (
             <button onClick={startRectangleDraw} className='draw-rectangle-btn'>
                 Beskär karta
             </button>
         ) : null;
+        }
     };
 
 
@@ -1538,6 +1540,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                             }}
                         />
                     </div>
+
                 ))}
                 <button onClick={() => saveAttributes()}>Spara</button>
             </div>
@@ -1942,7 +1945,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
     const renderTopBar = () => {
         return (
             <div className="top-bar">
-                <div className="top-bar-left"><h3>Projekt: {selectedProject.project_name}</h3></div>
+                <div className="top-bar-left"><h2>Projekt: {selectedProject.project_name}</h2></div>
                 <div className="top-bar-center">
                     <button className="top-bar-button">Filter</button>
                     <button className="top-bar-button">Rapport</button>
