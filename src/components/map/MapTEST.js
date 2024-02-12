@@ -370,6 +370,13 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                     onEachFeature: (feature, layer) => {
 
                         layer.on('click', () => {
+                            // Set the selected feature ID and its attributes for editing
+                            setSelectedId(feature.properties.id);
+                            setAttributesObject(feature.properties.attributes || {});
+                            setShowAttributeTable(true); // Show the attribute table
+                        });
+
+                        layer.on('click', () => {
                             setHighlightedId(feature.properties.id); // Set the highlighted feature's ID
                             if (typeof layer.setStyle === 'function' && feature.properties.shape !== "rectangleCrop") {
                                 layer.setStyle({
@@ -378,15 +385,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                                 });
                             }
                         });
-                        /*
-                        layer.on('click', () => {
-                            setHighlightedId(feature.properties.id); // Set the highlighted feature's ID
-                            if (feature.properties.isMarker && feature.properties.shape !== "rectangleCrop") {
-                                console.log('marker clicked: ', feature.properties.id);
-                                return L.marker({ icon: dotIconRed });
-                            }
-                        });
-                        */
+                    
                         layer.on('click', () => {
 
                             resetAllLayerStyles();
@@ -459,7 +458,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
 
 
                     }
-                })//.addTo(featureGroupRef.current);
+                })
 
 
                 featureGroupRef.current.eachLayer(layer => {
@@ -1501,6 +1500,38 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
         // Add more mappings as needed
     };
 
+
+
+    const renderAttributeSectionList = () => {
+        // Check if a feature is selected and attributes are available for editing
+        if (!selectedId || !attributesObject) return null;
+
+        return (
+            <div className="attributes-container">
+                <h3>Objektattribut</h3>
+                {Object.entries(attributesObject).map(([key, value], index) => (
+                    <div key={index}>
+                        <label>{key}:</label>
+                        <input
+                            type="text"
+                            value={value}
+                            onChange={(e) => {
+                                // Update attributesObject with new values
+                                setAttributesObject({
+                                    ...attributesObject,
+                                    [key]: e.target.value,
+                                });
+                            }}
+                        />
+                    </div>
+                ))}
+            </div>
+        )
+    };
+
+    // Include this render function in the main component render or return statement where appropriate
+
+
     const renderAttributeList = () => {
 
         return (
@@ -1894,68 +1925,71 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
     }
 
     // Top Bar JSX
-    const TopBar = () => (
-        <div className="top-bar">
-            <div className="top-bar-left"><h3>Projekt: {selectedProject.project_name}</h3></div>
-            <div className="top-bar-center">
-                <button className="top-bar-button">Filter</button>
-                <button className="top-bar-button">Rapport</button>
-                <button className="top-bar-button">Export</button>
-            </div>
-            <div className="top-bar-right">
-                <div className="user-dropdown">
-                    <span className="user-icon">👤</span>
-                    <select>
-                        <option>User Info</option>
-                        <option>Logout</option>
-                    </select>
+    const renderTopBar = () => {
+        return (
+            <div className="top-bar">
+                <div className="top-bar-left"><h3>Projekt: {selectedProject.project_name}</h3></div>
+                <div className="top-bar-center">
+                    <button className="top-bar-button">Filter</button>
+                    <button className="top-bar-button">Rapport</button>
+                    <button className="top-bar-button">Export</button>
+                </div>
+                <div className="top-bar-right">
+                    <div className="user-dropdown">
+                        <span className="user-icon">👤</span>
+                        <select>
+                            <option>User Info</option>
+                            <option>Logout</option>
+                        </select>
+                    </div>
                 </div>
             </div>
-        </div>
-    );
+        );
+    };
 
     // Left Section JSX
-    const LeftSection = () => (
-        <div className="left-section">
-            <div className="buttons-group">
-                <button>Kartläggning biologisk mångfald</button>
-                <button>Naturvärdesbiologi</button>
-                <button>Landskapsområden</button>
+    const renderLeftSection = () => {
+        return (
+            <div className="left-section">
+                <div className="buttons-group">
+                    <button>Kartläggning biologisk mångfald</button>
+                    <button>Naturvärdesbiologi</button>
+                    <button>Landskapsområden</button>
+                </div>
+                <div className="additional-section">
+                    <h3>Tillägg:</h3>
+                    <button>Example Button 1</button>
+                    <button>Example Button 2</button>
+                </div>
             </div>
-            <div className="additional-section">
-                <h3>Tillägg:</h3>
-                <button>Example Button 1</button>
-                <button>Example Button 2</button>
-            </div>
-        </div>
-    );
+        )
+    };
 
     // Right Section JSX
-    const RightSection = () => (
-        <div className="right-section">
-            <div className="project-info">
-                <h3>Projektinformation</h3>
-                <p>Example project information text...</p>
+    const renderRightSection = () => {
+        return (
+            <div className="right-section">
+                <div className="project-info">
+                    <h3>Projektinformation</h3>
+                    <p>Example project information text...</p>
+                </div>
+                <div className="project-images">
+                    <img src="{projectImageURL}" alt="Project" />
+                    {/* Implement image selection and viewing logic */}
+                </div>
+                {renderAttributeSectionList()}
             </div>
-            <div className="project-images">
-                <img src="{projectImageURL}" alt="Project" />
-                {/* Implement image selection and viewing logic */}
-            </div>
-            <div className="attribute-edit-table">
-                {/* Reuse the existing renderAttributeTable() function here */}
-                
-            </div>
-        </div>
-    );
+        )
+    }
 
     // Main Render Function (within MapTest component)
     return (
         <div className="data-analysis-page">
-            <TopBar />
+            {renderTopBar()}
             <div className="content-area">
-                <LeftSection />
+                {renderLeftSection()}
                 <div className="map-container">{renderMap()}</div>
-                <RightSection />
+                {renderRightSection()}
             </div>
         </div>
     );
