@@ -385,7 +385,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                                 });
                             }
                         });
-                    
+
                         layer.on('click', () => {
 
                             resetAllLayerStyles();
@@ -409,12 +409,13 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                             foundCropRectangle = true; // Set the flag if a crop rectangle is found
                         }
 
-                        // Generate popup content based on feature properties
-                        const popupContent = generatePopupContent(feature.properties);
+                        if (!shouldHide) {
+                            // Generate popup content based on feature properties
+                            const popupContent = generatePopupContent(feature.properties);
 
-                        // Bind the popup to the layer
-                        layer.bindPopup(popupContent);
-
+                            // Bind the popup to the layer
+                            layer.bindPopup(popupContent);
+                        }
 
                         if (feature.properties && feature.properties.isCircle) {
 
@@ -432,8 +433,12 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                                 radius: feature.properties.radius
 
                             });
+                            
+                            if (!shouldHide) {
+                                const popupContent = generatePopupContent(feature.properties);
+                                circle.bindPopup(popupContent); // Bind popup to circle
+                            }
 
-                            circle.bindPopup(popupContent); // Bind popup to circle
                             circle.options.id = feature.properties.id; // Assign the unique ID to the circle options for later reference
 
                             // Add the circle to the feature group
@@ -451,6 +456,9 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                                     fillOpacity: 0.1,
                                     weight: 5,
                                 });
+                                setSelectedId(feature.properties.id);
+                                setAttributesObject(feature.properties.attributes || {});
+                                setShowAttributeTable(true); // Show the attribute table
                             });
                         } else {
                             layer.addTo(featureGroupRef.current);
@@ -519,29 +527,31 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
             // Add more mappings as needed
         };
 
-        // Start the popup content with a div wrapper
-        let content = '<div class="popup-content">';
-
-        // Loop through each attribute in the properties.attributes object
-        if (properties.attributes) {
-            Object.entries(properties.attributes).forEach(([key, value]) => {
-                // Check if the key has a Swedish name mapping and is not 'Objekt-ID'
-                if (attributeNames[key] && key !== 'id') {
-                    content += `<p><strong>${attributeNames[key]}:</strong> ${value}</p>`;
-                }
-            });
-        }
-
-        // Generate content based on properties...
-        const id = properties.id; // Assume each feature has a unique ID
-        const attributesJson = JSON.stringify(properties.attributes); // Convert attributes to a JSON string for passing in the onclick handler
         if (!shouldHide) {
+            // Start the popup content with a div wrapper
+            let content = '<div class="popup-content">';
+
+            // Loop through each attribute in the properties.attributes object
+            if (properties.attributes) {
+                Object.entries(properties.attributes).forEach(([key, value]) => {
+                    // Check if the key has a Swedish name mapping and is not 'Objekt-ID'
+                    if (attributeNames[key] && key !== 'id') {
+                        content += `<p><strong>${attributeNames[key]}:</strong> ${value}</p>`;
+                    }
+                });
+            }
+
+            // Generate content based on properties...
+            //const id = properties.id; // Assume each feature has a unique ID
+            //const attributesJson = JSON.stringify(properties.attributes); // Convert attributes to a JSON string for passing in the onclick handler
+
             const id = properties.id;
             const attributesJson = JSON.stringify(properties.attributes);
             content += `<button className='primary-btn' onclick='window.toggleAttributeContainer("${id}", ${attributesJson})'>Redigera objektattribut</button>`;
+
+            content += '</div>';
+            return content;
         }
-        content += '</div>';
-        return content;
     };
 
 
@@ -1500,36 +1510,40 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
         // Add more mappings as needed
     };
 
-
-
     const renderAttributeSectionList = () => {
-        // Check if a feature is selected and attributes are available for editing
-        if (!selectedId || !attributesObject) return null;
+        // Initialize attributesObject with default values if no object is selected
+        const editableAttributesObject = attributesObject || Object.keys(attributeDisplayNameMap).reduce((acc, key) => {
+            acc[key] = ''; // Initialize all attributes with empty strings or default values
+            return acc;
+        }, {});
 
         return (
             <div className="attributes-container">
-                <h3>Objektattribut</h3>
-                {Object.entries(attributesObject).map(([key, value], index) => (
-                    <div key={index}>
-                        <label>{key}:</label>
+                <h3>Ändra markerad objekt</h3>
+                {Object.entries(editableAttributesObject).map(([key, value], index) => (
+                    <div key={index} className="attribute-field">
+                        <label htmlFor={`attribute-${key}`}>{attributeDisplayNameMap[key] || key}:</label>
                         <input
+                            id={`attribute-${key}`}
                             type="text"
                             value={value}
                             onChange={(e) => {
-                                // Update attributesObject with new values
-                                setAttributesObject({
-                                    ...attributesObject,
-                                    [key]: e.target.value,
-                                });
+                                // Update attributesObject with new values only if an object is selected
+                                if (selectedId) {
+                                    setAttributesObject({
+                                        ...editableAttributesObject,
+                                        [key]: e.target.value,
+                                    });
+                                }
                             }}
                         />
                     </div>
                 ))}
+                <button onClick={() => saveAttributes()}>Spara</button>
             </div>
-        )
+        );
     };
 
-    // Include this render function in the main component render or return statement where appropriate
 
 
     const renderAttributeList = () => {

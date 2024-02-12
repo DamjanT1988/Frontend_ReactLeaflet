@@ -865,6 +865,10 @@ h3 {
     /* Ensure it appears above the map */
 }
 
+.attribute-field {
+    font-size: 115%;
+}
+
 /* Style for the title of the attribute window */
 .attributes-container h3 {
     margin-bottom: 8px;
@@ -1112,7 +1116,7 @@ h3 {
     overflow-y: auto;
   }
   .right-section {
-    flex-basis: 16%;
+    flex-basis: 18%;
     padding: 8px;
     overflow-y: auto;
   }
