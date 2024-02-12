@@ -1813,7 +1813,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                         <thead>
                             <tr>
                                 <th className='th-index'>#</th>
-                                <th className='th-karta'>Kartan</th> {/* Additional column for highlight button */}
+                                <th className='th-karta'>Karta</th> {/* Additional column for highlight button */}
                                 {/* Assuming attributeNames is defined and accessible */}
                                 {attributeNames.map((name, index) => (
                                     <th key={index}>{attributeDisplayNameMap[name] || name}</th>
@@ -1836,7 +1836,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                                                     className={highlightedId === feature.properties.id ? 'highlighted' : ''}
                                                     onClick={() => highlightFeature(feature.properties.id)}
                                                 >
-                                                    Markera
+                                                    O
                                                 </button>
 
                                             </td>
@@ -1888,25 +1888,78 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                     </FeatureGroup>
                     <RectangleDrawButton isRectangleDrawn={isRectangleDrawn} setIsRectangleDrawn={setIsRectangleDrawn} />
                 </MapContainer>
-
+                {renderAttributeTable()}
             </div>
         )
     }
 
-
-
-    // MAIN RENDER
-    return (
-        <div>
-            {renderAttributeList()}
-
-            {renderMap()}
-            
-            {shouldHide && <div className="elementToHide">
-                {renderAttributeTable()}
-            </div>}
+    // Top Bar JSX
+    const TopBar = () => (
+        <div className="top-bar">
+            <div className="top-bar-left"><h3>Projekt: {selectedProject.project_name}</h3></div>
+            <div className="top-bar-center">
+                <button className="top-bar-button">Filter</button>
+                <button className="top-bar-button">Rapport</button>
+                <button className="top-bar-button">Export</button>
+            </div>
+            <div className="top-bar-right">
+                <div className="user-dropdown">
+                    <span className="user-icon">👤</span>
+                    <select>
+                        <option>User Info</option>
+                        <option>Logout</option>
+                    </select>
+                </div>
+            </div>
         </div>
     );
+
+    // Left Section JSX
+    const LeftSection = () => (
+        <div className="left-section">
+            <div className="buttons-group">
+                <button>Kartläggning biologisk mångfald</button>
+                <button>Naturvärdesbiologi</button>
+                <button>Landskapsområden</button>
+            </div>
+            <div className="additional-section">
+                <h3>Tillägg:</h3>
+                <button>Example Button 1</button>
+                <button>Example Button 2</button>
+            </div>
+        </div>
+    );
+
+    // Right Section JSX
+    const RightSection = () => (
+        <div className="right-section">
+            <div className="project-info">
+                <h3>Projektinformation</h3>
+                <p>Example project information text...</p>
+            </div>
+            <div className="project-images">
+                <img src="{projectImageURL}" alt="Project" />
+                {/* Implement image selection and viewing logic */}
+            </div>
+            <div className="attribute-edit-table">
+                {/* Reuse the existing renderAttributeTable() function here */}
+                
+            </div>
+        </div>
+    );
+
+    // Main Render Function (within MapTest component)
+    return (
+        <div className="data-analysis-page">
+            <TopBar />
+            <div className="content-area">
+                <LeftSection />
+                <div className="map-container">{renderMap()}</div>
+                <RightSection />
+            </div>
+        </div>
+    );
+
 };
 // Export the Map component
 export default MapTest;
