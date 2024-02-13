@@ -131,7 +131,86 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
     const [activeTab, setActiveTab] = useState('Punkter');
     const [selectedMarkerId, setSelectedMarkerId] = useState(null);
     const [lastClickedMarker, setLastClickedMarker] = useState(null);
+    const [selectedImage, setSelectedImage] = useState(null);
+    const [imageList, setImageList] = useState([]);
+    const [fullscreenImage, setFullscreenImage] = useState(null); // State to track the selected image for fullscreen view
 
+
+    const uploadImage = async () => {
+        if (!selectedImage) return;
+
+        // Function to convert the image file to a Base64 string
+        const toBase64 = file => new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = error => reject(error);
+        });
+
+        try {
+            // Convert the image to Base64
+            const base64Image = await toBase64(selectedImage);
+
+            // Prepare the JSON payload
+            const payload = {
+                projectId: 24,
+                imageData: base64Image
+            };
+
+            // Send the request
+            const response = await fetch(`${API_URLS.PROJECT_IMAGE_POST}`, {
+                method: 'POST',
+                body: JSON.stringify(payload),
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`, // Include your auth token if required
+                    'Content-Type': 'application/json'
+                },
+            });
+
+            if (response.ok) {
+                console.log('Image uploaded successfully');
+                fetchImages(); // Refresh the image list after uploading
+                setSelectedImage(null); // Reset the selected image
+            } else {
+                console.error('Failed to upload image');
+            }
+        } catch (error) {
+            console.error('Error uploading image:', error);
+        }
+    };
+
+
+    const fetchImages = async () => {
+        try {
+            const response = await fetch(`${API_URLS.PROJECT_IMAGE_GET.replace('<int:project_id>', selectedProjectId)}`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`,
+                },
+            });
+    
+            if (response.ok) {
+                const data = await response.json();
+                console.log('image data: ', data);
+                const images = data.images; // Use the 'images' key from the response
+                setImageList(images.map(image => ({
+                    url: image.url, // Include the image URL
+                    caption: image.caption, // Include the caption
+                    mapObjectId: image.mapObjectId // Include the mapObjectId
+                })));
+            } else {
+                console.error('Failed to fetch images, status:', response.status);
+            }
+        } catch (error) {
+            console.error('Error fetching images:', error);
+        }
+    };
+    
+
+
+    useEffect(() => {
+        fetchImages();
+    }, [selectedProjectId]); // Re-fetch images when selectedProjectId changes
 
 
     // Function to reset styles for all layers
@@ -1842,7 +1921,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
         };
 
 
-        console.log(selectedProject);
+        //console.log(selectedProject);
 
 
         return (
@@ -1976,22 +2055,75 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
         return (
             <div className="left-section">
                 <div className="top-left">
-                <h2>{selectedProject.project_name}</h2>
+                    <h2>{selectedProject.project_name}</h2>
                     <button>Kartläggning biologisk mångfald</button>
                     <button>Naturvärdesbiologi</button>
                     <button>Landskapsområden</button>
-                <div className="additional-section">
-                    <h3>Tillägg:</h3>
-                    <button>Example Button 1</button>
-                    <button>Example Button 2</button>
-                </div>
+                    <div className="additional-section">
+                        <h3>Tillägg:</h3>
+                        <button>Example Button 1</button>
+                        <button>Example Button 2</button>
+                    </div>
                 </div>
             </div>
         )
     };
 
+
+
     // Right Section JSX
     const renderRightSection = () => {
+        const selectedMapObjectId = selectedId; // Dynamically set based on user interaction
+
+        console.log("List 1", imageList[0]);
+
+        // Use .reduce() to filter and match IDs more defensively
+        const filteredImages = imageList.reduce((acc, image) => {
+            // Check if image.mapObjectId exists and matches selectedMapObjectId
+            if (image.mapObjectId && image.mapObjectId === selectedMapObjectId) {
+                acc.push(image); // If a match is found, add the image to the accumulator array
+            }
+            return acc; // Return the accumulator for the next iteration
+        }, []); // Initialize the accumulator as an empty array
+
+        console.log('imageList:', imageList);
+        console.log('Filtered Images:', filteredImages);
+        //console.log('Filtered Images 2:', filteredImages2);
+
+
+        // Function to handle image click: set the selected image for fullscreen view
+        const handleImageClick = (image) => {
+            setFullscreenImage(image);
+        };
+    
+        // Function to close fullscreen view
+        const closeFullscreen = () => {
+            setFullscreenImage(null);
+        };
+
+// Display filtered images in a grid, three in a row
+const miniatureView = (
+    <div className="image-display-section">
+        {filteredImages.map((image, index) => (
+            <div key={index} className="image-wrapper" onClick={() => handleImageClick(image)}>
+                <img src={image.url} alt={`Uploaded ${index}`} className="miniature-image" />
+            </div>
+        ))}
+    </div>
+);
+
+// Fullscreen view for the selected image
+const fullscreenView = fullscreenImage && (
+    <div className="fullscreen-view">
+        <img src={fullscreenImage.url} alt="Fullscreen" className="fullscreen-image" />
+        <div className="image-info">
+            <p>{fullscreenImage.caption}</p>
+            <button onClick={closeFullscreen} className="close-fullscreen-btn">Stäng</button>
+        </div>
+    </div>
+);
+
+
         return (
             <div className="right-section">
                 <div className="top-right">
@@ -1999,17 +2131,20 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                     <button className="top-bar-button">Rapport</button>
                     <button className="top-bar-button">Export</button>
                 </div>
-                <div className="project-info">
-                    <h3>Projektinformation</h3>
-                 </div>
-                <div className="project-images">
-                    <img src="{projectImageURL}" alt="Project" />
-                    {/* Implement image selection and viewing logic */}
-                </div>
+
                 {renderAttributeSectionList()}
+                
+                <h3>Bilder</h3>
+                {fullscreenImage ? fullscreenView : miniatureView}
+
+
+
             </div>
-        )
-    }
+        );
+    };
+
+
+
 
     // Main Render Function (within MapTest component)
     return (
