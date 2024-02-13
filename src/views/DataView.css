@@ -273,3 +273,47 @@
   border-radius: 5px;
   font-size: 24px;
 }
+
+/* Upload Section Styles */
+.upload-section {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.file-upload-label {
+  padding: 5px 10px;
+  float: right;
+  background-color: #30A875;
+  color: white !important;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.file-upload-label:hover {
+  background-color: #267356;
+}
+
+.upload-section input[type="text"] {
+  width: 95%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.upload-section button {
+  padding: 10px 15px;
+  background-color: #30A875;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.upload-section button:hover {
+  background-color: #267356;
+}

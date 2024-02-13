@@ -134,12 +134,11 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
     const [selectedImage, setSelectedImage] = useState(null);
     const [imageList, setImageList] = useState([]);
     const [fullscreenImage, setFullscreenImage] = useState(null); // State to track the selected image for fullscreen view
-
+    const [captionText, setCaptionText] = useState(''); // New state for caption text
 
     const uploadImage = async () => {
-        if (!selectedImage) return;
+        if (!selectedImage || !selectedId) return; // Ensure both image and ID are selected
 
-        // Function to convert the image file to a Base64 string
         const toBase64 = file => new Promise((resolve, reject) => {
             const reader = new FileReader();
             reader.readAsDataURL(file);
@@ -148,29 +147,27 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
         });
 
         try {
-            // Convert the image to Base64
             const base64Image = await toBase64(selectedImage);
 
-            // Prepare the JSON payload
             const payload = {
-                projectId: 24,
-                imageData: base64Image
+                projectId: selectedProjectId, // Include the selected project ID
+                imageData: base64Image,
+                mapObjectId: selectedId, // Include the selected ID
+                caption: captionText // Include the caption text
             };
 
-            // Send the request
             const response = await fetch(`${API_URLS.PROJECT_IMAGE_POST}`, {
                 method: 'POST',
                 body: JSON.stringify(payload),
                 headers: {
-                    'Authorization': `Bearer ${accessToken}`, // Include your auth token if required
+                    'Authorization': `Bearer ${accessToken}`,
                     'Content-Type': 'application/json'
                 },
             });
 
             if (response.ok) {
-                console.log('Image uploaded successfully');
-                fetchImages(); // Refresh the image list after uploading
-                setSelectedImage(null); // Reset the selected image
+                // Your existing success logic...
+                setCaptionText(''); // Reset caption text after successful upload
             } else {
                 console.error('Failed to upload image');
             }
@@ -451,7 +448,6 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                     },
 
                     onEachFeature: (feature, layer) => {
-
                         layer.on('click', () => {
                             // Set the selected feature ID and its attributes for editing
                             setSelectedId(feature.properties.id);
@@ -752,6 +748,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                 const data = await response.json();
                 setGeoJsonData(data);
                 console.log('data: ', data);
+                setSelectedImage(null); // Reset the selected image after successful upload 
 
             } else {
                 console.error('Failed to load data');
@@ -1627,7 +1624,16 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
 
                 ))}
                 <button onClick={() => saveAttributes()}>Spara</button>
-            </div>
+                    <label htmlFor="file-upload" className="file-upload-label">Lägg till en bild</label>
+                    <input id="file-upload" type="file" onChange={(e) => setSelectedImage(e.target.files[0])} accept="image/*" style={{ display: 'none' }} />
+                    {selectedImage && (
+                        <>
+                            <input type="text" value={captionText} onChange={(e) => setCaptionText(e.target.value)} placeholder="Lägg till text om bilden.." />
+                            <button onClick={uploadImage}>Ladda upp</button>
+                        </>
+                    )}
+                </div>
+
         );
     };
 
@@ -2146,6 +2152,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                 </div>
 
                 {renderAttributeSectionList()}
+
 
                 <h3>Bilder</h3>
                 {fullscreenImage ? fullscreenView : miniatureView}
