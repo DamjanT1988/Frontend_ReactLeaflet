@@ -207,6 +207,8 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
     };
     
 
+    
+
 
     useEffect(() => {
         fetchImages();
@@ -2069,10 +2071,10 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
         )
     };
 
-
+    
 
     // Right Section JSX
-    const renderRightSection = () => {
+    const renderRightSection = () => { 
         const selectedMapObjectId = selectedId; // Dynamically set based on user interaction
 
         console.log("List 1", imageList[0]);
@@ -2101,6 +2103,22 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
             setFullscreenImage(null);
         };
 
+        const handlePreviousImage = () => {
+            const currentIndex = filteredImages.findIndex(img => img.url === fullscreenImage.url);
+            if (currentIndex > 0) {
+                setFullscreenImage(filteredImages[currentIndex - 1]);
+            }
+        };
+        
+        // Function to go to the next image
+        const handleNextImage = () => {
+            const currentIndex = filteredImages.findIndex(img => img.url === fullscreenImage.url);
+            if (currentIndex < filteredImages.length - 1) {
+                setFullscreenImage(filteredImages[currentIndex + 1]);
+            }
+        };
+
+    
 // Display filtered images in a grid, three in a row
 const miniatureView = (
     <div className="image-display-section">
@@ -2112,16 +2130,18 @@ const miniatureView = (
     </div>
 );
 
-// Fullscreen view for the selected image
 const fullscreenView = fullscreenImage && (
     <div className="fullscreen-view">
+        <button onClick={handlePreviousImage} className="nav-btn left-nav">&lt;</button>
         <img src={fullscreenImage.url} alt="Fullscreen" className="fullscreen-image" />
         <div className="image-info">
-            <p>{fullscreenImage.caption}</p>
-            <button onClick={closeFullscreen} className="close-fullscreen-btn">Stäng</button>
+            <p className="image-caption">{fullscreenImage.caption}</p>
         </div>
+        <button onClick={handleNextImage} className="nav-btn right-nav">&gt;</button>
+        <button onClick={closeFullscreen} className="close-fullscreen-btn">Stäng</button>
     </div>
 );
+
 
 
         return (
