@@ -188,7 +188,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                     'Authorization': `Bearer ${accessToken}`,
                 },
             });
-    
+
             if (response.ok) {
                 const data = await response.json();
                 console.log('image data: ', data);
@@ -205,9 +205,9 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
             console.error('Error fetching images:', error);
         }
     };
-    
 
-    
+
+
 
 
     useEffect(() => {
@@ -2071,13 +2071,12 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
         )
     };
 
-    
+
 
     // Right Section JSX
-    const renderRightSection = () => { 
+    const renderRightSection = () => {
         const selectedMapObjectId = selectedId; // Dynamically set based on user interaction
 
-        console.log("List 1", imageList[0]);
 
         // Use .reduce() to filter and match IDs more defensively
         const filteredImages = imageList.reduce((acc, image) => {
@@ -2088,16 +2087,12 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
             return acc; // Return the accumulator for the next iteration
         }, []); // Initialize the accumulator as an empty array
 
-        console.log('imageList:', imageList);
-        console.log('Filtered Images:', filteredImages);
-        //console.log('Filtered Images 2:', filteredImages2);
-
 
         // Function to handle image click: set the selected image for fullscreen view
         const handleImageClick = (image) => {
             setFullscreenImage(image);
         };
-    
+
         // Function to close fullscreen view
         const closeFullscreen = () => {
             setFullscreenImage(null);
@@ -2109,7 +2104,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                 setFullscreenImage(filteredImages[currentIndex - 1]);
             }
         };
-        
+
         // Function to go to the next image
         const handleNextImage = () => {
             const currentIndex = filteredImages.findIndex(img => img.url === fullscreenImage.url);
@@ -2118,31 +2113,29 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
             }
         };
 
-    
-// Display filtered images in a grid, three in a row
-const miniatureView = (
-    <div className="image-display-section">
-        {filteredImages.map((image, index) => (
-            <div key={index} className="image-wrapper" onClick={() => handleImageClick(image)}>
-                <img src={image.url} alt={`Uploaded ${index}`} className="miniature-image" />
+
+        // Display filtered images in a grid, three in a row
+        const miniatureView = (
+            <div className="image-display-section">
+                {filteredImages.map((image, index) => (
+                    <div key={index} className="image-wrapper" onClick={() => handleImageClick(image)}>
+                        <img src={image.url} alt={`Uploaded ${index}`} className="miniature-image" />
+                    </div>
+                ))}
             </div>
-        ))}
-    </div>
-);
+        );
 
-const fullscreenView = fullscreenImage && (
-    <div className="fullscreen-view">
-        <button onClick={handlePreviousImage} className="nav-btn left-nav">&lt;</button>
-        <img src={fullscreenImage.url} alt="Fullscreen" className="fullscreen-image" />
-        <div className="image-info">
-            <p className="image-caption">{fullscreenImage.caption}</p>
-        </div>
-        <button onClick={handleNextImage} className="nav-btn right-nav">&gt;</button>
-        <button onClick={closeFullscreen} className="close-fullscreen-btn">Stäng</button>
-    </div>
-);
-
-
+        const fullscreenView = fullscreenImage && (
+            <div className="fullscreen-view">
+                <button onClick={handlePreviousImage} className="nav-btn left-nav">&lt;</button>
+                <img src={fullscreenImage.url} alt="Fullscreen" className="fullscreen-image" />
+                <div className="image-info">
+                    <p className="image-caption">{fullscreenImage.caption}</p>
+                </div>
+                <button onClick={handleNextImage} className="nav-btn right-nav">&gt;</button>
+                <button onClick={closeFullscreen} className="close-fullscreen-btn">Stäng</button>
+            </div>
+        );
 
         return (
             <div className="right-section">
@@ -2153,7 +2146,7 @@ const fullscreenView = fullscreenImage && (
                 </div>
 
                 {renderAttributeSectionList()}
-                
+
                 <h3>Bilder</h3>
                 {fullscreenImage ? fullscreenView : miniatureView}
 
