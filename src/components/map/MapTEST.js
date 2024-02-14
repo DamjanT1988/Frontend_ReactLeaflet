@@ -1574,6 +1574,22 @@ const loadDataFromServer = async () => {
 
             return newHighlightedIds;
         });
+        if (event.ctrlKey) {
+            // If CTRL key is pressed, add or remove the feature from the selection
+            setSelectedRowIds(prevSelectedRowIds => {
+                const newSelectedRowIds = new Set(prevSelectedRowIds);
+    
+                if (newSelectedRowIds.has(featureId)) {
+                    // If the feature is already selected, remove it from the selection
+                    newSelectedRowIds.delete(featureId);
+                } else {
+                    // If the feature is not yet selected, add it to the selection
+                    newSelectedRowIds.add(featureId);
+                }
+    
+                return newSelectedRowIds;
+            });
+        }
 
         // Update the map to reflect the new highlighted features
         updateMapHighlights();
@@ -1701,7 +1717,7 @@ const loadDataFromServer = async () => {
                 {!shouldHide &&
                     <div className='map-container elementToHide'>
                         <h3>Projektkarta</h3>
-                        <button className="toggle-form-button" onClick={saveDataToServer}>Spara ritning!</button>
+                        <button className="toggle-form-button" onClick={saveDataToServer}>Spara projekt!</button>
                         <span className="save-status">{saveStatus}</span>
                         <p>Tryck på kartobjekt för att se attribut.</p>
                         {selectedId && attributesObject && showAttributeTable && (
@@ -1893,7 +1909,7 @@ const loadDataFromServer = async () => {
                     return feature.geometry.type === 'LineString' || feature.geometry.type === 'MultiLineString';
                 case 'Polygoner':
                     return feature.geometry.type === 'Polygon' || feature.geometry.type === 'MultiPolygon' || feature.properties.isCircleMarker || feature.properties.isCircle;
-                case 'Sparade':
+                case 'Selekterade':
                     // Only include features with IDs contained in savedObjectIds for the 'Sparade objekt' tab
                     return savedObjectIds.has(feature.properties.id);
                 default:
@@ -1986,14 +2002,22 @@ const loadDataFromServer = async () => {
             setGeoJsonData(updatedGeoJsonData);
         };
 
+    // New function to add selected features to savedObjectIDs
+    const addSelectedToSavedObjects = () => {
+        console.log('selectedRowIds:', selectedRowIds);
+        console.log('selectedId:', selectedId);
+        setSavedObjectIds(new Set([...savedObjectIds, ...selectedRowIds, ...selectedId]));
+    };
 
-        //console.log(selectedProject);
-
+      // Function to clear savedObjectIds
+      const clearSavedObjectIds = () => {
+        setSavedObjectIds(new Set()); // Clears the set
+    };
 
         return (
             <div>
                 {shouldHide && <div className="elementToHide">
-                    <button className="toggle-form-button-2" onClick={saveDataToServer}>Spara ritning! {saveStatus}</button>
+                    <button className="toggle-form-button-2" onClick={saveDataToServer}>Spara projekt! {saveStatus}</button>
                 </div>}
 
                 <div className="attributes-container">
@@ -2003,7 +2027,7 @@ const loadDataFromServer = async () => {
                         <button className={activeTab === 'Punkter' ? 'active' : ''} onClick={() => setActiveTab('Punkter')}>Punkter</button>
                         <button className={activeTab === 'Linjer' ? 'active' : ''} onClick={() => setActiveTab('Linjer')}>Linjer</button>
                         <button className={activeTab === 'Polygoner' ? 'active' : ''} onClick={() => setActiveTab('Polygoner')}>Polygoner</button>
-                        <button className={activeTab === 'Sparade' ? 'active' : ''} onClick={() => setActiveTab('Sparade')}>Sparade objekt</button>
+                        <button className={activeTab === 'Selekterade' ? 'active' : ''} onClick={() => setActiveTab('Selekterade')}>Selekterade</button>
                     </div>
 
                     <table>
@@ -2048,12 +2072,24 @@ const loadDataFromServer = async () => {
 
 
                                                 </td>
+                                                
                                             ))}
                                         </tr>
+                                        
                                     ) : null
                                 ))}
                         </tbody>
                     </table>
+                    {activeTab !== 'Sparade' && (
+                    <button onClick={addSelectedToSavedObjects} style={{ marginTop: '10px' }}>
+                    Lägg till valda objekt till sparade
+                    </button>
+                    )}
+                    {activeTab === 'Sparade' && (
+                    <button onClick={clearSavedObjectIds} style={{ marginTop: '10px', marginBottom: '10px' }}>
+                        Rensa hela listan
+                    </button>
+                )}
                 </div>
             </div>
         );
