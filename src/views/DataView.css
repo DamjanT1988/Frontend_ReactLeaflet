@@ -274,6 +274,18 @@
   font-size: 24px;
 }
 
+.remove-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  cursor: pointer;
+  padding: 6px 8px;
+  background-color:  red;
+  color: white;
+  border-radius: 5px;
+  font-size: 14px;
+}
+
 /* Upload Section Styles */
 .upload-section {
   display: flex;
@@ -316,4 +328,49 @@
 
 .upload-section button:hover {
   background-color: #267356;
+}
+
+.confirmation-dialog {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: auto;
+  padding: 20px;
+  background-color: white;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  z-index: 1500; /* Ensure this is higher than the fullscreen view's z-index */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-radius: 5px;
+}
+
+.confirmation-dialog p {
+  margin: 0 0 20px 0;
+  text-align: center;
+}
+
+.confirmation-dialog button {
+  padding: 10px 20px;
+  margin: 10px 10px;
+  background-color: #30A875;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.confirmation-dialog button:hover {
+  background-color: #267356;
+}
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1400; /* Just below the confirmation dialog */
 }

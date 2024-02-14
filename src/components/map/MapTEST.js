@@ -135,6 +135,41 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
     const [imageList, setImageList] = useState([]);
     const [fullscreenImage, setFullscreenImage] = useState(null); // State to track the selected image for fullscreen view
     const [captionText, setCaptionText] = useState(''); // New state for caption text
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+    const [imageToDelete, setImageToDelete] = useState(null);
+
+    const toggleDeleteConfirm = (image) => {
+        setImageToDelete(image); // Set the image to delete with the full image object
+        setShowDeleteConfirm(!showDeleteConfirm);
+    };
+
+    const handleDeleteImage = async () => {
+        if (!imageToDelete) return; // Ensure imageToDelete is not null or undefined
+
+
+        try {
+            const response = await fetch(`${API_URLS.PROJECT_IMAGE_DELETE.replace('<int:image_id>', imageToDelete.id)}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`,
+                },
+            });
+
+            if (response.ok) {
+                // Successfully deleted the image
+                setImageList(imageList.filter(image => image.id !== imageToDelete.id)); // Remove the deleted image from the imageList state
+                setShowDeleteConfirm(false); // Close the confirmation dialog
+                setFullscreenImage(null); // Close the fullscreen view if the deleted image was being displayed
+            } else {
+                // Handle the error, e.g., show an error message to the user
+                console.error('Failed to delete image');
+            }
+        } catch (error) {
+            console.error('Error deleting image:', error);
+        }
+    };
+
+
 
     const uploadImage = async () => {
         if (!selectedImage || !selectedId) return; // Ensure both image and ID are selected
@@ -191,6 +226,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                 console.log('image data: ', data);
                 const images = data.images; // Use the 'images' key from the response
                 setImageList(images.map(image => ({
+                    id: image.id, // Include the image ID
                     url: image.url, // Include the image URL
                     caption: image.caption, // Include the caption
                     mapObjectId: image.mapObjectId // Include the mapObjectId
@@ -1624,15 +1660,15 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
 
                 ))}
                 <button onClick={() => saveAttributes()}>Spara</button>
-                    <label htmlFor="file-upload" className="file-upload-label">Lägg till en bild</label>
-                    <input id="file-upload" type="file" onChange={(e) => setSelectedImage(e.target.files[0])} accept="image/*" style={{ display: 'none' }} />
-                    {selectedImage && (
-                        <>
-                            <input type="text" value={captionText} onChange={(e) => setCaptionText(e.target.value)} placeholder="Lägg till text om bilden.." />
-                            <button onClick={uploadImage}>Ladda upp</button>
-                        </>
-                    )}
-                </div>
+                <label htmlFor="file-upload" className="file-upload-label">Lägg till en bild</label>
+                <input id="file-upload" type="file" onChange={(e) => setSelectedImage(e.target.files[0])} accept="image/*" style={{ display: 'none' }} />
+                {selectedImage && (
+                    <>
+                        <input type="text" value={captionText} onChange={(e) => setCaptionText(e.target.value)} placeholder="Lägg till text om bilden.." />
+                        <button onClick={uploadImage}>Ladda upp</button>
+                    </>
+                )}
+            </div>
 
         );
     };
@@ -2138,9 +2174,24 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                 <div className="image-info">
                     <p className="image-caption">{fullscreenImage.caption}</p>
                 </div>
+
+                {showDeleteConfirm && (
+  <>
+    <div className="overlay"></div>
+    <div className="confirmation-dialog">
+      <p>Är du säker att du vill ta bort bilden?</p>
+      <button onClick={handleDeleteImage}>Radera</button>
+      <button onClick={() => toggleDeleteConfirm(null)}>Avbryt</button>
+    </div>
+  </>
+)}
+
+
                 <button onClick={handleNextImage} className="nav-btn right-nav">&gt;</button>
                 <button onClick={closeFullscreen} className="close-fullscreen-btn">Stäng</button>
+                <button onClick={() => toggleDeleteConfirm(fullscreenImage)} className="remove-btn">Ta bort</button>
             </div>
+
         );
 
         return (

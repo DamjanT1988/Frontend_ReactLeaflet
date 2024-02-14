@@ -25,6 +25,7 @@ export const API_URLS = {
     PROJECT_FILES_GET: `${BASE_URL}/projects/get`, // Add a project ID when using this endpoint for detail view
     PROJECT_IMAGE_POST: `${BASE_URL}/projects/image/save/`, // Add a project ID when using this endpoint for detail view
     PROJECT_IMAGE_GET: `${BASE_URL}/projects/<int:project_id>/image/`, // Add a project ID when using this endpoint for detail view
+    PROJECT_IMAGE_DELETE: `${BASE_URL}/projects/image/delete/<int:image_id>/`, // Add a project ID when using this endpoint for detail view
 
     REPORTS: `${BASE_URL}/reports/`, // List reports
     REPORT_DETAIL: `${BASE_URL}/reports/`, // Add a report ID when using this endpoint for detail view
@@ -43,10 +44,3 @@ export const API_URLS = {
     DOWNLOAD_GMLFILE: `${BASE_URL}/download/gmlfile/`, // Add a data ID when using this endpoint
     DOWNLOAD_GEOJSONFILE: `${BASE_URL}/download/geojsonfile/`, // Add a data ID when using this endpoint
 };
-
-/*
-const projectId = 1; // This would dynamically come from your application state or route parameters
-fetch(`${API_URLS.PROJECT_DETAIL}${projectId}/`, {
-  // your fetch options here
-});
-*/
