@@ -16,7 +16,12 @@ L.Icon.Default.mergeOptions({
     iconUrl: require('leaflet/dist/images/marker-icon.png'),
     shadowUrl: require('leaflet/dist/images/marker-shadow.png')
 });
-
+const dotIconWhite = L.divIcon({
+    className: 'custom-dot-icon',
+    html: '<svg width="15" height="15" viewBox="0 0 8 8"><circle cx="4" cy="4" r="3" fill="#ffffff"/></svg>',
+    iconSize: [8, 8], // Size of the icon
+    iconAnchor: [4, 4] // Anchor point of the icon
+});
 const dotIconBlue = L.divIcon({
     className: 'custom-dot-icon',
     html: '<svg width="15" height="15" viewBox="0 0 8 8"><circle cx="4" cy="4" r="3" fill="#3388ff"/></svg>',
@@ -137,8 +142,39 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
     const [captionText, setCaptionText] = useState(''); // New state for caption text
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [imageToDelete, setImageToDelete] = useState(null);
-    
+    const [selectedFeatureIds, setSelectedFeatureIds] = useState(new Set());
+    const [savedObjectIds, setSavedObjectIds] = useState(new Set());
 
+
+
+    // Function to handle feature click with CTRL key support for multi-selection
+    const handleFeatureClick = (featureId, layer, event) => {
+        // If CTRL key is not pressed, clear selections and revert styles
+        if (!event.originalEvent.ctrlKey) {
+            // Clear the selectedFeatureIds set
+            //setSelectedFeatureIds(new Set());
+            return;
+
+        }
+
+        setSavedObjectIds(prevSelectedIds => {
+            const newSelectedIds = new Set(prevSelectedIds);
+
+            if (newSelectedIds.has(featureId)) {
+                newSelectedIds.delete(featureId);
+                // Revert to original style when deselected
+                //revertToOriginalStyle(layer);
+            } else {
+                newSelectedIds.add(featureId);
+                // Apply the selected feature style
+                
+            }
+            console.log('selected feature ids: ', newSelectedIds);
+            return newSelectedIds;
+        });
+    };
+
+    
     const toggleDeleteConfirm = (image) => {
         setImageToDelete(image); // Set the image to delete with the full image object
         setShowDeleteConfirm(!showDeleteConfirm);
@@ -436,57 +472,15 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                             radius: feature.properties.radius // Use the radius from the feature properties
                         });
 
-                        /*
-                        // Use L.marker with the custom dot icon
-                        const marker = L.marker(latlng, { icon: dotIconBlue, id: feature.properties.id });
-
-                        marker.on('click', () => {
-                            // Update the state with the currently selected marker's ID
-                            setSelectedMarkerId(feature.properties.id);
-
-                            // Iterate through all markers to update their icons
-                            featureGroupRef.current.eachLayer(layer => {
-                                if (layer instanceof L.Marker && !(layer instanceof L.CircleMarker)) {
-                                    if (layer.options.id === feature.properties.id) {
-                                        // Change the clicked marker's icon to red
-                                        layer.setIcon(dotIconRed);
-                                    } else {
-                                        // Revert other markers' icons back to blue
-                                        layer.setIcon(dotIconBlue);
-                                    }
-                                }
-                            });
-                        });
-
-                        return marker;
-                        */
-
-                        /*                 
-                        return L.circleMarker(latlng, {
-                            radius: 8, // Radius of the circle marker (dot size)
-                            fillColor: "#3388ff", // Default fill color
-                            color: "#3388ff", // Border color
-                            weight: 4, // Border width
-                            opacity: 1,
-                            fillOpacity: 5
-                        });
-                        */
-
-                        /*  
-                        if (feature.properties.isCircleMarker) {
-                            // If the feature has a property indicating it's a circle marker, create a L.CircleMarker
-                            return L.circleMarker(latlng, {
-                                radius: feature.properties.radius // Use the radius from the feature properties
-                            });
-                        } else {
-                            // For other points, return a default marker
-                            return L.marker(latlng, { icon: dotIconBlue });
-                        }
-                        */
-
                     },
 
                     onEachFeature: (feature, layer) => {
+                        layer.on('click', (event) => {
+                            handleFeatureClick(feature.properties.id, layer, event);
+                            // Additional logic for displaying attributes, etc.
+                            
+                        });
+
                         layer.on('click', () => {
                             // Set the selected feature ID and its attributes for editing
                             setSelectedId(feature.properties.id);
@@ -562,7 +556,8 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                             // Add the circle to the feature group
                             circle.addTo(featureGroupRef.current);
 
-                            circle.on('click', () => {
+                            circle.on('click', (event) => {
+                                handleFeatureClick(feature.properties.id, layer, event);
                                 resetAllLayerStyles();
                                 setHighlightedIds(new Set([feature.properties.id]));
                                 //setHighlightedId(null); // Set the highlighted feature's ID
@@ -736,66 +731,73 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
 
     };
 
-    // Function to save GeoJSON data to the server
-    const saveDataToServer = async () => {
-        try {
-            setSaveStatus('Sparar...');
-            const response = await fetch(`${API_URLS.PROJECT_FILES_POST}/${userID}/${selectedProjectId}/file`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${accessToken}` // Include the accessToken in the Authorization header
-                },
-                body: JSON.stringify(geoJsonData),
-            });
-            if (response.ok) {
-                setSaveStatus('... kartdata sparad!');
-                console.log('Data saved successfully');
-                console.log('geoJsonData: ', geoJsonData);
-                // Clear the save status message after 2 seconds
-                setTimeout(() => {
-                    setSaveStatus('');
-                }, 2500);
-            } else {
-                setSaveStatus('... fel i sparande av kartdata');
-                console.error('Failed to save data');
-                // Clear the save status message after 2 seconds
-                setTimeout(() => {
-                    setSaveStatus('');
-                }, 2000);
-            }
-        } catch (error) {
-            setSaveStatus('No data to save');
-            console.error('Error:', error);
-            // Clear the save status message after 2 seconds
+    // Function to save GeoJSON data and saved objects to the server
+const saveDataToServer = async () => {
+    try {
+        setSaveStatus('Sparar...');
+        const dataToSave = {
+            ...geoJsonData, // Your existing GeoJSON data
+            savedObjectIds: Array.from(savedObjectIds) // Convert Set to Array for serialization
+        };
+        const response = await fetch(`${API_URLS.PROJECT_FILES_POST}/${userID}/${selectedProjectId}/file`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${accessToken}`
+            },
+            body: JSON.stringify(dataToSave),
+        });
+        if (response.ok) {
+            setSaveStatus('... kartdata sparad!');
+            console.log('Data saved successfully', dataToSave);
+            setTimeout(() => {
+                setSaveStatus('');
+            }, 2500);
+        } else {
+            setSaveStatus('... fel i sparande av kartdata');
+            console.error('Failed to save data');
             setTimeout(() => {
                 setSaveStatus('');
             }, 2000);
         }
-    };
+    } catch (error) {
+        setSaveStatus('No data to save');
+        console.error('Error:', error);
+        setTimeout(() => {
+            setSaveStatus('');
+        }, 2000);
+    }
+};
 
 
-    const loadDataFromServer = async () => {
-        try {
-            const response = await fetch(`${API_URLS.PROJECT_FILES_GET}/${userID}/${selectedProjectId}/file`, {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${accessToken}` // Include the accessToken in the Authorization header
-                }
-            });
-            if (response.ok) {
-                const data = await response.json();
-                setGeoJsonData(data);
-                console.log('data: ', data);
-                setSelectedImage(null); // Reset the selected image after successful upload 
-
-            } else {
-                console.error('Failed to load data');
+const loadDataFromServer = async () => {
+    try {
+        const response = await fetch(`${API_URLS.PROJECT_FILES_GET}/${userID}/${selectedProjectId}/file`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${accessToken}`
             }
-        } catch (error) {
-            console.error('Error:', error);
+        });
+        if (response.ok) {
+            const data = await response.json();
+            if (data.features) {
+                setGeoJsonData(data); // Assuming the GeoJSON data is directly at the top level
+            }
+            if (data.savedObjectIds) {
+                setSavedObjectIds(new Set(data.savedObjectIds)); // Convert array back to Set
+                console.log('Saved object IDs:', data.savedObjectIds);
+            }
+            console.log('Loaded data:', data);
+            setSelectedImage(null); // Reset the selected image after successful upload
+        } else {
+            console.error('Failed to load data');
         }
-    };
+    } catch (error) {
+        console.error('Error:', error);
+    }
+};
+
+
 
     // useEffect hook to call loadDataFromServer on component mount
     useEffect(() => {
@@ -1549,7 +1551,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
         }
     };
 
-
+    // Inside MapTest component
 
     // Function to handle row clicks and feature highlighting
     const handleRowClick = (featureId, attributes, event) => {
@@ -1598,10 +1600,24 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                             });
                         }
                     }
+                    // Special handling for markers
+                    if (layer instanceof L.Marker) {
+                        if (highlightedIds.has(layer.feature.properties.id)) {
+                            layer.setIcon(dotIconRed);
+                        } else {
+                            layer.setIcon(dotIconBlue);
+                        }
+                    }
                 }
             });
         }
     };
+
+    // Call updateMapHighlights in useEffect to ensure highlights are updated when highlightedIds changes
+    useEffect(() => {
+        updateMapHighlights();
+    }, [highlightedIds]);
+
 
 
 
@@ -1865,23 +1881,26 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
         const attributeNames = Array.from(allAttributeNames);
 
         const filteredFeatures = geoJsonData.features.filter(feature => {
+            // Exclude rectangleCrop shapes
             if (feature.properties.shape === "rectangleCrop") {
                 return false;
             }
-            if (activeTab === 'Punkter') {
-                // Only include point features for the "Points" tab
-                return feature.properties.isMarker || feature.properties.isPoint;
-            } else if (activeTab === 'Linjer') {
-                // Only include line features for the "Lines" tab
-                return feature.geometry.type === 'LineString' || feature.geometry.type === 'MultiLineString';
-            } else if (activeTab === 'Polygoner') {
-                // Only include polygon features for the "Polygons" tab
-                return feature.geometry.type === 'Polygon' || feature.geometry.type === 'MultiPolygon' || feature.properties.isCircleMarker || feature.properties.isCircle;
+            // Filter by active tab
+            switch (activeTab) {
+                case 'Punkter':
+                    return feature.properties.isMarker || feature.properties.isPoint;
+                case 'Linjer':
+                    return feature.geometry.type === 'LineString' || feature.geometry.type === 'MultiLineString';
+                case 'Polygoner':
+                    return feature.geometry.type === 'Polygon' || feature.geometry.type === 'MultiPolygon' || feature.properties.isCircleMarker || feature.properties.isCircle;
+                case 'Sparade':
+                    // Only include features with IDs contained in savedObjectIds for the 'Sparade objekt' tab
+                    return savedObjectIds.has(feature.properties.id);
+                default:
+                    return true;
             }
-            // Default case to include all features if no tab matches
-            return true;
         });
-
+        
 
 
 
@@ -1984,6 +2003,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                         <button className={activeTab === 'Punkter' ? 'active' : ''} onClick={() => setActiveTab('Punkter')}>Punkter</button>
                         <button className={activeTab === 'Linjer' ? 'active' : ''} onClick={() => setActiveTab('Linjer')}>Linjer</button>
                         <button className={activeTab === 'Polygoner' ? 'active' : ''} onClick={() => setActiveTab('Polygoner')}>Polygoner</button>
+                        <button className={activeTab === 'Sparade' ? 'active' : ''} onClick={() => setActiveTab('Sparade')}>Sparade objekt</button>
                     </div>
 
                     <table>
@@ -1998,6 +2018,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                             </tr>
                         </thead>
                         <tbody>
+                        
                             {/* Mapping through your geoJsonData */}
                             {
                                 filteredFeatures.map((feature, featureIndex) => (
