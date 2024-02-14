@@ -137,6 +137,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
     const [captionText, setCaptionText] = useState(''); // New state for caption text
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [imageToDelete, setImageToDelete] = useState(null);
+    
 
     const toggleDeleteConfirm = (image) => {
         setImageToDelete(image); // Set the image to delete with the full image object
@@ -202,7 +203,9 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
 
             if (response.ok) {
                 // Your existing success logic...
+                setSelectedImage(null) // Reset the selected ID after successful upload   
                 setCaptionText(''); // Reset caption text after successful upload
+                fetchImages(); // Fetch the updated image list after successful upload
             } else {
                 console.error('Failed to upload image');
             }
@@ -1638,7 +1641,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
 
         return (
             <div className="attributes-container">
-                <h3>Ändra markerad objekt</h3>
+                <h3>Objektattribut</h3>
                 {Object.entries(editableAttributesObject).map(([key, value], index) => (
                     <div key={index} className="attribute-field">
                         <label htmlFor={`attribute-${key}`}>{attributeDisplayNameMap[key] || key}:</label>
@@ -2176,15 +2179,15 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                 </div>
 
                 {showDeleteConfirm && (
-  <>
-    <div className="overlay"></div>
-    <div className="confirmation-dialog">
-      <p>Är du säker att du vill ta bort bilden?</p>
-      <button onClick={handleDeleteImage}>Radera</button>
-      <button onClick={() => toggleDeleteConfirm(null)}>Avbryt</button>
-    </div>
-  </>
-)}
+                    <>
+                        <div className="overlay"></div>
+                        <div className="confirmation-dialog">
+                            <p>Är du säker att du vill ta bort bilden?</p>
+                            <button onClick={handleDeleteImage}>Radera</button>
+                            <button onClick={() => toggleDeleteConfirm(null)}>Avbryt</button>
+                        </div>
+                    </>
+                )}
 
 
                 <button onClick={handleNextImage} className="nav-btn right-nav">&gt;</button>
