@@ -144,7 +144,52 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, shouldHide })
     const [imageToDelete, setImageToDelete] = useState(null);
     const [selectedFeatureIds, setSelectedFeatureIds] = useState(new Set());
     const [savedObjectIds, setSavedObjectIds] = useState(new Set());
+    const [isDrawingMode, setIsDrawingMode] = useState(false);
+    const [imageSize, setImageSize] = useState({ width: 0, height: 0 }); // State for the image size
 
+
+
+
+    const Canvas = ({ width, height, onClose, onSave }) => {
+        const canvasRef = useRef(null);
+
+        useEffect(() => {
+            const canvas = canvasRef.current;
+            if (canvas) {
+                canvas.width = width;
+                canvas.height = height;
+            }
+        }, [width, height]);
+
+        const handleMouseDown = (e) => {
+            const canvas = canvasRef.current;
+            const ctx = canvas.getContext('2d');
+            ctx.beginPath();
+            ctx.moveTo(e.nativeEvent.offsetX, e.nativeEvent.offsetY);
+            document.addEventListener('mousemove', handleMouseMove);
+            document.addEventListener('mouseup', handleMouseUp);
+        };
+
+        const handleMouseMove = (e) => {
+            const canvas = canvasRef.current;
+            const ctx = canvas.getContext('2d');
+            ctx.lineTo(e.offsetX, e.offsetY);
+            ctx.stroke();
+        };
+
+        const handleMouseUp = () => {
+            document.removeEventListener('mousemove', handleMouseMove);
+            document.removeEventListener('mouseup', handleMouseUp);
+        };
+
+        return (
+            <div className="canvas-container" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 10 }}>
+                <canvas ref={canvasRef} width={width} height={height} onMouseDown={handleMouseDown} />
+                <button className='confirmation-dialog-draw' onClick={onClose}>Close</button>
+                <button className='confirmation-dialog-draw' onClick={() => onSave(canvasRef.current)}>Save</button>
+            </div>
+        );
+    };
 
 
     // Function to handle feature click with CTRL key support for multi-selection
@@ -167,14 +212,14 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, shouldHide })
             } else {
                 newSelectedIds.add(featureId);
                 // Apply the selected feature style
-                
+
             }
             console.log('selected feature ids: ', newSelectedIds);
             return newSelectedIds;
         });
     };
 
-    
+
     const toggleDeleteConfirm = (image) => {
         setImageToDelete(image); // Set the image to delete with the full image object
         setShowDeleteConfirm(!showDeleteConfirm);
@@ -478,7 +523,7 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, shouldHide })
                         layer.on('click', (event) => {
                             handleFeatureClick(feature.properties.id, layer, event);
                             // Additional logic for displaying attributes, etc.
-                            
+
                         });
 
                         layer.on('click', () => {
@@ -732,70 +777,70 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, shouldHide })
     };
 
     // Function to save GeoJSON data and saved objects to the server
-const saveDataToServer = async () => {
-    try {
-        setSaveStatus('Sparar...');
-        const dataToSave = {
-            ...geoJsonData, // Your existing GeoJSON data
-            savedObjectIds: Array.from(savedObjectIds) // Convert Set to Array for serialization
-        };
-        const response = await fetch(`${API_URLS.PROJECT_FILES_POST}/${userID}/${selectedProjectId}/file`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${accessToken}`
-            },
-            body: JSON.stringify(dataToSave),
-        });
-        if (response.ok) {
-            setSaveStatus('... kartdata sparad!');
-            console.log('Data saved successfully', dataToSave);
-            setTimeout(() => {
-                setSaveStatus('');
-            }, 2500);
-        } else {
-            setSaveStatus('... fel i sparande av kartdata');
-            console.error('Failed to save data');
+    const saveDataToServer = async () => {
+        try {
+            setSaveStatus('Sparar...');
+            const dataToSave = {
+                ...geoJsonData, // Your existing GeoJSON data
+                savedObjectIds: Array.from(savedObjectIds) // Convert Set to Array for serialization
+            };
+            const response = await fetch(`${API_URLS.PROJECT_FILES_POST}/${userID}/${selectedProjectId}/file`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${accessToken}`
+                },
+                body: JSON.stringify(dataToSave),
+            });
+            if (response.ok) {
+                setSaveStatus('... kartdata sparad!');
+                console.log('Data saved successfully', dataToSave);
+                setTimeout(() => {
+                    setSaveStatus('');
+                }, 2500);
+            } else {
+                setSaveStatus('... fel i sparande av kartdata');
+                console.error('Failed to save data');
+                setTimeout(() => {
+                    setSaveStatus('');
+                }, 2000);
+            }
+        } catch (error) {
+            setSaveStatus('No data to save');
+            console.error('Error:', error);
             setTimeout(() => {
                 setSaveStatus('');
             }, 2000);
         }
-    } catch (error) {
-        setSaveStatus('No data to save');
-        console.error('Error:', error);
-        setTimeout(() => {
-            setSaveStatus('');
-        }, 2000);
-    }
-};
+    };
 
 
-const loadDataFromServer = async () => {
-    try {
-        const response = await fetch(`${API_URLS.PROJECT_FILES_GET}/${userID}/${selectedProjectId}/file`, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${accessToken}`
+    const loadDataFromServer = async () => {
+        try {
+            const response = await fetch(`${API_URLS.PROJECT_FILES_GET}/${userID}/${selectedProjectId}/file`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`
+                }
+            });
+            if (response.ok) {
+                const data = await response.json();
+                if (data.features) {
+                    setGeoJsonData(data); // Assuming the GeoJSON data is directly at the top level
+                }
+                if (data.savedObjectIds) {
+                    setSavedObjectIds(new Set(data.savedObjectIds)); // Convert array back to Set
+                    console.log('Saved object IDs:', data.savedObjectIds);
+                }
+                console.log('Loaded data:', data);
+                setSelectedImage(null); // Reset the selected image after successful upload
+            } else {
+                console.error('Failed to load data');
             }
-        });
-        if (response.ok) {
-            const data = await response.json();
-            if (data.features) {
-                setGeoJsonData(data); // Assuming the GeoJSON data is directly at the top level
-            }
-            if (data.savedObjectIds) {
-                setSavedObjectIds(new Set(data.savedObjectIds)); // Convert array back to Set
-                console.log('Saved object IDs:', data.savedObjectIds);
-            }
-            console.log('Loaded data:', data);
-            setSelectedImage(null); // Reset the selected image after successful upload
-        } else {
-            console.error('Failed to load data');
+        } catch (error) {
+            console.error('Error:', error);
         }
-    } catch (error) {
-        console.error('Error:', error);
-    }
-};
+    };
 
 
 
@@ -1578,7 +1623,7 @@ const loadDataFromServer = async () => {
             // If CTRL key is pressed, add or remove the feature from the selection
             setSelectedRowIds(prevSelectedRowIds => {
                 const newSelectedRowIds = new Set(prevSelectedRowIds);
-    
+
                 if (newSelectedRowIds.has(featureId)) {
                     // If the feature is already selected, remove it from the selection
                     newSelectedRowIds.delete(featureId);
@@ -1586,7 +1631,7 @@ const loadDataFromServer = async () => {
                     // If the feature is not yet selected, add it to the selection
                     newSelectedRowIds.add(featureId);
                 }
-    
+
                 return newSelectedRowIds;
             });
         }
@@ -1916,7 +1961,7 @@ const loadDataFromServer = async () => {
                     return true;
             }
         });
-        
+
 
 
 
@@ -2002,17 +2047,17 @@ const loadDataFromServer = async () => {
             setGeoJsonData(updatedGeoJsonData);
         };
 
-    // New function to add selected features to savedObjectIDs
-    const addSelectedToSavedObjects = () => {
-        console.log('selectedRowIds:', selectedRowIds);
-        console.log('selectedId:', selectedId);
-        setSavedObjectIds(new Set([...savedObjectIds, ...selectedRowIds, ...selectedId]));
-    };
+        // New function to add selected features to savedObjectIDs
+        const addSelectedToSavedObjects = () => {
+            console.log('selectedRowIds:', selectedRowIds);
+            console.log('selectedId:', selectedId);
+            setSavedObjectIds(new Set([...savedObjectIds, ...selectedRowIds, ...selectedId]));
+        };
 
-      // Function to clear savedObjectIds
-      const clearSavedObjectIds = () => {
-        setSavedObjectIds(new Set()); // Clears the set
-    };
+        // Function to clear savedObjectIds
+        const clearSavedObjectIds = () => {
+            setSavedObjectIds(new Set()); // Clears the set
+        };
 
         return (
             <div>
@@ -2042,7 +2087,7 @@ const loadDataFromServer = async () => {
                             </tr>
                         </thead>
                         <tbody>
-                        
+
                             {/* Mapping through your geoJsonData */}
                             {
                                 filteredFeatures.map((feature, featureIndex) => (
@@ -2072,24 +2117,24 @@ const loadDataFromServer = async () => {
 
 
                                                 </td>
-                                                
+
                                             ))}
                                         </tr>
-                                        
+
                                     ) : null
                                 ))}
                         </tbody>
                     </table>
                     {activeTab !== 'Sparade' && (
-                    <button onClick={addSelectedToSavedObjects} style={{ marginTop: '10px' }}>
-                    Lägg till valda objekt till sparade
-                    </button>
+                        <button onClick={addSelectedToSavedObjects} style={{ marginTop: '10px' }}>
+                            Lägg till valda objekt till sparade
+                        </button>
                     )}
                     {activeTab === 'Sparade' && (
-                    <button onClick={clearSavedObjectIds} style={{ marginTop: '10px', marginBottom: '10px' }}>
-                        Rensa hela listan
-                    </button>
-                )}
+                        <button onClick={clearSavedObjectIds} style={{ marginTop: '10px', marginBottom: '10px' }}>
+                            Rensa hela listan
+                        </button>
+                    )}
                 </div>
             </div>
         );
@@ -2179,7 +2224,6 @@ const loadDataFromServer = async () => {
     const renderRightSection = () => {
         const selectedMapObjectId = selectedId; // Dynamically set based on user interaction
 
-
         // Use .reduce() to filter and match IDs more defensively
         const filteredImages = imageList.reduce((acc, image) => {
             // Check if image.mapObjectId exists and matches selectedMapObjectId
@@ -2190,10 +2234,25 @@ const loadDataFromServer = async () => {
         }, []); // Initialize the accumulator as an empty array
 
 
+
+        const ImageWithDrawing = ({ src, alt }) => {
+            const [imageSize, setImageSize] = useState({ width: 0, height: 0 });
+
+            useEffect(() => {
+                const img = new Image();
+                img.onload = () => setImageSize({ width: img.width, height: img.height });
+                img.src = src;
+            }, [src]);
+        }
+
+
+
         // Function to handle image click: set the selected image for fullscreen view
+        /*
         const handleImageClick = (image) => {
             setFullscreenImage(image);
         };
+        */
 
         // Function to close fullscreen view
         const closeFullscreen = () => {
@@ -2227,6 +2286,17 @@ const loadDataFromServer = async () => {
             </div>
         );
 
+        // When setting the fullscreen image, calculate its dimensions
+        const handleImageClick = (image) => {
+            const img = new Image();
+            img.onload = () => {
+                setImageSize({ width: img.width, height: img.height });
+                setFullscreenImage(image);
+            };
+            img.src = image.url;
+        };
+
+
         const fullscreenView = fullscreenImage && (
             <div className="fullscreen-view">
                 <button onClick={handlePreviousImage} className="nav-btn left-nav">&lt;</button>
@@ -2234,7 +2304,22 @@ const loadDataFromServer = async () => {
                 <div className="image-info">
                     <p className="image-caption">{fullscreenImage.caption}</p>
                 </div>
-
+                {isDrawingMode ? (
+                    <Canvas
+                        width={imageSize.width}
+                        height={imageSize.height}
+                        onClose={() => setIsDrawingMode(false)}
+                        onSave={(canvas) => {
+                            // Implement save functionality here
+                            // For example, convert canvas to image and save
+                            const dataURL = canvas.toDataURL('image/png');
+                            // Save dataURL as an image
+                            setIsDrawingMode(false);
+                        }}
+                    />
+                ) : (
+                    <button className="draw-btn" onClick={() => setIsDrawingMode(true)}>Rita</button>
+                )}
                 {showDeleteConfirm && (
                     <>
                         <div className="overlay"></div>
@@ -2254,6 +2339,8 @@ const loadDataFromServer = async () => {
 
         );
 
+
+
         return (
             <div className="right-section">
                 <div className="top-right">
@@ -2267,6 +2354,7 @@ const loadDataFromServer = async () => {
 
                 <h3>Bilder</h3>
                 {fullscreenImage ? fullscreenView : miniatureView}
+
 
 
 
