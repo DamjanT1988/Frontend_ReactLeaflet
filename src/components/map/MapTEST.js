@@ -153,6 +153,14 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
     const Canvas = ({ width, height, onClose, onSave }) => {
         const canvasRef = useRef(null);
 
+        useEffect(() => {
+            const canvas = canvasRef.current;
+            if (canvas) {
+                canvas.width = width;
+                canvas.height = height;
+            }
+        }, [width, height]);
+
         const handleMouseDown = (e) => {
             const canvas = canvasRef.current;
             const ctx = canvas.getContext('2d');
@@ -182,8 +190,6 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
             </div>
         );
     };
-
-
 
 
     // Function to handle feature click with CTRL key support for multi-selection
