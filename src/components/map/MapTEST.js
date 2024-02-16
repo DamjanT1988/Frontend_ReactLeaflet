@@ -10,6 +10,7 @@ import 'leaflet-draw/dist/leaflet.draw.css';
 import shp from 'shpjs';
 import { v4 as uuidv4 } from 'uuid';
 
+
 delete L.Icon.Default.prototype._getIconUrl
 L.Icon.Default.mergeOptions({
     iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
@@ -2323,15 +2324,38 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
             img.src = image.url;
         };
 
-        const handleSaveDrawing = async (imageBase64) => {
-            // Assuming `uploadImage` is your function to upload the image to the server
-            console.log('imageBase64:', imageBase64);
-            setImageBase64(imageBase64);
-            await uploadImage();
-            // Close the canvas or provide feedback to the user
-            // For example: onCloseCanvas();
-            //alert('Drawing saved successfully!');
+        const handleSaveDrawing = async (drawingBase64) => {
+            const img = new Image();
+            img.crossOrigin = "anonymous"; // Request CORS
+            img.onload = async () => {
+                // Create a canvas to combine the image and the drawing
+                const canvas = document.createElement('canvas');
+                canvas.width = img.width;
+                canvas.height = img.height;
+        
+                const ctx = canvas.getContext('2d');
+                // Draw the original image first
+                ctx.drawImage(img, 0, 0);
+                // Then draw the drawing on top of the image
+                const drawingImg = new Image();
+                drawingImg.onload = async () => {
+                    ctx.drawImage(drawingImg, 0, 0);
+        
+                    // Convert the canvas to a base64 image string
+                    const combinedImageBase64 = canvas.toDataURL('image/png');
+                    
+                    // Here you can save or upload combinedImageBase64 as needed
+                    console.log('Combined image base64:', combinedImageBase64);
+                    setImageBase64(combinedImageBase64);
+                    await uploadImage(); // Assuming this function uploads the base64 image
+                };
+                drawingImg.src = drawingBase64;
+            };
+            img.src = fullscreenImage.url; // Use the URL of the fullscreen image
         };
+        
+
+        
 
 
         const fullscreenView = fullscreenImage && (
