@@ -161,6 +161,14 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
             }
         }, [width, height]);
 
+        
+        const captureDrawing = () => {
+            if (canvasRef.current) {
+                const dataURL = canvasRef.current.toDataURL('image/png');
+                onSave(dataURL); // Pass the base64 image data to the onSave callback
+            }
+        };
+
         const handleMouseDown = (e) => {
             const canvas = canvasRef.current;
             const ctx = canvas.getContext('2d');
@@ -186,7 +194,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
             <div className="canvas-container" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 10 }}>
                 <canvas ref={canvasRef} width={width} height={height} onMouseDown={handleMouseDown} />
                 <button className='confirmation-dialog-draw' onClick={onClose}>Stäng</button>
-                <button className='confirmation-dialog-draw' onClick={() => onSave(canvasRef.current)}>Spara</button>
+                <button className='confirmation-dialog-draw' onClick={captureDrawing}>Spara</button>
             </div>
         );
     };
@@ -253,7 +261,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
 
 
 
-    const uploadImage = async () => {
+    const uploadImage = async (base64Image) => {
         if (!selectedImage || !selectedId) return; // Ensure both image and ID are selected
 
         const toBase64 = file => new Promise((resolve, reject) => {
@@ -2296,6 +2304,14 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
             img.src = image.url;
         };
 
+        const handleSaveDrawing = async (base64Image) => {
+            // Assuming `uploadImage` is your function to upload the image to the server
+            await uploadImage(base64Image);
+            // Close the canvas or provide feedback to the user
+            // For example: onCloseCanvas();
+            alert('Drawing saved successfully!');
+        };
+        
 
         const fullscreenView = fullscreenImage && (
             <div className="fullscreen-view">
@@ -2309,13 +2325,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                         width={imageSize.width}
                         height={imageSize.height}
                         onClose={() => setIsDrawingMode(false)}
-                        onSave={(canvas) => {
-                            // Implement save functionality here
-                            // For example, convert canvas to image and save
-                            const dataURL = canvas.toDataURL('image/png');
-                            // Save dataURL as an image
-                            setIsDrawingMode(false);
-                        }}
+                        onSave={(handleSaveDrawing)}
                     />
                 ) : (
                     <button className="draw-btn" onClick={() => setIsDrawingMode(true)}>Rita</button>

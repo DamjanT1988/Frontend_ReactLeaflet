@@ -161,6 +161,7 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, shouldHide })
             }
         }, [width, height]);
 
+        
         const handleMouseDown = (e) => {
             const canvas = canvasRef.current;
             const ctx = canvas.getContext('2d');
