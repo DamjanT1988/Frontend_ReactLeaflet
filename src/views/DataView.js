@@ -6,6 +6,7 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-draw/dist/leaflet.draw.css';
 import Map from '../components/map/Map';
+import MapTEST from '../components/map/MapTEST';
 import './DataView.css'; // Import the CSS for the DataView component
 
 
@@ -99,23 +100,15 @@ const DataView = () => {
   };
 
 
-/*
-  const handleAttributeValueChange = (featureIndex, attributeName, newValue) => {
-    const updatedGeoJsonData = { ...geoJsonData };
-    updatedGeoJsonData.features[featureIndex].properties[attributeName] = newValue;
-    setGeoJsonData(updatedGeoJsonData);
-    console.log(geoJsonData);
-  };
-*/
 
   if (selectedProject) {
     return (
             <div className='parent-one'>
-              <Map
+              <MapTEST
                 selectedProjectId={selectedProject.id}
                 geoJsonData={geoJsonData}
                 userID={selectedProject.user}
-                shouldHide={true}
+                shouldHideDataView={true}
               />
             </div>
     );

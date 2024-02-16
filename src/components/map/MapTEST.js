@@ -115,7 +115,7 @@ window.toggleAttributeContainer = (id, attributes) => {
 
 
 // Define the Map component
-const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHide }) => {
+const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHideDataView }) => {
     const featureGroupRef = useRef(null);
     const position = [51.505, -0.09];
     const zoom = 11;
@@ -146,6 +146,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
     const [savedObjectIds, setSavedObjectIds] = useState(new Set());
     const [isDrawingMode, setIsDrawingMode] = useState(false);
     const [imageSize, setImageSize] = useState({ width: 0, height: 0 }); // State for the image size
+    const [imageBase64, setImageBase64] = useState(null); // State for the image size
 
 
 
@@ -161,11 +162,12 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
             }
         }, [width, height]);
 
-        
+
         const captureDrawing = () => {
             if (canvasRef.current) {
                 const dataURL = canvasRef.current.toDataURL('image/png');
                 onSave(dataURL); // Pass the base64 image data to the onSave callback
+                console.log('dataURL: ', dataURL);
             }
         };
 
@@ -260,27 +262,38 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
     };
 
 
-
-    const uploadImage = async (base64Image) => {
-        if (!selectedImage || !selectedId) return; // Ensure both image and ID are selected
-
-        const toBase64 = file => new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = () => resolve(reader.result);
-            reader.onerror = error => reject(error);
-        });
-
+    const uploadImage = async () => {
+        // Ensure there is either an image file or a base64 string, and an ID is selected
+        //if (!selectedId || (!selectedImage && !imageBase64)) return;
+    
         try {
-            const base64Image = await toBase64(selectedImage);
-
+            let base64Image;
+    
+            // If there's a selected image file, convert it to base64
+            if (selectedImage) {
+                const toBase64 = file => new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.readAsDataURL(file);
+                    reader.onload = () => resolve(reader.result);
+                    reader.onerror = error => reject(error);
+                });
+    
+                base64Image = await toBase64(selectedImage);
+            } else {
+                // If there's no selected image file, use the provided base64 string
+                base64Image = imageBase64;
+            }
+    
+            // Construct the payload with the base64 image data
             const payload = {
                 projectId: selectedProjectId, // Include the selected project ID
-                imageData: base64Image,
+                imageData: base64Image, // Include the base64 image data
                 mapObjectId: selectedId, // Include the selected ID
                 caption: captionText // Include the caption text
             };
-
+    
+            console.log('upload payload: ', payload);
+    
             const response = await fetch(`${API_URLS.PROJECT_IMAGE_POST}`, {
                 method: 'POST',
                 body: JSON.stringify(payload),
@@ -289,12 +302,14 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                     'Content-Type': 'application/json'
                 },
             });
-
+    
             if (response.ok) {
-                // Your existing success logic...
-                setSelectedImage(null) // Reset the selected ID after successful upload   
+                // Logic after successful upload
+                setSelectedImage(null); // Reset the selected image file after successful upload
                 setCaptionText(''); // Reset caption text after successful upload
                 fetchImages(); // Fetch the updated image list after successful upload
+                // Optionally reset the base64 image data here if needed
+                // setImageBase64(null); 
             } else {
                 console.error('Failed to upload image');
             }
@@ -302,6 +317,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
             console.error('Error uploading image:', error);
         }
     };
+    
 
 
     const fetchImages = async () => {
@@ -414,7 +430,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
             map.once(L.Draw.Event.CREATED, onRectangleCreated);
         };
 
-        if (!shouldHide) {
+        if (!shouldHideDataView) {
             // Conditionally render the button based on showRectangleButton state
             return showRectangleButton ? (
                 <button onClick={startRectangleDraw} className='draw-rectangle-btn'>
@@ -574,7 +590,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                             foundCropRectangle = true; // Set the flag if a crop rectangle is found
                         }
 
-                        if (!shouldHide) {
+                        if (!shouldHideDataView) {
                             // Generate popup content based on feature properties
                             const popupContent = generatePopupContent(feature.properties);
 
@@ -599,7 +615,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
 
                             });
 
-                            if (!shouldHide) {
+                            if (!shouldHideDataView) {
                                 const popupContent = generatePopupContent(feature.properties);
                                 circle.bindPopup(popupContent); // Bind popup to circle
                             }
@@ -693,7 +709,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
             // Add more mappings as needed
         };
 
-        if (!shouldHide) {
+        if (!shouldHideDataView) {
             // Start the popup content with a div wrapper
             let content = '<div class="popup-content">';
 
@@ -1767,7 +1783,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
 
         return (
             <div>
-                {!shouldHide &&
+                {!shouldHideDataView &&
                     <div className='map-container elementToHide'>
                         <h3>Projektkarta</h3>
                         <button className="toggle-form-button" onClick={saveDataToServer}>Spara projekt!</button>
@@ -2069,7 +2085,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
 
         return (
             <div>
-                {shouldHide && <div className="elementToHide">
+                {shouldHideDataView && <div className="elementToHide">
                     <button className="toggle-form-button-2" onClick={saveDataToServer}>Spara projekt! {saveStatus}</button>
                 </div>}
 
@@ -2209,6 +2225,9 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
 
     // Left Section JSX
     const renderLeftSection = () => {
+        if (!selectedProject) {
+            return <div>Laddar..</div>; // Provide a loading message or any other fallback content
+          }
         return (
             <div className="left-section">
                 <div className="top-left">
@@ -2304,14 +2323,16 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
             img.src = image.url;
         };
 
-        const handleSaveDrawing = async (base64Image) => {
+        const handleSaveDrawing = async (imageBase64) => {
             // Assuming `uploadImage` is your function to upload the image to the server
-            await uploadImage(base64Image);
+            console.log('imageBase64:', imageBase64);
+            setImageBase64(imageBase64);
+            await uploadImage();
             // Close the canvas or provide feedback to the user
             // For example: onCloseCanvas();
-            alert('Drawing saved successfully!');
+            //alert('Drawing saved successfully!');
         };
-        
+
 
         const fullscreenView = fullscreenImage && (
             <div className="fullscreen-view">

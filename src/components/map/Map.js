@@ -2202,6 +2202,9 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, shouldHide })
 
     // Left Section JSX
     const renderLeftSection = () => {
+        if (!selectedProject) {
+            return <div>Loading project details...</div>; // Provide a loading message or any other fallback content
+          }
         return (
             <div className="left-section">
                 <div className="top-left">

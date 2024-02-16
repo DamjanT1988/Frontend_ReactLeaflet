@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'; // Import the useNavigate hook f
 import { API_URLS } from '../constants/APIURLS'; // Import the API_URLS constant
 import './ProjectView.css'; // Import the CSS for this component
 import Map from '../components/map/Map.js'; // Import the Map component
+import MapTEST from '../components/map/MapTEST.js';
 import Survey from '../components/survey/Survey.js'; // Import the Survey component
 import { useParams } from 'react-router-dom';
 
@@ -301,7 +302,7 @@ const ProjectView = () => {
 
         </div>
 
-            <Survey/>
+          <Survey/>
         {/* MAP */}
         <div>
           <Map
