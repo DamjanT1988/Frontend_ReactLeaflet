@@ -10,6 +10,7 @@ import 'leaflet-draw/dist/leaflet.draw.css';
 import shp from 'shpjs';
 import { v4 as uuidv4 } from 'uuid';
 
+
 delete L.Icon.Default.prototype._getIconUrl
 L.Icon.Default.mergeOptions({
     iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
@@ -115,7 +116,7 @@ window.toggleAttributeContainer = (id, attributes) => {
 
 
 // Define the Map component
-const Map = ({ selectedProjectId, selectedProject, onSave, userID, shouldHide }) => {
+const Map = ({ selectedProjectId, selectedProject, onSave, userID, shouldHideDataView }) => {
     const featureGroupRef = useRef(null);
     const position = [51.505, -0.09];
     const zoom = 11;
@@ -146,53 +147,70 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, shouldHide })
     const [savedObjectIds, setSavedObjectIds] = useState(new Set());
     const [isDrawingMode, setIsDrawingMode] = useState(false);
     const [imageSize, setImageSize] = useState({ width: 0, height: 0 }); // State for the image size
+    const [imageBase64, setImageBase64] = useState(null); // State for the image size
+    const [showReplacePrompt, setShowReplacePrompt] = useState(false);
+    const [pendingDrawing, setPendingDrawing] = useState(null);
+    const [showSavePrompt, setSavePrompt] = useState(false);
 
 
-
-
-    const Canvas = ({ width, height, onClose, onSave }) => {
-        const canvasRef = useRef(null);
-
-        useEffect(() => {
-            const canvas = canvasRef.current;
-            if (canvas) {
-                canvas.width = width;
-                canvas.height = height;
-            }
-        }, [width, height]);
+        const Canvas = ({ width, height, onClose, onSave }) => {
+            const canvasRef = useRef(null);
+    
+            useEffect(() => {
+                const canvas = canvasRef.current;
+                if (canvas) {
+                    canvas.width = width;
+                    canvas.height = height;
+                }
+            }, [width, height]);
+    
+    
+            const captureDrawing = () => {
+                if (canvasRef.current) {
+                    const dataURL = canvasRef.current.toDataURL('image/png');
+                    onSave(dataURL); // Pass the base64 image data to the onSave callback
+                    console.log('dataURL: ', dataURL);
+                }
+            };
+    
+            const handleMouseDown = (e) => {
+                const canvas = canvasRef.current;
+                const ctx = canvas.getContext('2d');
+                ctx.beginPath();
+                ctx.moveTo(e.nativeEvent.offsetX, e.nativeEvent.offsetY);
+                document.addEventListener('mousemove', handleMouseMove);
+                document.addEventListener('mouseup', handleMouseUp);
+            };
+    
+            const handleMouseMove = (e) => {
+                const canvas = canvasRef.current;
+                const ctx = canvas.getContext('2d');
+                ctx.lineTo(e.offsetX, e.offsetY);
+                ctx.stroke();
+            };
+    
+            const handleMouseUp = () => {
+                document.removeEventListener('mousemove', handleMouseMove);
+                document.removeEventListener('mouseup', handleMouseUp);
+            };
+    
+            return (
+                <div>
+                    {isDrawingMode && (
+                        <>
+                            <div className="canvas-container" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 10 }}>
+                                <canvas ref={canvasRef} width={width} height={height} onMouseDown={handleMouseDown} />
+                                <button className='confirmation-dialog-draw' onClick={onClose}>Stäng</button>
+                                <button className='confirmation-dialog-draw' onClick={captureDrawing}>Spara</button>
+                            </div>
+                        </>
+                    )}
+                </div>
+            );
+    
+        };
 
         
-        const handleMouseDown = (e) => {
-            const canvas = canvasRef.current;
-            const ctx = canvas.getContext('2d');
-            ctx.beginPath();
-            ctx.moveTo(e.nativeEvent.offsetX, e.nativeEvent.offsetY);
-            document.addEventListener('mousemove', handleMouseMove);
-            document.addEventListener('mouseup', handleMouseUp);
-        };
-
-        const handleMouseMove = (e) => {
-            const canvas = canvasRef.current;
-            const ctx = canvas.getContext('2d');
-            ctx.lineTo(e.offsetX, e.offsetY);
-            ctx.stroke();
-        };
-
-        const handleMouseUp = () => {
-            document.removeEventListener('mousemove', handleMouseMove);
-            document.removeEventListener('mouseup', handleMouseUp);
-        };
-
-        return (
-            <div className="canvas-container" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 10 }}>
-                <canvas ref={canvasRef} width={width} height={height} onMouseDown={handleMouseDown} />
-                <button className='confirmation-dialog-draw' onClick={onClose}>Close</button>
-                <button className='confirmation-dialog-draw' onClick={() => onSave(canvasRef.current)}>Save</button>
-            </div>
-        );
-    };
-
-
     // Function to handle feature click with CTRL key support for multi-selection
     const handleFeatureClick = (featureId, layer, event) => {
         // If CTRL key is not pressed, clear selections and revert styles
@@ -253,26 +271,37 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, shouldHide })
     };
 
 
-
     const uploadImage = async () => {
-        if (!selectedImage || !selectedId) return; // Ensure both image and ID are selected
-
-        const toBase64 = file => new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = () => resolve(reader.result);
-            reader.onerror = error => reject(error);
-        });
+        // Ensure there is either an image file or a base64 string, and an ID is selected
+        if (!selectedId || (!selectedImage && !imageBase64)) return;
 
         try {
-            const base64Image = await toBase64(selectedImage);
+            let base64Image;
 
+            // If there's a selected image file, convert it to base64
+            if (selectedImage) {
+                const toBase64 = file => new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.readAsDataURL(file);
+                    reader.onload = () => resolve(reader.result);
+                    reader.onerror = error => reject(error);
+                });
+
+                base64Image = await toBase64(selectedImage);
+            } else {
+                // If there's no selected image file, use the provided base64 string
+                base64Image = imageBase64;
+            }
+
+            // Construct the payload with the base64 image data
             const payload = {
                 projectId: selectedProjectId, // Include the selected project ID
-                imageData: base64Image,
+                imageData: base64Image, // Include the base64 image data
                 mapObjectId: selectedId, // Include the selected ID
                 caption: captionText // Include the caption text
             };
+
+            console.log('upload payload: ', payload);
 
             const response = await fetch(`${API_URLS.PROJECT_IMAGE_POST}`, {
                 method: 'POST',
@@ -284,10 +313,13 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, shouldHide })
             });
 
             if (response.ok) {
-                // Your existing success logic...
-                setSelectedImage(null) // Reset the selected ID after successful upload   
+                // Logic after successful upload
+                setSelectedImage(null); // Reset the selected image file after successful upload
                 setCaptionText(''); // Reset caption text after successful upload
                 fetchImages(); // Fetch the updated image list after successful upload
+                // Optionally reset the base64 image data here if needed
+                setImageBase64(null);
+                console.log('UPLOAD DONE');
             } else {
                 console.error('Failed to upload image');
             }
@@ -295,6 +327,7 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, shouldHide })
             console.error('Error uploading image:', error);
         }
     };
+
 
 
     const fetchImages = async () => {
@@ -324,7 +357,12 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, shouldHide })
         }
     };
 
-
+// useEffect hook to call uploadImage when imageBase64 changes and is not null
+useEffect(() => {
+    if (imageBase64) {
+        uploadImage(); // Call uploadImage here
+    }
+}, [imageBase64]);
 
 
 
@@ -407,7 +445,7 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, shouldHide })
             map.once(L.Draw.Event.CREATED, onRectangleCreated);
         };
 
-        if (!shouldHide) {
+        if (!shouldHideDataView) {
             // Conditionally render the button based on showRectangleButton state
             return showRectangleButton ? (
                 <button onClick={startRectangleDraw} className='draw-rectangle-btn'>
@@ -567,7 +605,7 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, shouldHide })
                             foundCropRectangle = true; // Set the flag if a crop rectangle is found
                         }
 
-                        if (!shouldHide) {
+                        if (!shouldHideDataView) {
                             // Generate popup content based on feature properties
                             const popupContent = generatePopupContent(feature.properties);
 
@@ -592,7 +630,7 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, shouldHide })
 
                             });
 
-                            if (!shouldHide) {
+                            if (!shouldHideDataView) {
                                 const popupContent = generatePopupContent(feature.properties);
                                 circle.bindPopup(popupContent); // Bind popup to circle
                             }
@@ -686,7 +724,7 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, shouldHide })
             // Add more mappings as needed
         };
 
-        if (!shouldHide) {
+        if (!shouldHideDataView) {
             // Start the popup content with a div wrapper
             let content = '<div class="popup-content">';
 
@@ -1760,7 +1798,7 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, shouldHide })
 
         return (
             <div>
-                {!shouldHide &&
+                {!shouldHideDataView &&
                     <div className='map-container elementToHide'>
                         <h3>Projektkarta</h3>
                         <button className="toggle-form-button" onClick={saveDataToServer}>Spara projekt!</button>
@@ -2062,7 +2100,7 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, shouldHide })
 
         return (
             <div>
-                {shouldHide && <div className="elementToHide">
+                {shouldHideDataView && <div className="elementToHide">
                     <button className="toggle-form-button-2" onClick={saveDataToServer}>Spara projekt! {saveStatus}</button>
                 </div>}
 
@@ -2203,8 +2241,8 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, shouldHide })
     // Left Section JSX
     const renderLeftSection = () => {
         if (!selectedProject) {
-            return <div>Loading project details...</div>; // Provide a loading message or any other fallback content
-          }
+            return <div>Laddar..</div>; // Provide a loading message or any other fallback content
+        }
         return (
             <div className="left-section">
                 <div className="top-left">
@@ -2236,27 +2274,6 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, shouldHide })
             }
             return acc; // Return the accumulator for the next iteration
         }, []); // Initialize the accumulator as an empty array
-
-
-
-        const ImageWithDrawing = ({ src, alt }) => {
-            const [imageSize, setImageSize] = useState({ width: 0, height: 0 });
-
-            useEffect(() => {
-                const img = new Image();
-                img.onload = () => setImageSize({ width: img.width, height: img.height });
-                img.src = src;
-            }, [src]);
-        }
-
-
-
-        // Function to handle image click: set the selected image for fullscreen view
-        /*
-        const handleImageClick = (image) => {
-            setFullscreenImage(image);
-        };
-        */
 
         // Function to close fullscreen view
         const closeFullscreen = () => {
@@ -2300,6 +2317,93 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, shouldHide })
             img.src = image.url;
         };
 
+        const handleSaveDrawing = (drawingBase64) => {
+            // Store the drawing data temporarily
+            setPendingDrawing(drawingBase64);
+            //setImageBase64(drawingBase64);
+            // Show the custom prompt
+            setShowReplacePrompt(true);
+        };
+
+        
+        const handleReplaceDecision = async (replace) => {
+            console.log('Replace decision:', replace);
+            //setSelectedId(fullscreenImage.mapObjectId); // Set the selected ID for the image
+            if (replace) {
+                const img = new Image();
+                img.crossOrigin = "anonymous"; // Request CORS
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+        
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0);
+        
+                    const drawingImg = new Image();
+                    drawingImg.onload = () => {
+                        ctx.drawImage(drawingImg, 0, 0);
+                        const combinedImageBase64 = canvas.toDataURL('image/png');
+                        setImageBase64(combinedImageBase64); // Update the base64 image state
+                    };
+                    drawingImg.src = pendingDrawing;
+                };
+                img.src = fullscreenImage.url;
+                // Proceed with replacing the existing image
+                toggleDeleteConfirm(fullscreenImage); // Use the existing function to handle deletion
+
+            } else {
+                // Proceed with the image saving process
+                const img = new Image();
+                img.crossOrigin = "anonymous"; // Request CORS
+                img.onload = () => {
+                    // Create a canvas to combine the image and the drawing
+                    const canvas = document.createElement('canvas');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+
+                    const ctx = canvas.getContext('2d');
+                    // Draw the original image first
+                    ctx.drawImage(img, 0, 0);
+                    // Then draw the drawing on top of the image
+                    const drawingImg = new Image();
+                    drawingImg.onload = () => {
+                        ctx.drawImage(drawingImg, 0, 0);
+
+                        // Convert the canvas to a base64 image string
+                        const combinedImageBase64 = canvas.toDataURL('image/png');
+                        console.log('Combined image base64:', combinedImageBase64);
+                        setImageBase64(combinedImageBase64);
+                        uploadImage(); // Assuming this function uploads the base64 image
+                    };
+                    drawingImg.src = pendingDrawing;
+                };
+                img.src = fullscreenImage.url; // Use the URL of the fullscreen image
+
+            }
+
+
+            // Clear the drawing data and close the prompt
+            fetchImages()
+            setIsDrawingMode(false);
+            setShowReplacePrompt(false);
+            setPendingDrawing(null);
+        };
+
+
+
+        const ReplacePrompt = () => (
+            <div className="overlay">
+                <div className="confirmation-dialog">
+                    <p>Vill du ersätta befintlig bild eller lägga till den nya som en extra bild?</p>
+                    <button onClick={() => handleReplaceDecision(true)}>Ersätt</button>
+                    <button onClick={() => handleReplaceDecision(false)}>Lägg till som ny</button>
+                </div>
+            </div>
+        );
+
+
+
 
         const fullscreenView = fullscreenImage && (
             <div className="fullscreen-view">
@@ -2313,13 +2417,7 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, shouldHide })
                         width={imageSize.width}
                         height={imageSize.height}
                         onClose={() => setIsDrawingMode(false)}
-                        onSave={(canvas) => {
-                            // Implement save functionality here
-                            // For example, convert canvas to image and save
-                            const dataURL = canvas.toDataURL('image/png');
-                            // Save dataURL as an image
-                            setIsDrawingMode(false);
-                        }}
+                        onSave={(handleSaveDrawing)}
                     />
                 ) : (
                     <button className="draw-btn" onClick={() => setIsDrawingMode(true)}>Rita</button>
@@ -2335,6 +2433,7 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, shouldHide })
                     </>
                 )}
 
+                {showReplacePrompt && <ReplacePrompt />}
 
                 <button onClick={handleNextImage} className="nav-btn right-nav">&gt;</button>
                 <button onClick={closeFullscreen} className="close-fullscreen-btn">Stäng</button>
