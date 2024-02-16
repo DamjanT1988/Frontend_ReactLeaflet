@@ -105,7 +105,7 @@ const ReportView = () => {
           geoJsonData={geoJsonData}
           userID={selectedProject.user}
           selectedProject={selectedProject}
-          shouldHide={true}
+          shouldHideDataView={true}
         />
       </div>
     );
