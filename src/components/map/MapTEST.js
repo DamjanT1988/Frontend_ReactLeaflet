@@ -185,8 +185,8 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
         return (
             <div className="canvas-container" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 10 }}>
                 <canvas ref={canvasRef} width={width} height={height} onMouseDown={handleMouseDown} />
-                <button className='confirmation-dialog-draw' onClick={onClose}>Close</button>
-                <button className='confirmation-dialog-draw' onClick={() => onSave(canvasRef.current)}>Save</button>
+                <button className='confirmation-dialog-draw' onClick={onClose}>Stäng</button>
+                <button className='confirmation-dialog-draw' onClick={() => onSave(canvasRef.current)}>Spara</button>
             </div>
         );
     };
