@@ -5,10 +5,8 @@ import { API_URLS } from '../constants/APIURLS'; // Import the API_URLS constant
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-draw/dist/leaflet.draw.css';
-import Map from '../components/map/Map';
-import MapTEST from '../components/map/MapTEST';
+import MapTest from '../components/map/MapTEST';
 import './DataView.css'; // Import the CSS for the DataView component
-
 
 
 const DataView = () => {
@@ -40,7 +38,7 @@ const DataView = () => {
       fetchProjects(); // Fetch the projects
       //console.log(geoJsonData);
       //viewProjectDetails(projectId);
-      navigate('/data');
+      navigate('/report');
     }
   }, [accessToken]); // Dependency array for the useEffect hook
 
@@ -98,17 +96,16 @@ const DataView = () => {
       })
       .catch(error => console.error('Error fetching project details:', error)); // Log any errors
   };
-
-
-
+  
   if (selectedProject) {
     return (
             <div className='parent-one'>
-              <MapTEST
+              <MapTest
                 selectedProjectId={selectedProject.id}
                 geoJsonData={geoJsonData}
                 userID={selectedProject.user}
-                shouldHideDataView={true}
+                selectedProject={selectedProject}
+                shouldHide={true}
               />
             </div>
     );
