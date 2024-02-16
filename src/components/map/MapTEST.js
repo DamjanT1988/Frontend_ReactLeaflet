@@ -148,6 +148,8 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
     const [isDrawingMode, setIsDrawingMode] = useState(false);
     const [imageSize, setImageSize] = useState({ width: 0, height: 0 }); // State for the image size
     const [imageBase64, setImageBase64] = useState(null); // State for the image size
+    const [showReplacePrompt, setShowReplacePrompt] = useState(false);
+    const [pendingDrawing, setPendingDrawing] = useState(null);
 
 
 
@@ -266,10 +268,10 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
     const uploadImage = async () => {
         // Ensure there is either an image file or a base64 string, and an ID is selected
         //if (!selectedId || (!selectedImage && !imageBase64)) return;
-    
+
         try {
             let base64Image;
-    
+
             // If there's a selected image file, convert it to base64
             if (selectedImage) {
                 const toBase64 = file => new Promise((resolve, reject) => {
@@ -278,13 +280,13 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                     reader.onload = () => resolve(reader.result);
                     reader.onerror = error => reject(error);
                 });
-    
+
                 base64Image = await toBase64(selectedImage);
             } else {
                 // If there's no selected image file, use the provided base64 string
                 base64Image = imageBase64;
             }
-    
+
             // Construct the payload with the base64 image data
             const payload = {
                 projectId: selectedProjectId, // Include the selected project ID
@@ -292,9 +294,9 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                 mapObjectId: selectedId, // Include the selected ID
                 caption: captionText // Include the caption text
             };
-    
+
             console.log('upload payload: ', payload);
-    
+
             const response = await fetch(`${API_URLS.PROJECT_IMAGE_POST}`, {
                 method: 'POST',
                 body: JSON.stringify(payload),
@@ -303,7 +305,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                     'Content-Type': 'application/json'
                 },
             });
-    
+
             if (response.ok) {
                 // Logic after successful upload
                 setSelectedImage(null); // Reset the selected image file after successful upload
@@ -318,7 +320,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
             console.error('Error uploading image:', error);
         }
     };
-    
+
 
 
     const fetchImages = async () => {
@@ -2228,7 +2230,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
     const renderLeftSection = () => {
         if (!selectedProject) {
             return <div>Laddar..</div>; // Provide a loading message or any other fallback content
-          }
+        }
         return (
             <div className="left-section">
                 <div className="top-left">
@@ -2325,37 +2327,63 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
         };
 
         const handleSaveDrawing = async (drawingBase64) => {
-            const img = new Image();
-            img.crossOrigin = "anonymous"; // Request CORS
-            img.onload = async () => {
-                // Create a canvas to combine the image and the drawing
-                const canvas = document.createElement('canvas');
-                canvas.width = img.width;
-                canvas.height = img.height;
-        
-                const ctx = canvas.getContext('2d');
-                // Draw the original image first
-                ctx.drawImage(img, 0, 0);
-                // Then draw the drawing on top of the image
-                const drawingImg = new Image();
-                drawingImg.onload = async () => {
-                    ctx.drawImage(drawingImg, 0, 0);
-        
-                    // Convert the canvas to a base64 image string
-                    const combinedImageBase64 = canvas.toDataURL('image/png');
-                    
-                    // Here you can save or upload combinedImageBase64 as needed
-                    console.log('Combined image base64:', combinedImageBase64);
-                    setImageBase64(combinedImageBase64);
-                    await uploadImage(); // Assuming this function uploads the base64 image
-                };
-                drawingImg.src = drawingBase64;
-            };
-            img.src = fullscreenImage.url; // Use the URL of the fullscreen image
+            // Store the drawing data temporarily
+            setPendingDrawing(drawingBase64);
+            // Show the custom prompt
+            setShowReplacePrompt(true);
         };
-        
 
-        
+        const handleReplaceDecision = async (replace) => {
+            if (replace) {
+                // Proceed with replacing the existing image
+                await toggleDeleteConfirm(fullscreenImage); // Use the existing function to handle deletion
+                // Continue with saving the new image...
+            } else {
+                // Proceed with the image saving process
+                const img = new Image();
+                img.crossOrigin = "anonymous"; // Request CORS
+                img.onload = async () => {
+                    // Create a canvas to combine the image and the drawing
+                    const canvas = document.createElement('canvas');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+
+                    const ctx = canvas.getContext('2d');
+                    // Draw the original image first
+                    ctx.drawImage(img, 0, 0);
+                    // Then draw the drawing on top of the image
+                    const drawingImg = new Image();
+                    drawingImg.onload = async () => {
+                        ctx.drawImage(drawingImg, 0, 0);
+
+                        // Convert the canvas to a base64 image string
+                        const combinedImageBase64 = canvas.toDataURL('image/png');
+                        console.log('Combined image base64:', combinedImageBase64);
+                        setImageBase64(combinedImageBase64);
+                        await uploadImage(); // Assuming this function uploads the base64 image
+                    };
+                    drawingImg.src = pendingDrawing;
+                };
+                img.src = fullscreenImage.url; // Use the URL of the fullscreen image
+
+            }
+            // Hide the custom prompt and clear the pending drawing data
+            setShowReplacePrompt(false);
+            setPendingDrawing(null);
+        };
+
+
+        const ReplacePrompt = () => (
+            <div className="overlay">
+                <div className="confirmation-dialog">
+                    <p>Vill du ersätta befintlig bild eller lägga till den nya som en extra bild?</p>
+                    <button onClick={() => handleReplaceDecision(true)}>Ersätt</button>
+                    <button onClick={() => handleReplaceDecision(false)}>Lägg till som ny</button>
+                </div>
+            </div>
+        );
+
+
 
 
         const fullscreenView = fullscreenImage && (
@@ -2386,6 +2414,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                     </>
                 )}
 
+                {showReplacePrompt && <ReplacePrompt />}
 
                 <button onClick={handleNextImage} className="nav-btn right-nav">&gt;</button>
                 <button onClick={closeFullscreen} className="close-fullscreen-btn">Stäng</button>
