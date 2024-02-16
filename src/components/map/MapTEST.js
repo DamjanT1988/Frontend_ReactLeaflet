@@ -153,66 +153,64 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
     const [showSavePrompt, setSavePrompt] = useState(false);
 
 
-
-
-    const Canvas = ({ width, height, onClose, onSave }) => {
-        const canvasRef = useRef(null);
-
-        useEffect(() => {
-            const canvas = canvasRef.current;
-            if (canvas) {
-                canvas.width = width;
-                canvas.height = height;
-            }
-        }, [width, height]);
-
-
-        const captureDrawing = () => {
-            if (canvasRef.current) {
-                const dataURL = canvasRef.current.toDataURL('image/png');
-                onSave(dataURL); // Pass the base64 image data to the onSave callback
-                console.log('dataURL: ', dataURL);
-            }
+        const Canvas = ({ width, height, onClose, onSave }) => {
+            const canvasRef = useRef(null);
+    
+            useEffect(() => {
+                const canvas = canvasRef.current;
+                if (canvas) {
+                    canvas.width = width;
+                    canvas.height = height;
+                }
+            }, [width, height]);
+    
+    
+            const captureDrawing = () => {
+                if (canvasRef.current) {
+                    const dataURL = canvasRef.current.toDataURL('image/png');
+                    onSave(dataURL); // Pass the base64 image data to the onSave callback
+                    console.log('dataURL: ', dataURL);
+                }
+            };
+    
+            const handleMouseDown = (e) => {
+                const canvas = canvasRef.current;
+                const ctx = canvas.getContext('2d');
+                ctx.beginPath();
+                ctx.moveTo(e.nativeEvent.offsetX, e.nativeEvent.offsetY);
+                document.addEventListener('mousemove', handleMouseMove);
+                document.addEventListener('mouseup', handleMouseUp);
+            };
+    
+            const handleMouseMove = (e) => {
+                const canvas = canvasRef.current;
+                const ctx = canvas.getContext('2d');
+                ctx.lineTo(e.offsetX, e.offsetY);
+                ctx.stroke();
+            };
+    
+            const handleMouseUp = () => {
+                document.removeEventListener('mousemove', handleMouseMove);
+                document.removeEventListener('mouseup', handleMouseUp);
+            };
+    
+            return (
+                <div>
+                    {isDrawingMode && (
+                        <>
+                            <div className="canvas-container" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 10 }}>
+                                <canvas ref={canvasRef} width={width} height={height} onMouseDown={handleMouseDown} />
+                                <button className='confirmation-dialog-draw' onClick={onClose}>Stäng</button>
+                                <button className='confirmation-dialog-draw' onClick={captureDrawing}>Spara</button>
+                            </div>
+                        </>
+                    )}
+                </div>
+            );
+    
         };
 
-        const handleMouseDown = (e) => {
-            const canvas = canvasRef.current;
-            const ctx = canvas.getContext('2d');
-            ctx.beginPath();
-            ctx.moveTo(e.nativeEvent.offsetX, e.nativeEvent.offsetY);
-            document.addEventListener('mousemove', handleMouseMove);
-            document.addEventListener('mouseup', handleMouseUp);
-        };
-
-        const handleMouseMove = (e) => {
-            const canvas = canvasRef.current;
-            const ctx = canvas.getContext('2d');
-            ctx.lineTo(e.offsetX, e.offsetY);
-            ctx.stroke();
-        };
-
-        const handleMouseUp = () => {
-            document.removeEventListener('mousemove', handleMouseMove);
-            document.removeEventListener('mouseup', handleMouseUp);
-        };
-
-        return (
-            <div>
-                {isDrawingMode && (
-                    <>
-                        <div className="canvas-container" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 10 }}>
-                            <canvas ref={canvasRef} width={width} height={height} onMouseDown={handleMouseDown} />
-                            <button className='confirmation-dialog-draw' onClick={onClose}>Stäng</button>
-                            <button className='confirmation-dialog-draw' onClick={captureDrawing}>Spara</button>
-                        </div>
-                    </>
-                )}
-            </div>
-        );
-
-    };
-
-
+        
     // Function to handle feature click with CTRL key support for multi-selection
     const handleFeatureClick = (featureId, layer, event) => {
         // If CTRL key is not pressed, clear selections and revert styles
@@ -275,7 +273,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
 
     const uploadImage = async () => {
         // Ensure there is either an image file or a base64 string, and an ID is selected
-        //if (!selectedId || (!selectedImage && !imageBase64)) return;
+        if (!selectedId || (!selectedImage && !imageBase64)) return;
 
         try {
             let base64Image;
@@ -321,7 +319,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                 fetchImages(); // Fetch the updated image list after successful upload
                 // Optionally reset the base64 image data here if needed
                 setImageBase64(null);
-                console.log('UPLOAD DONE'); 
+                console.log('UPLOAD DONE');
             } else {
                 console.error('Failed to upload image');
             }
@@ -359,7 +357,12 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
         }
     };
 
-
+// useEffect hook to call uploadImage when imageBase64 changes and is not null
+useEffect(() => {
+    if (imageBase64) {
+        uploadImage(); // Call uploadImage here
+    }
+}, [imageBase64]);
 
 
 
@@ -2272,27 +2275,6 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
             return acc; // Return the accumulator for the next iteration
         }, []); // Initialize the accumulator as an empty array
 
-
-
-        const ImageWithDrawing = ({ src, alt }) => {
-            const [imageSize, setImageSize] = useState({ width: 0, height: 0 });
-
-            useEffect(() => {
-                const img = new Image();
-                img.onload = () => setImageSize({ width: img.width, height: img.height });
-                img.src = src;
-            }, [src]);
-        }
-
-
-
-        // Function to handle image click: set the selected image for fullscreen view
-        /*
-        const handleImageClick = (image) => {
-            setFullscreenImage(image);
-        };
-        */
-
         // Function to close fullscreen view
         const closeFullscreen = () => {
             setFullscreenImage(null);
@@ -2335,50 +2317,46 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
             img.src = image.url;
         };
 
-        const handleSaveDrawing = async (drawingBase64) => {
+        const handleSaveDrawing = (drawingBase64) => {
             // Store the drawing data temporarily
             setPendingDrawing(drawingBase64);
+            //setImageBase64(drawingBase64);
             // Show the custom prompt
             setShowReplacePrompt(true);
         };
 
+        
         const handleReplaceDecision = async (replace) => {
-            setSelectedId(fullscreenImage.mapObjectId); // Set the selected ID for the image
+            console.log('Replace decision:', replace);
+            //setSelectedId(fullscreenImage.mapObjectId); // Set the selected ID for the image
             if (replace) {
                 const img = new Image();
                 img.crossOrigin = "anonymous"; // Request CORS
-                img.onload = async () => {
-                    // Create a canvas to combine the image and the drawing
+                img.onload = () => {
                     const canvas = document.createElement('canvas');
                     canvas.width = img.width;
                     canvas.height = img.height;
-
+        
                     const ctx = canvas.getContext('2d');
-                    // Draw the original image first
                     ctx.drawImage(img, 0, 0);
-                    // Then draw the drawing on top of the image
+        
                     const drawingImg = new Image();
-                    drawingImg.onload = async () => {
-                        ctx.drawImage(drawingImg, 0, 0);
-
-                        // Convert the canvas to a base64 image string
-                        const combinedImageBase64 = canvas.toDataURL('image/png');
-                        console.log('Combined image base64:', combinedImageBase64);
-                        setImageBase64(combinedImageBase64);
-                        await uploadImage(); // Assuming this function uploads the base64 image
-                    };
                     drawingImg.src = pendingDrawing;
+                    drawingImg.onload = () => {
+                        ctx.drawImage(drawingImg, 0, 0);
+                        const combinedImageBase64 = canvas.toDataURL('image/png');
+                        setImageBase64(combinedImageBase64); // Update the base64 image state
+                    };
                 };
-                img.src = fullscreenImage.url; // Use the URL of the fullscreen image
-
+                img.src = fullscreenImage.url;
                 // Proceed with replacing the existing image
-                await toggleDeleteConfirm(fullscreenImage); // Use the existing function to handle deletion
+                toggleDeleteConfirm(fullscreenImage); // Use the existing function to handle deletion
 
             } else {
                 // Proceed with the image saving process
                 const img = new Image();
                 img.crossOrigin = "anonymous"; // Request CORS
-                img.onload = async () => {
+                img.onload = () => {
                     // Create a canvas to combine the image and the drawing
                     const canvas = document.createElement('canvas');
                     canvas.width = img.width;
@@ -2389,16 +2367,18 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                     ctx.drawImage(img, 0, 0);
                     // Then draw the drawing on top of the image
                     const drawingImg = new Image();
-                    drawingImg.onload = async () => {
+                    drawingImg.src = pendingDrawing;
+                    drawingImg.onload = () => {
                         ctx.drawImage(drawingImg, 0, 0);
 
                         // Convert the canvas to a base64 image string
                         const combinedImageBase64 = canvas.toDataURL('image/png');
                         console.log('Combined image base64:', combinedImageBase64);
                         setImageBase64(combinedImageBase64);
-                        await uploadImage(); // Assuming this function uploads the base64 image
+                        uploadImage(); // Assuming this function uploads the base64 image
                     };
-                    drawingImg.src = pendingDrawing;
+
+ 
                 };
                 img.src = fullscreenImage.url; // Use the URL of the fullscreen image
 
@@ -2411,6 +2391,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
             setShowReplacePrompt(false);
             setPendingDrawing(null);
         };
+
 
 
         const ReplacePrompt = () => (
