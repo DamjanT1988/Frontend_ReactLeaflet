@@ -198,16 +198,16 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
 
         return (
             <div>
-            {isDrawingMode && (
-                <>
-            <div className="canvas-container" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 10 }}>
-                <canvas ref={canvasRef} width={width} height={height} onMouseDown={handleMouseDown} />
-                <button className='confirmation-dialog-draw' onClick={onClose}>Stäng</button>
-                <button className='confirmation-dialog-draw' onClick={captureDrawing}>Spara</button>
+                {isDrawingMode && (
+                    <>
+                        <div className="canvas-container" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 10 }}>
+                            <canvas ref={canvasRef} width={width} height={height} onMouseDown={handleMouseDown} />
+                            <button className='confirmation-dialog-draw' onClick={onClose}>Stäng</button>
+                            <button className='confirmation-dialog-draw' onClick={captureDrawing}>Spara</button>
+                        </div>
+                    </>
+                )}
             </div>
-            </>
-        )}
-        </div>
         );
 
     };
@@ -320,7 +320,8 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                 setCaptionText(''); // Reset caption text after successful upload
                 fetchImages(); // Fetch the updated image list after successful upload
                 // Optionally reset the base64 image data here if needed
-                // setImageBase64(null); 
+                setImageBase64(null);
+                console.log('UPLOAD DONE'); 
             } else {
                 console.error('Failed to upload image');
             }
@@ -2342,10 +2343,37 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
         };
 
         const handleReplaceDecision = async (replace) => {
+            setSelectedId(fullscreenImage.mapObjectId); // Set the selected ID for the image
             if (replace) {
+                const img = new Image();
+                img.crossOrigin = "anonymous"; // Request CORS
+                img.onload = async () => {
+                    // Create a canvas to combine the image and the drawing
+                    const canvas = document.createElement('canvas');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+
+                    const ctx = canvas.getContext('2d');
+                    // Draw the original image first
+                    ctx.drawImage(img, 0, 0);
+                    // Then draw the drawing on top of the image
+                    const drawingImg = new Image();
+                    drawingImg.onload = async () => {
+                        ctx.drawImage(drawingImg, 0, 0);
+
+                        // Convert the canvas to a base64 image string
+                        const combinedImageBase64 = canvas.toDataURL('image/png');
+                        console.log('Combined image base64:', combinedImageBase64);
+                        setImageBase64(combinedImageBase64);
+                        await uploadImage(); // Assuming this function uploads the base64 image
+                    };
+                    drawingImg.src = pendingDrawing;
+                };
+                img.src = fullscreenImage.url; // Use the URL of the fullscreen image
+
                 // Proceed with replacing the existing image
                 await toggleDeleteConfirm(fullscreenImage); // Use the existing function to handle deletion
-                // Continue with saving the new image...
+
             } else {
                 // Proceed with the image saving process
                 const img = new Image();
@@ -2376,6 +2404,8 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
 
             }
 
+
+            // Clear the drawing data and close the prompt
             fetchImages()
             setIsDrawingMode(false);
             setShowReplacePrompt(false);
