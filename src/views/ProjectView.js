@@ -302,7 +302,7 @@ const ProjectView = () => {
 
         </div>
 
-          <Survey/>
+        <Survey />
         {/* MAP */}
         <div>
           <Map

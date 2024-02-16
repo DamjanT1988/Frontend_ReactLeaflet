@@ -20,15 +20,15 @@ const ReportView = () => {
   const [geoJsonData, setGeoJsonData] = useState(null);
   const [searchTerm, setSearchTerm] = useState(''); // State for search term
   const [sortOrder, setSortOrder] = useState('desc'); // State for sort order ('asc' or 'desc')
-/*
-  useEffect(() => {
-    if (!accessToken) {
-      if (projectId) {
-        viewProjectDetails(projectId);
+  /*
+    useEffect(() => {
+      if (!accessToken) {
+        if (projectId) {
+          viewProjectDetails(projectId);
+        }
       }
-    }
-  }, [projectId]);
-*/
+    }, [projectId]);
+  */
 
   // Use effect hook to fetch projects if access token is available
   useEffect(() => {
@@ -96,18 +96,18 @@ const ReportView = () => {
       })
       .catch(error => console.error('Error fetching project details:', error)); // Log any errors
   };
-  
+
   if (selectedProject) {
     return (
-            <div className='parent-one'>
-              <MapTest
-                selectedProjectId={selectedProject.id}
-                geoJsonData={geoJsonData}
-                userID={selectedProject.user}
-                selectedProject={selectedProject}
-                shouldHide={true}
-              />
-            </div>
+      <div className='parent-one'>
+        <MapTest
+          selectedProjectId={selectedProject.id}
+          geoJsonData={geoJsonData}
+          userID={selectedProject.user}
+          selectedProject={selectedProject}
+          shouldHide={true}
+        />
+      </div>
     );
   }
 
