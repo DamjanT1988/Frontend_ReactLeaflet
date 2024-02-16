@@ -38,7 +38,7 @@ const DataView = () => {
       fetchProjects(); // Fetch the projects
       //console.log(geoJsonData);
       //viewProjectDetails(projectId);
-      navigate('/report');
+      navigate('/data');
     }
   }, [accessToken]); // Dependency array for the useEffect hook
 
