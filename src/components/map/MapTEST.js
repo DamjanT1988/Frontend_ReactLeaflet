@@ -2341,12 +2341,12 @@ useEffect(() => {
                     ctx.drawImage(img, 0, 0);
         
                     const drawingImg = new Image();
-                    drawingImg.src = pendingDrawing;
                     drawingImg.onload = () => {
                         ctx.drawImage(drawingImg, 0, 0);
                         const combinedImageBase64 = canvas.toDataURL('image/png');
                         setImageBase64(combinedImageBase64); // Update the base64 image state
                     };
+                    drawingImg.src = pendingDrawing;
                 };
                 img.src = fullscreenImage.url;
                 // Proceed with replacing the existing image
@@ -2367,7 +2367,6 @@ useEffect(() => {
                     ctx.drawImage(img, 0, 0);
                     // Then draw the drawing on top of the image
                     const drawingImg = new Image();
-                    drawingImg.src = pendingDrawing;
                     drawingImg.onload = () => {
                         ctx.drawImage(drawingImg, 0, 0);
 
@@ -2377,8 +2376,7 @@ useEffect(() => {
                         setImageBase64(combinedImageBase64);
                         uploadImage(); // Assuming this function uploads the base64 image
                     };
-
- 
+                    drawingImg.src = pendingDrawing;
                 };
                 img.src = fullscreenImage.url; // Use the URL of the fullscreen image
 
