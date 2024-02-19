@@ -214,9 +214,8 @@ h3 {
     /* Darker shade for hover effect */
 }
 
+
 /* ProjectView.css */
-
-
 .toggle-form-button {
     background-color: #30A875;
     /* Green background */
@@ -241,6 +240,7 @@ h3 {
     cursor: pointer;
     width: 100%;
     margin-top: 0px;
+    margin-bottom: 20px;
     /* Spacing before form or list */
     text-transform: uppercase;
     font-weight: bold;
@@ -672,7 +672,7 @@ h3 {
 .tabs {
     display: flex;
     /* Display tabs in a row */
-    justify-content: right;
+    justify-content: left;
     /* Center tabs horizontally */
     margin-bottom: 0px;
     /* Space below the tabs */
@@ -709,7 +709,7 @@ h3 {
 
 /* Active tab button */
 .tabs button.active {
-    background-color: #30A875;
+    background-color: gray;
     /* Green background for active tab, matching your theme */
     color: white;
     /* White text for active tab */

@@ -2105,7 +2105,7 @@ useEffect(() => {
                 </div>}
 
                 <div className="attributes-container">
-                    <h3>{activeTab}</h3>
+                    <h3>{}</h3>
 
                     <div className="tabs">
                         <button className={activeTab === 'Punkter' ? 'active' : ''} onClick={() => setActiveTab('Punkter')}>Punkter</button>
@@ -2118,16 +2118,13 @@ useEffect(() => {
                         <thead>
                             <tr>
                                 <th className='th-index'>#</th>
-                                <th className='th-karta'>Karta</th> {/* Additional column for highlight button */}
-                                {/* Assuming attributeNames is defined and accessible */}
+                                <th className='th-karta'>Karta</th> 
                                 {attributeNames.map((name, index) => (
                                     <th key={index}>{attributeDisplayNameMap[name] || name}</th>
                                 ))}
                             </tr>
                         </thead>
                         <tbody>
-
-                            {/* Mapping through your geoJsonData */}
                             {
                                 filteredFeatures.map((feature, featureIndex) => (
                                     feature.properties.attributes ? (

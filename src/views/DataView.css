@@ -248,12 +248,12 @@
 }
 
 .confirmation-dialog-draw-save {
-  position: absolute;
-  top: 50px;
-  right: 200px;
+  position: fixed;
+  top: 100px;
+  right: -33px;
   transform: translate(-50%, -50%);
-  width: auto;
-  padding: 20px;
+  width: 100px;
+  padding: 15px;
   background-color: white;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   z-index: 1500; /* Ensure this is higher than the fullscreen view's z-index */
@@ -264,12 +264,12 @@
 }
 
 .confirmation-dialog-draw-close {
-  position: absolute;
-  top: 50px;
-  right: 275px;
+  position: fixed;
+  top: 155px;
+  right: -33px;
   transform: translate(-50%, -50%);
-  width: auto;
-  padding: 20px;
+  width: 100px;
+  padding: 15px;
   background-color: white;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   z-index: 1500; /* Ensure this is higher than the fullscreen view's z-index */
