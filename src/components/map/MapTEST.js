@@ -152,29 +152,30 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
     const [showReplacePrompt, setShowReplacePrompt] = useState(false);
     const [pendingDrawing, setPendingDrawing] = useState(null);
     const [showSavePrompt, setSavePrompt] = useState(false);
-    const [mapHeight, setMapHeight] = useState("55vh"); // Default height
+    const [mapHeight, setMapHeight] = useState("59vh"); // Default height
     const mapRef = useRef(null);
     const [mapInstance, setMapInstance] = useState(null);
 
+
     const handleSliderChange = (e) => {
         const newHeight = `${e.target.value}vh`;
-        setMapHeight(newHeight); // Update map height state
-
-        // Check if the mapRef.current exists and then directly update the container's height
+        setMapHeight(newHeight); // Update state to reflect new height
+    
+        // Ensure the mapRef.current is available and then directly update the container's height
         if (mapRef.current) {
-            mapRef.current.style.height = newHeight;
-        }
-
-        // If you have a map instance, invalidate its size after the container's height adjustment
-        if (mapInstance) {
-            setTimeout(() => {
+            const container = mapRef.current.container; // Assuming mapRef.current directly references the container
+            if (container) {
+                container.style.height = newHeight; // Update the height of the container
+            }
+    
+            // Invalidate the map size after the container's height adjustment
+            if (mapInstance) {
                 mapInstance.invalidateSize();
-            }, 100); // A slight delay to ensure the DOM has updated
+            }
         }
     };
-
-
-
+    
+    
 
 
     const Canvas = ({ width, height, onClose, onSave }) => {
@@ -2468,7 +2469,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                         id="map-height-slider"
                         type="range"
                         min="30"
-                        max="100"
+                        max="69"
                         value={parseInt(mapHeight, 10)}
                         onChange={handleSliderChange}
                         className="height-slider"

@@ -976,7 +976,7 @@ h3 {
     /* Use fixed table layout to control column widths */
     /* Ensure it appears above the map */
     display: block;
-    max-height: 250px;
+    max-height: 300px;
     /* Adjust based on your needs */
     max-width: 100%;
     /* Adjust based on your needs */
