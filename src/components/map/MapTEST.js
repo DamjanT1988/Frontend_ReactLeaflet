@@ -2164,18 +2164,19 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                     </table>
                     <div className="marked-rows-info">
                         {`${highlightedIds.size} av ${filteredFeatures.length} markerade`}
+                        {activeTab !== 'Selekterade' && (
+                            <button onClick={addSelectedToSavedObjects}>
+                                Lägg till valda objekt till sparade
+                            </button>
+                        )}
+                        {activeTab === 'Selekterade' && (
+                            <button onClick={clearSavedObjectIds}>
+                                Rensa hela listan
+                            </button>
+                        )}
+
                     </div>
 
-                    {activeTab !== 'Sparade' && (
-                        <button onClick={addSelectedToSavedObjects} style={{ marginTop: '10px' }}>
-                            Lägg till valda objekt till sparade
-                        </button>
-                    )}
-                    {activeTab === 'Sparade' && (
-                        <button onClick={clearSavedObjectIds} style={{ marginTop: '10px', marginBottom: '10px' }}>
-                            Rensa hela listan
-                        </button>
-                    )}
                 </div>
             </div>
         );
