@@ -2099,6 +2099,21 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
             setSavedObjectIds(new Set()); // Clears the set
         };
 
+        // Filter features based on their type
+        const points = geoJsonData.features.filter(feature => feature.geometry.type === 'Point' || feature.properties.isCircleMarker);
+        const lines = geoJsonData.features.filter(feature => feature.geometry.type === 'LineString' || feature.geometry.type === 'MultiLineString');
+        const polygons = geoJsonData.features.filter(feature => feature.geometry.type === 'Polygon' || feature.geometry.type === 'MultiPolygon' || feature.properties.isCircle);
+
+        // Function to render table rows for a given set of features
+        const renderFeatureRows = (features) => features.map((feature, index) => (
+            <tr key={index}>
+                <td>{index + 1}</td>
+                {Object.entries(feature.properties.attributes || {}).map(([key, value], attrIndex) => (
+                    <td key={attrIndex}>{value}</td>
+                ))}
+            </tr>
+        ));
+
         return (
             <div>
                 {shouldHideDataView && <div className="elementToHide">
@@ -2178,8 +2193,67 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                     </div>
 
                 </div>
-            </div>
+
+                {points.length > 0 && (
+                    <>
+                        <h3>Punkter</h3>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    {/* Dynamically generate table headers based on attribute keys */}
+                                    {Object.keys(points[0].properties.attributes || {}).map((key, index) => (
+                                        <th key={index}>{key}</th>
+                                    ))}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {renderFeatureRows(points)}
+                            </tbody>
+                        </table>
+                    </>
+                )}
+                {lines.length > 0 && (
+                    <>
+                        <h3>Linjer</h3>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    {/* Dynamically generate table headers based on attribute keys */}
+                                    {Object.keys(lines[0].properties.attributes || {}).map((key, index) => (
+                                        <th key={index}>{key}</th>
+                                    ))}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {renderFeatureRows(lines)}
+                            </tbody>
+                        </table>
+                    </>
+                )}
+                {polygons.length > 0 && (
+                    <>
+                        <h3>Polygoner</h3>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    {/* Dynamically generate table headers based on attribute keys */}
+                                    {Object.keys(polygons[0].properties.attributes || {}).map((key, index) => (
+                                        <th key={index}>{key}</th>
+                                    ))}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {renderFeatureRows(polygons)}
+                            </tbody>
+                        </table>
+                    </>
+                )}
+                </div>
         );
+
     };
 
 
