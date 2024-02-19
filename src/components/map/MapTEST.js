@@ -152,7 +152,29 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
     const [showReplacePrompt, setShowReplacePrompt] = useState(false);
     const [pendingDrawing, setPendingDrawing] = useState(null);
     const [showSavePrompt, setSavePrompt] = useState(false);
-    const [mapHeight, setMapHeight] = useState("50vh"); // Default height
+    const [mapHeight, setMapHeight] = useState("55vh"); // Default height
+    const mapRef = useRef(null);
+    const [mapInstance, setMapInstance] = useState(null);
+
+    const handleSliderChange = (e) => {
+        const newHeight = `${e.target.value}vh`;
+        setMapHeight(newHeight); // Update map height state
+
+        // Check if the mapRef.current exists and then directly update the container's height
+        if (mapRef.current) {
+            mapRef.current.style.height = newHeight;
+        }
+
+        // If you have a map instance, invalidate its size after the container's height adjustment
+        if (mapInstance) {
+            setTimeout(() => {
+                mapInstance.invalidateSize();
+            }, 100); // A slight delay to ensure the DOM has updated
+        }
+    };
+
+
+
 
 
     const Canvas = ({ width, height, onClose, onSave }) => {
@@ -2107,13 +2129,13 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                 </div>}
 
                 <div className="attributes-container">
-                    <h3>{ }</h3>
 
                     <div className="tabs">
                         <button className={activeTab === 'Punkter' ? 'active' : ''} onClick={() => setActiveTab('Punkter')}>Punkter</button>
                         <button className={activeTab === 'Linjer' ? 'active' : ''} onClick={() => setActiveTab('Linjer')}>Linjer</button>
                         <button className={activeTab === 'Polygoner' ? 'active' : ''} onClick={() => setActiveTab('Polygoner')}>Polygoner</button>
                         <button className={activeTab === 'Selekterade' ? 'active' : ''} onClick={() => setActiveTab('Selekterade')}>Selekterade</button>
+
                     </div>
 
                     <table>
@@ -2187,40 +2209,42 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
 
     const renderMap = () => {
         return (
-            <div>
+            <div ref={mapRef} style={{ height: mapHeight, width: '100%' }}>
 
-                    <MapContainer center={position} zoom={zoom} style={{ height: '100vh', width: '100%' }} className="full-width-map">
+                <MapContainer whenCreated={setMapInstance} center={position} zoom={zoom} style={{ height: '100%', width: '100%' }} className="full-width-map">
 
-                        <LayersControl position="topright">
-                            <BaseLayer checked name="Informationskarta">
-                                <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-                            </BaseLayer>
-                            <BaseLayer name="Satellitkarta">
-                                <TileLayer url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}" />
-                            </BaseLayer>
-                        </LayersControl>
-                        <FeatureGroup ref={featureGroupRef}>
-                            <EditControl
-                                position="topright"
-                                onCreated={onCreate}
-                                onEdited={onEdited}
-                                onDeleted={onDeleted}
-                            />
-                            {shapeLayers && shapeLayers.map((feature, index) => (
-                                <GeoJSON key={index} data={feature} />
-                            ))}
-                        </FeatureGroup>
-                        <RectangleDrawButton isRectangleDrawn={isRectangleDrawn} setIsRectangleDrawn={setIsRectangleDrawn} />
-                    </MapContainer>
+                    <LayersControl position="topright">
+                        <BaseLayer checked name="Informationskarta">
+                            <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                        </BaseLayer>
+                        <BaseLayer name="Satellitkarta">
+                            <TileLayer url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}" />
+                        </BaseLayer>
+                    </LayersControl>
+                    <FeatureGroup ref={featureGroupRef}>
+                        <EditControl
+                            position="topright"
+                            onCreated={onCreate}
+                            onEdited={onEdited}
+                            onDeleted={onDeleted}
+                        />
+                        {shapeLayers && shapeLayers.map((feature, index) => (
+                            <GeoJSON key={index} data={feature} />
+                        ))}
+                    </FeatureGroup>
+                    <RectangleDrawButton isRectangleDrawn={isRectangleDrawn} setIsRectangleDrawn={setIsRectangleDrawn} />
+                </MapContainer>
 
-                    {renderAttributeTable()}
+                {renderAttributeTable()}
+
+
             </div>
         )
     }
 
     // Top Bar JSX
     const renderTopBar = () => {
-        
+
     };
 
     // Left Section JSX
@@ -2436,6 +2460,21 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                     <button className="top-bar-button">Rapport</button>
                     <button className="top-bar-button">Export</button>
                 </div>
+
+
+                <div className="slider-container">
+                    <label htmlFor="map-height-slider">Justera karthöjd</label><br />
+                    <input
+                        id="map-height-slider"
+                        type="range"
+                        min="30"
+                        max="100"
+                        value={parseInt(mapHeight, 10)}
+                        onChange={handleSliderChange}
+                        className="height-slider"
+                    />
+                </div>
+
 
                 {renderAttributeSectionList()}
 
