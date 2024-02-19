@@ -11,6 +11,7 @@ import shp from 'shpjs';
 import { v4 as uuidv4 } from 'uuid';
 
 
+
 delete L.Icon.Default.prototype._getIconUrl
 L.Icon.Default.mergeOptions({
     iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
@@ -151,7 +152,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
     const [showReplacePrompt, setShowReplacePrompt] = useState(false);
     const [pendingDrawing, setPendingDrawing] = useState(null);
     const [showSavePrompt, setSavePrompt] = useState(false);
-
+    const [mapHeight, setMapHeight] = useState("50vh"); // Default height
 
 
     const Canvas = ({ width, height, onClose, onSave }) => {
@@ -1981,6 +1982,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
         // Convert the Set to an array for mapping
         const attributeNames = Array.from(allAttributeNames);
 
+
         const filteredFeatures = geoJsonData.features.filter(feature => {
             // Exclude rectangleCrop shapes
             if (feature.properties.shape === "rectangleCrop") {
@@ -2001,8 +2003,6 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                     return true;
             }
         });
-
-
 
 
         const highlightFeature = (featureId) => {
@@ -2099,20 +2099,6 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
             setSavedObjectIds(new Set()); // Clears the set
         };
 
-        // Filter features based on their type
-        const points = geoJsonData.features.filter(feature => feature.geometry.type === 'Point' || feature.properties.isCircleMarker);
-        const lines = geoJsonData.features.filter(feature => feature.geometry.type === 'LineString' || feature.geometry.type === 'MultiLineString');
-        const polygons = geoJsonData.features.filter(feature => feature.geometry.type === 'Polygon' || feature.geometry.type === 'MultiPolygon' || feature.properties.isCircle);
-
-        // Function to render table rows for a given set of features
-        const renderFeatureRows = (features) => features.map((feature, index) => (
-            <tr key={index}>
-                <td>{index + 1}</td>
-                {Object.entries(feature.properties.attributes || {}).map(([key, value], attrIndex) => (
-                    <td key={attrIndex}>{value}</td>
-                ))}
-            </tr>
-        ));
 
         return (
             <div>
@@ -2194,125 +2180,47 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
 
                 </div>
 
-                {points.length > 0 && (
-                    <>
-                        <h3>Punkter</h3>
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>#</th>
-                                    {/* Dynamically generate table headers based on attribute keys */}
-                                    {Object.keys(points[0].properties.attributes || {}).map((key, index) => (
-                                        <th key={index}>{key}</th>
-                                    ))}
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {renderFeatureRows(points)}
-                            </tbody>
-                        </table>
-                    </>
-                )}
-                {lines.length > 0 && (
-                    <>
-                        <h3>Linjer</h3>
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>#</th>
-                                    {/* Dynamically generate table headers based on attribute keys */}
-                                    {Object.keys(lines[0].properties.attributes || {}).map((key, index) => (
-                                        <th key={index}>{key}</th>
-                                    ))}
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {renderFeatureRows(lines)}
-                            </tbody>
-                        </table>
-                    </>
-                )}
-                {polygons.length > 0 && (
-                    <>
-                        <h3>Polygoner</h3>
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>#</th>
-                                    {/* Dynamically generate table headers based on attribute keys */}
-                                    {Object.keys(polygons[0].properties.attributes || {}).map((key, index) => (
-                                        <th key={index}>{key}</th>
-                                    ))}
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {renderFeatureRows(polygons)}
-                            </tbody>
-                        </table>
-                    </>
-                )}
-                </div>
+            </div>
         );
-
     };
 
 
     const renderMap = () => {
         return (
             <div>
-                <MapContainer center={position} zoom={zoom} style={{ height: '100vh', width: '100%' }} className="full-width-map">
 
-                    <LayersControl position="topright">
-                        <BaseLayer checked name="Informationskarta">
-                            <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-                        </BaseLayer>
-                        <BaseLayer name="Satellitkarta">
-                            <TileLayer url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}" />
-                        </BaseLayer>
-                    </LayersControl>
-                    <FeatureGroup ref={featureGroupRef}>
-                        <EditControl
-                            position="topright"
-                            onCreated={onCreate}
-                            onEdited={onEdited}
-                            onDeleted={onDeleted}
-                        />
-                        {shapeLayers && shapeLayers.map((feature, index) => (
-                            <GeoJSON key={index} data={feature} />
-                        ))}
-                    </FeatureGroup>
-                    <RectangleDrawButton isRectangleDrawn={isRectangleDrawn} setIsRectangleDrawn={setIsRectangleDrawn} />
-                </MapContainer>
-                {renderAttributeTable()}
+                    <MapContainer center={position} zoom={zoom} style={{ height: '100vh', width: '100%' }} className="full-width-map">
+
+                        <LayersControl position="topright">
+                            <BaseLayer checked name="Informationskarta">
+                                <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                            </BaseLayer>
+                            <BaseLayer name="Satellitkarta">
+                                <TileLayer url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}" />
+                            </BaseLayer>
+                        </LayersControl>
+                        <FeatureGroup ref={featureGroupRef}>
+                            <EditControl
+                                position="topright"
+                                onCreated={onCreate}
+                                onEdited={onEdited}
+                                onDeleted={onDeleted}
+                            />
+                            {shapeLayers && shapeLayers.map((feature, index) => (
+                                <GeoJSON key={index} data={feature} />
+                            ))}
+                        </FeatureGroup>
+                        <RectangleDrawButton isRectangleDrawn={isRectangleDrawn} setIsRectangleDrawn={setIsRectangleDrawn} />
+                    </MapContainer>
+
+                    {renderAttributeTable()}
             </div>
         )
     }
 
     // Top Bar JSX
     const renderTopBar = () => {
-        /*
-                return (
-                    <div className="top-bar">
-                        <div className="top-bar-left"><h2>Projekt: {selectedProject.project_name}</h2></div>
-                        <div className="top-bar-center">
-                            <button className="top-bar-button">Filter</button>
-                            <button className="top-bar-button">Rapport</button>
-                            <button className="top-bar-button">Export</button>
-                        </div>
-                        <div className="top-bar-right">
-                            
-                            <div className="user-dropdown">
-                                <span className="user-icon">👤</span>
-                                <select>
-                                    <option>User Info</option>
-                                    <option>Logout</option>
-                                </select>
-                            </div>
-                            
-                        </div>
-                    </div>
-                );
-                */
+        
     };
 
     // Left Section JSX
