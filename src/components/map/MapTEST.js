@@ -153,64 +153,64 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
     const [showSavePrompt, setSavePrompt] = useState(false);
 
 
-        const Canvas = ({ width, height, onClose, onSave }) => {
-            const canvasRef = useRef(null);
-    
-            useEffect(() => {
-                const canvas = canvasRef.current;
-                if (canvas) {
-                    canvas.width = width;
-                    canvas.height = height;
-                }
-            }, [width, height]);
-    
-    
-            const captureDrawing = () => {
-                if (canvasRef.current) {
-                    const dataURL = canvasRef.current.toDataURL('image/png');
-                    onSave(dataURL); // Pass the base64 image data to the onSave callback
-                    console.log('dataURL: ', dataURL);
-                }
-            };
-    
-            const handleMouseDown = (e) => {
-                const canvas = canvasRef.current;
-                const ctx = canvas.getContext('2d');
-                ctx.beginPath();
-                ctx.moveTo(e.nativeEvent.offsetX, e.nativeEvent.offsetY);
-                document.addEventListener('mousemove', handleMouseMove);
-                document.addEventListener('mouseup', handleMouseUp);
-            };
-    
-            const handleMouseMove = (e) => {
-                const canvas = canvasRef.current;
-                const ctx = canvas.getContext('2d');
-                ctx.lineTo(e.offsetX, e.offsetY);
-                ctx.stroke();
-            };
-    
-            const handleMouseUp = () => {
-                document.removeEventListener('mousemove', handleMouseMove);
-                document.removeEventListener('mouseup', handleMouseUp);
-            };
-    
-            return (
-                <div>
-                    {isDrawingMode && (
-                        <>
-                            <div className="canvas-container" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 10 }}>
-                                <canvas ref={canvasRef} width={width} height={height} onMouseDown={handleMouseDown} />
-                                <button className='confirmation-dialog-draw-close' onClick={onClose}>Stäng</button>
-                                <button className='confirmation-dialog-draw-save' onClick={captureDrawing}>Spara</button>
-                            </div>
-                        </>
-                    )}
-                </div>
-            );
-    
+    const Canvas = ({ width, height, onClose, onSave }) => {
+        const canvasRef = useRef(null);
+
+        useEffect(() => {
+            const canvas = canvasRef.current;
+            if (canvas) {
+                canvas.width = width;
+                canvas.height = height;
+            }
+        }, [width, height]);
+
+
+        const captureDrawing = () => {
+            if (canvasRef.current) {
+                const dataURL = canvasRef.current.toDataURL('image/png');
+                onSave(dataURL); // Pass the base64 image data to the onSave callback
+                console.log('dataURL: ', dataURL);
+            }
         };
 
-        
+        const handleMouseDown = (e) => {
+            const canvas = canvasRef.current;
+            const ctx = canvas.getContext('2d');
+            ctx.beginPath();
+            ctx.moveTo(e.nativeEvent.offsetX, e.nativeEvent.offsetY);
+            document.addEventListener('mousemove', handleMouseMove);
+            document.addEventListener('mouseup', handleMouseUp);
+        };
+
+        const handleMouseMove = (e) => {
+            const canvas = canvasRef.current;
+            const ctx = canvas.getContext('2d');
+            ctx.lineTo(e.offsetX, e.offsetY);
+            ctx.stroke();
+        };
+
+        const handleMouseUp = () => {
+            document.removeEventListener('mousemove', handleMouseMove);
+            document.removeEventListener('mouseup', handleMouseUp);
+        };
+
+        return (
+            <div>
+                {isDrawingMode && (
+                    <>
+                        <div className="canvas-container" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 10 }}>
+                            <canvas ref={canvasRef} width={width} height={height} onMouseDown={handleMouseDown} />
+                            <button className='confirmation-dialog-draw-close' onClick={onClose}>Stäng</button>
+                            <button className='confirmation-dialog-draw-save' onClick={captureDrawing}>Spara</button>
+                        </div>
+                    </>
+                )}
+            </div>
+        );
+
+    };
+
+
     // Function to handle feature click with CTRL key support for multi-selection
     const handleFeatureClick = (featureId, layer, event) => {
         // If CTRL key is not pressed, clear selections and revert styles
@@ -357,12 +357,12 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
         }
     };
 
-// useEffect hook to call uploadImage when imageBase64 changes and is not null
-useEffect(() => {
-    if (imageBase64) {
-        uploadImage(); // Call uploadImage here
-    }
-}, [imageBase64]);
+    // useEffect hook to call uploadImage when imageBase64 changes and is not null
+    useEffect(() => {
+        if (imageBase64) {
+            uploadImage(); // Call uploadImage here
+        }
+    }, [imageBase64]);
 
 
 
@@ -2105,7 +2105,7 @@ useEffect(() => {
                 </div>}
 
                 <div className="attributes-container">
-                    <h3>{}</h3>
+                    <h3>{ }</h3>
 
                     <div className="tabs">
                         <button className={activeTab === 'Punkter' ? 'active' : ''} onClick={() => setActiveTab('Punkter')}>Punkter</button>
@@ -2118,13 +2118,13 @@ useEffect(() => {
                         <thead>
                             <tr>
                                 <th className='th-index'>#</th>
-                                <th className='th-karta'>Karta</th> 
+                                <th className='th-karta'>Karta</th>
                                 {attributeNames.map((name, index) => (
                                     <th key={index}>{attributeDisplayNameMap[name] || name}</th>
                                 ))}
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody className="attributes-container-table">
                             {
                                 filteredFeatures.map((feature, featureIndex) => (
                                     feature.properties.attributes ? (
@@ -2322,7 +2322,7 @@ useEffect(() => {
             setShowReplacePrompt(true);
         };
 
-        
+
         const handleReplaceDecision = async (replace) => {
             console.log('Replace decision:', replace);
             //setSelectedId(fullscreenImage.mapObjectId); // Set the selected ID for the image
@@ -2333,10 +2333,10 @@ useEffect(() => {
                     const canvas = document.createElement('canvas');
                     canvas.width = img.width;
                     canvas.height = img.height;
-        
+
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0);
-        
+
                     const drawingImg = new Image();
                     drawingImg.onload = () => {
                         ctx.drawImage(drawingImg, 0, 0);
