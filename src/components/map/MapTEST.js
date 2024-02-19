@@ -2468,8 +2468,8 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                     <input
                         id="map-height-slider"
                         type="range"
-                        min="30"
-                        max="69"
+                        min="0"
+                        max="59"
                         value={parseInt(mapHeight, 10)}
                         onChange={handleSliderChange}
                         className="height-slider"
