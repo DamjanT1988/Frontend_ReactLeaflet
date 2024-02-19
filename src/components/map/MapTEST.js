@@ -153,6 +153,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
     const [showSavePrompt, setSavePrompt] = useState(false);
 
 
+
     const Canvas = ({ width, height, onClose, onSave }) => {
         const canvasRef = useRef(null);
 
@@ -2161,6 +2162,10 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                                 ))}
                         </tbody>
                     </table>
+                    <div className="marked-rows-info">
+                        {`${highlightedIds.size} av ${filteredFeatures.length} markerade`}
+                    </div>
+
                     {activeTab !== 'Sparade' && (
                         <button onClick={addSelectedToSavedObjects} style={{ marginTop: '10px' }}>
                             Lägg till valda objekt till sparade
@@ -2452,7 +2457,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                 {renderAttributeSectionList()}
 
 
-                <h3>Bilder</h3>
+                <h3>Objektbilder</h3>
                 {fullscreenImage ? fullscreenView : miniatureView}
 
 

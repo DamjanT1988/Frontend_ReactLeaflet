@@ -839,12 +839,12 @@ h3 {
 }
 
 .th-index {
-    width: 1.25%;
+    width: 20px;
     text-align: left;
 }
 
 .th-karta {
-    width: 2.5%;
+    width: 30px;
     padding: 0px;
 }
 
@@ -862,6 +862,10 @@ h3 {
     border-radius: 8px;
     /*box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);*/
     z-index: 1000;
+    overflow-x: auto;
+    /* Enable horizontal scrolling */
+    white-space: nowrap;
+    /* Prevent text wrapping in table cells */
 
 }
 
@@ -896,6 +900,7 @@ h3 {
     border: 1px solid #ccc;
     border-radius: 4px;
     box-sizing: border-box;
+    min-width: 125px;
 }
 
 /* Style for the 'Save' button */
@@ -937,8 +942,6 @@ h3 {
 .attributes-container table td {
     font-size: 70%;
     font-weight: bold;
-    /* Reduce the font size to 75% of the original size */
-    ;
 }
 
 .attributes-container button {
@@ -970,22 +973,30 @@ h3 {
     /* Ensure table uses the full width available */
     /*table-layout: fixed;*/
     /* Use fixed table layout to control column widths */
-        /* Ensure it appears above the map */
-        display: block;
-        max-height: 250px; /* Adjust based on your needs */
-        max-width: 100%; /* Adjust based on your needs */
-        overflow-x: auto;
-        overflow-y: auto;
-        white-space: nowrap;    /* Ensure the container is responsive and looks good on smaller screens */
-    
+    /* Ensure it appears above the map */
+    display: block;
+    max-height: 250px;
+    /* Adjust based on your needs */
+    max-width: 100%;
+    /* Adjust based on your needs */
+    overflow-x: auto;
+    overflow-y: auto;
+    white-space: nowrap;
+    /* Ensure the container is responsive and looks good on smaller screens */
+    table-layout: fixed;
+    width: 100%;
+    /* Set the table width to fill the container */
 }
 
 .attributes-container th {
     position: sticky;
     top: 0;
-    background-color: #fff; /* Or any desired background color */
-    z-index: 10; /* Ensure the header is above other content */
-    box-shadow: 0 2px 2px -1px rgba(0,0,0,0.4); /* Optional: adds a subtle shadow under the header */
+    background-color: #fff;
+    /* Or any desired background color */
+    z-index: 10;
+    /* Ensure the header is above other content */
+    box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.4);
+    /* Optional: adds a subtle shadow under the header */
 }
 
 
@@ -996,7 +1007,7 @@ h3 {
     text-overflow: ellipsis;
     /* Add an ellipsis to overflow text */
     white-space: nowrap;
-    /* Keep text in a single line */
+
 }
 
 
