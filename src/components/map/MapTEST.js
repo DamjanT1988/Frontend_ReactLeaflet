@@ -160,22 +160,22 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
     const handleSliderChange = (e) => {
         const newHeight = `${e.target.value}vh`;
         setMapHeight(newHeight); // Update state to reflect new height
-    
+
         // Ensure the mapRef.current is available and then directly update the container's height
         if (mapRef.current) {
             const container = mapRef.current.container; // Assuming mapRef.current directly references the container
             if (container) {
                 container.style.height = newHeight; // Update the height of the container
             }
-    
+
             // Invalidate the map size after the container's height adjustment
             if (mapInstance) {
                 mapInstance.invalidateSize();
             }
         }
     };
-    
-    
+
+
 
 
     const Canvas = ({ width, height, onClose, onSave }) => {
@@ -2186,21 +2186,20 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                                 ))}
                         </tbody>
                     </table>
-                    <div className="marked-rows-info">
-                        {`${highlightedIds.size} av ${filteredFeatures.length} markerade`}
-                        {activeTab !== 'Selekterade' && (
-                            <button onClick={addSelectedToSavedObjects}>
-                                Lägg till valda objekt till sparade
-                            </button>
-                        )}
-                        {activeTab === 'Selekterade' && (
-                            <button onClick={clearSavedObjectIds}>
-                                Rensa hela listan
-                            </button>
-                        )}
 
-                    </div>
-
+                </div>
+                <div className="marked-rows-info">
+                    {`${highlightedIds.size} av ${filteredFeatures.length} markerade`}
+                    {activeTab !== 'Selekterade' && (
+                        <button onClick={addSelectedToSavedObjects}>
+                            Lägg till valda objekt till sparade
+                        </button>
+                    )}
+                    {activeTab === 'Selekterade' && (
+                        <button onClick={clearSavedObjectIds}>
+                            Rensa hela listan
+                        </button>
+                    )}
                 </div>
 
             </div>
