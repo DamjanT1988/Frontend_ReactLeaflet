@@ -113,8 +113,8 @@ window.toggleAttributeContainer = (id, attributes) => {
     // Function implementation will be set in the component
 };
 
-const DraggableButton = ({ onDrag }) => {
-    const buttonRef = useRef(null);
+const DraggableLine = ({ onDrag }) => {
+    const lineRef = useRef(null);
     const lastDragTime = useRef(Date.now());
     const dragUpdateScheduled = useRef(false);
 
@@ -135,11 +135,10 @@ const DraggableButton = ({ onDrag }) => {
     };
 
     useEffect(() => {
-        const button = buttonRef.current;
+        const line = lineRef.current;
 
         const startDrag = (e) => {
             e.preventDefault(); // Prevent default to avoid text selection
-
             const initialY = e.clientY;
 
             const doDrag = (e) => {
@@ -156,18 +155,15 @@ const DraggableButton = ({ onDrag }) => {
             window.addEventListener('mouseup', stopDrag);
         };
 
-        button.addEventListener('mousedown', startDrag);
+        line.addEventListener('mousedown', startDrag);
 
         return () => {
-            button.removeEventListener('mousedown', startDrag);
+            line.removeEventListener('mousedown', startDrag);
         };
     }, [onDrag]);
 
-    // Use the new CSS class here
-    return <div ref={buttonRef} className="draggable-map-adjuster">Justera karta</div>;
+    return <div ref={lineRef} className="draggable-line"></div>;
 };
-
-
 
 
 // Define the Map component
@@ -2186,8 +2182,9 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
             <div>
                 {shouldHideDataView && <div className="elementToHide">
                     <button className="toggle-form-button-2" onClick={saveDataToServer}>Spara projekt! {saveStatus}</button>
+                    
                 </div>}
-
+                <DraggableLine onDrag={handleDrag} />
                 <div className="attributes-container">
 
                     <div className="tabs">
@@ -2197,7 +2194,6 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                         <button className={activeTab === 'Selekterade' ? 'active' : ''} onClick={() => setActiveTab('Selekterade')}>Selekterade</button>
                         
                     </div>
-                    <DraggableButton onDrag={handleDrag} className="drag-button"/>
                     <table>
                         <thead>
                             <tr>

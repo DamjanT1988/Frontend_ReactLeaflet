@@ -502,3 +502,10 @@ z-index: 10; /* Ensure it's above other content */
 .draggable-map-adjuster:hover {
   background-color: #267356; /* Slightly darker green on hover, for feedback */
 }
+
+.draggable-line {
+  height: 4px;
+  background-color: #ccc;
+  cursor: ns-resize;
+   /* Adjust as needed to position under the "Spara projekt" button */
+}
