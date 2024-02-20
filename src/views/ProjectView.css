@@ -84,7 +84,7 @@
 .map-container {
     width: 768px;
     margin: 50px auto;
-    height: auto;
+    height: 900px;
     /* Center the container */
     padding: 10px;
     border-radius: 8px;
@@ -849,6 +849,10 @@ h3 {
 
 /* Container for the attribute information window */
 .attributes-container {
+    max-height: 300px; /* Adjust the max-height as needed */
+    overflow-y: auto; /* Enables vertical scrolling */
+    width: 100%; /* Ensures the container's width matches its parent */
+    border: 1px solid #ccc; /* Optional, adds a border around the container */
     position: relative;
     /*width: auto;*/
     margin: auto;
@@ -856,8 +860,31 @@ h3 {
     background-color: #fff;
     /*padding: 5px;*/
     padding-top: 0px;
-    margin-bottom: 10px;
-    
+    /*margin-bottom: 10px;*/
+    border-radius: 8px;
+    width: 100%;
+    /*box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);*/
+    z-index: 1000;
+    overflow-x: auto;
+    /* Enable horizontal scrolling */
+    white-space: nowrap;
+    /* Prevent text wrapping in table cells */
+
+}
+
+/* Container for the attribute information window */
+.attributes-container-object {
+    /*max-height: 300px; /* Adjust the max-height as needed */
+    overflow-y: auto; /* Enables vertical scrolling */
+    width: 100%; /* Ensures the container's width matches its parent */
+    position: relative;
+    /*width: auto;*/
+    margin: auto;
+    /*max-width: 100%;*/
+    background-color: #fff;
+    /*padding: 5px;*/
+    padding-top: 0px;
+    /*margin-bottom: 10px;*/
     border-radius: 8px;
     width: 100%;
     /*box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);*/
@@ -870,31 +897,34 @@ h3 {
 }
 
 /* Style for the title of the attribute window */
-.attributes-container h3 {
+.attributes-container h3, .attributes-container-object h3 {
     margin-bottom: 8px;
     margin-top: 10px;
     color: #30A875;
     text-align: left;
 }
 
-.attributes-container h4 {
+.attributes-container h4, .attributes-container-object h4 {
     margin-bottom: 8px;
     color: #30A875;
     text-align: center;
 }
 
 /* Style for attribute labels */
-.attributes-container label {
+.attributes-container label, .attributes-container-object label {
     display: block;
     margin-top: 0px;
     color: #666;
 }
-
 /* Style for input fields for editing attributes */
 .attributes-container input[type="text"],
 .attributes-container input[type="date"],
 .attributes-container textarea,
-.attributes-container select {
+.attributes-container select,
+.attributes-container-object input[type="text"],
+.attributes-container-object input[type="date"],
+.attributes-container-object textarea,
+.attributes-container-object select {
     width: 100%;
     padding: 0px;
     margin-top: 0px;
@@ -905,7 +935,8 @@ h3 {
 }
 
 /* Style for the 'Save' button */
-.attributes-container .save-attributes-btn {
+.attributes-container .save-attributes-btn,
+.attributes-container-object .save-attributes-btn {
     display: inline-block;
     background-color: #30A875;
     color: #fff;
@@ -916,12 +947,14 @@ h3 {
     cursor: pointer;
 }
 
-.attributes-container .save-attributes-btn:hover {
+.attributes-container .save-attributes-btn:hover,
+.attributes-container-object .save-attributes-btn:hover {
     background-color: #26724d;
 }
 
 /* Style for a 'Cancel' or 'Close' button if needed */
-.attributes-container .cancel-btn {
+.attributes-container .cancel-btn,
+.attributes-container-object .cancel-btn {
     display: inline-block;
     background-color: #bbb;
     color: #fff;
@@ -933,26 +966,32 @@ h3 {
     cursor: pointer;
 }
 
-.attributes-container .cancel-btn:hover {
+.attributes-container .cancel-btn:hover,
+.attributes-container-object .cancel-btn:hover {
     background-color: #999;
 }
 
 /* Smaller text size for labels and table data */
 .attributes-container label,
 .attributes-container table th,
-.attributes-container table td {
+.attributes-container table td,
+.attributes-container-object label,
+.attributes-container-object table th,
+.attributes-container-object table td {
     font-size: 70%;
     font-weight: bold;
 }
 
-.attributes-container button {
+.attributes-container button,
+.attributes-container-object button {
     font-size: 90%;
     text-align: center;
     color: white;
     background-color: #30A875;
 }
 
-.td-markera button {
+.td-markera button,
+.attributes-container-object .td-markera button {
     width: 100%;
     transition: all 0.3s;
 }
@@ -960,55 +999,45 @@ h3 {
 /* Shorter width for input fields and textareas */
 .attributes-container input[type="text"],
 .attributes-container textarea,
-.attributes-container select {
+.attributes-container select,
+.attributes-container-object input[type="text"],
+.attributes-container-object textarea,
+.attributes-container-object select {
     width: 100%;
     font-size: 100%;
     font-weight: bold;
-    /* Reduce the width to 75% of the original width */
-    /* Other input styles remain unchanged */
 }
 
 /* Adjust table layout to accommodate smaller text and field sizes */
-.attributes-container table {
-    /*width: 100%;*/
-    /* Ensure table uses the full width available */
-    /*table-layout: fixed;*/
-    /* Use fixed table layout to control column widths */
-    /* Ensure it appears above the map */
+.attributes-container table,
+.attributes-container-object table {
     display: block;
+    margin-bottom: 0px;
     max-height: auto;
-    /* Adjust based on your needs */
     max-width: 100%;
-    /* Adjust based on your needs */
     overflow-x: auto;
     overflow-y: auto;
     white-space: nowrap;
-    /* Ensure the container is responsive and looks good on smaller screens */
     table-layout: fixed;
     width: 100%;
-    /* Set the table width to fill the container */
 }
 
-.attributes-container th {
+.attributes-container th,
+.attributes-container-object th {
     position: sticky;
     top: 0;
     background-color: #fff;
-    /* Or any desired background color */
     z-index: 10;
-    /* Ensure the header is above other content */
     box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.4);
-    /* Optional: adds a subtle shadow under the header */
 }
 
-
 .attributes-container table th,
-.attributes-container table td {
+.attributes-container table td,
+.attributes-container-object table th,
+.attributes-container-object table td {
     overflow: hidden;
-    /* Hide overflow text */
     text-overflow: ellipsis;
-    /* Add an ellipsis to overflow text */
     white-space: nowrap;
-
 }
 
 

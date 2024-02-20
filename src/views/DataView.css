@@ -1,484 +1,504 @@
 .dataView-container {
-    max-width: 1500px;
-    margin: auto;
-    display: flex;
-    flex-direction: column;
-  }
-
-/* Styles.css */
-.parent-one .hideElement {
-    display: none;
-  }
-  
-
-  .top-bar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px;
-  }
-  
-  .top-bar .project-name {
-    flex-grow: 1;
-  }
-  
-  .top-bar-buttons button {
-    margin: 0 5px;
-  }
-  
-  .hamburger-menu {
-    /* Styling for the hamburger menu */
-  }
-  
-  .content {
-    display: flex;
-    height: calc(100vh - 50px); /* Adjust based on the top bar height */
-  }
-  
-  .left-window, .middle-window, .right-window {
-    padding: 10px;
-  }
-  
-  .left-window {
-    width: 15%;
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .buttons-section button,
-  .additional-section button,
-  .mapping-types-section button {
-    display: block;
-    margin-bottom: 5px;
-  }
-  
-
-  .full-width-map, .full-width-map .leaflet-container .leaflet-touch .leaflet-fade-anim .leaflet-grab .leaflet-touch-drag .leaflet-touch-zoom {
-    width: 100%;
-    /*height: 55vh !important;*/
-  } 
-
-  .middle-window {
-    width: 60%;
-    display: flex;
-    flex-direction: column;
-  }
-  
-  
-  .attribute-table {
-    margin-top: 20px;
-    flex-grow: 1; /* This ensures that the attribute table takes up the remaining space */
-  }
-  
-  .right-window {
-    width: 15%;
-  }
-  
-  .project-info, .project-image, .edit-section {
-    margin-bottom: 20px;
-  }
-  
-  
-/* Data Analysis Page Styles */
-.data-analysis-page {
+  max-width: 1500px;
+  margin: auto;
   display: flex;
   flex-direction: column;
 }
 
+/* Styles.css */
+.parent-one .hideElement {
+  display: none;
+}
+
+
 .top-bar {
   display: flex;
-  text-align: center;
   justify-content: space-between;
+  align-items: center;
   padding: 10px;
-  background-color: #f3f3f3;
+}
+
+.top-bar .project-name {
+  flex-grow: 1;
+}
+
+.top-bar-buttons button {
+  margin: 0 5px;
+}
+
+.hamburger-menu {
+  /* Styling for the hamburger menu */
+}
+
+.content {
+  display: flex;
+  height: calc(100vh - 50px); /* Adjust based on the top bar height */
+}
+
+.left-window, .middle-window, .right-window {
+  padding: 10px;
+}
+
+.left-window {
+  width: 15%;
+  display: flex;
+  flex-direction: column;
+}
+
+.buttons-section button,
+.additional-section button,
+.mapping-types-section button {
+  display: block;
+  margin-bottom: 5px;
+}
+
+
+.full-width-map, .full-width-map .leaflet-container .leaflet-touch .leaflet-fade-anim .leaflet-grab .leaflet-touch-drag .leaflet-touch-zoom {
+  width: 100%;
+  /*height: 55vh !important;*/
+} 
+
+.middle-window {
+  width: 60%;
+  display: flex;
+  flex-direction: column;
+}
+
+
+.attribute-table {
+  margin-top: 20px;
+  flex-grow: 1; /* This ensures that the attribute table takes up the remaining space */
+}
+
+.right-window {
+  width: 15%;
+}
+
+.project-info, .project-image, .edit-section {
+  margin-bottom: 20px;
+}
+
+
+/* Data Analysis Page Styles */
+.data-analysis-page {
+display: flex;
+flex-direction: column;
+}
+
+.top-bar {
+display: flex;
+text-align: center;
+justify-content: space-between;
+padding: 10px;
+background-color: #f3f3f3;
 }
 
 .top-bar-left, .top-bar-center, .top-bar-right {
-  display: flex;
-  align-items: center;
-  height: 25px;
+display: flex;
+align-items: center;
+height: 25px;
 }
 
 .top-bar-button {
-  margin: 0 5px;
-  padding: 5px 10px;
-  background-color: #30A875;
-  color: white;
-  border: none;
-  cursor: pointer;
+margin: 0 5px;
+padding: 5px 10px;
+background-color: #30A875;
+color: white;
+border: none;
+cursor: pointer;
 }
 
 .user-dropdown {
-  display: flex;
-  align-items: center;
+display: flex;
+align-items: center;
 }
 
 .user-icon {
-  margin-right: 5px;
+margin-right: 5px;
 }
 
 .content-area {
-  display: flex;
-  height: auto; /* Adjust height as needed */
+display: flex;
+height: auto; /* Adjust height as needed */
 }
 
 .left-section {
-  flex-basis: 7%; /* Adjust width as needed */
-  height: 100vh; /* Full viewport height or adjust as needed */
-  overflow-y: auto; /* Enables vertical scrolling if content overflows */
-  padding: 10px;
+flex-basis: 7%; /* Adjust width as needed */
+height: 100vh; /* Full viewport height or adjust as needed */
+overflow-y: auto; /* Enables vertical scrolling if content overflows */
+padding: 10px;
 }
 
 .right-section {
-  flex-basis: 22%; /* Adjust width as needed */
-  height: 100vh; /* Full viewport height or adjust as needed */
-  overflow-y: auto; /* Enables vertical scrolling if content overflows */
-  padding: 10px;
+flex-basis: 22%; /* Adjust width as needed */
+height: 100vh; /* Full viewport height or adjust as needed */
+overflow-y: auto; /* Enables vertical scrolling if content overflows */
+padding: 10px;
 
 }
 
 .right-section > h4{
-  margin: 0px;
-  color: #30A875;
+margin: 0px;
+color: #30A875;
 }
 
 .project-info > h3 {
-  margin-top: 5px;
+margin-top: 5px;
 }
 
 .top-left > h2 {
-  margin-top: -5px;
-  font-size: 100%;
-  font-weight: 700;
-  border-bottom: 4px solid #30A875
+margin-top: -5px;
+font-size: 100%;
+font-weight: 700;
+border-bottom: 4px solid #30A875
 }
 
 
 .map-container {
-  flex-grow: 1;
-  overflow-y: auto; /* Enables vertical scrolling if content overflows */
+flex-grow: 1;
+overflow-y: auto; /* Enables vertical scrolling if content overflows */
 }
 
 .top-left > button {
-  display: block;
-  width: 100%;
-  margin-bottom: 10px;
-  padding: 10px;
-  background-color: #e7e7e7;
-  border: none;
-  cursor: pointer;
+display: block;
+width: 100%;
+margin-bottom: 10px;
+padding: 10px;
+background-color: #e7e7e7;
+border: none;
+cursor: pointer;
 }
 
 .additional-section h3 {
-  margin-top: 20px;
+margin-top: 20px;
 }
 
 .project-info, .project-images {
-  margin-bottom: 20px;
+margin-bottom: 20px;
 }
 
 .project-images img {
-  width: 100%;
-  height: auto;
-  margin-bottom: 10px;
+width: 100%;
+height: auto;
+margin-bottom: 10px;
 }
 
 .attribute-edit-table {
-  /* Styles for the attribute edit table */
+/* Styles for the attribute edit table */
 }
 
 .attribute-field {
-  font-size: 100%;
-  padding-left: 5px;
+font-size: 100%;
+padding-left: 5px;
 }
 
 .image-wrapper > img {
-  width: 100px;
+width: 100px;
 }
 
 .image-display-section {
-  width: 100px;
-  margin-bottom: 10px;
+width: 100px;
+margin-bottom: 10px;
 }
 
 .image-display-section {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 5px;
+display: grid;
+grid-template-columns: repeat(4, 1fr);
+gap: 5px;
 }
 
 .image-wrapper {
-  cursor: pointer;
+cursor: pointer;
 }
 
 .miniature-image {
-  width: 100%;
-  display: block; /* Removes bottom space under the image */
+width: 100%;
+display: block; /* Removes bottom space under the image */
 }
 
 .fullscreen-view {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-color: rgba(0, 0, 0, 0.8);
-  z-index: 1000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+position: fixed;
+top: 0;
+left: 0;
+width: 100vw;
+height: 100vh;
+background-color: rgba(0, 0, 0, 0.8);
+z-index: 1000;
+display: flex;
+align-items: center;
+justify-content: center;
 }
 
 .fullscreen-image {
-  max-width: 100%; /* Ensure image does not exceed container width */
-  max-height: 100%; /* Ensure image does not exceed container height */
-  position: absolute; /* Absolute positioning to fit in the container */
+max-width: 100%; /* Ensure image does not exceed container width */
+max-height: 100%; /* Ensure image does not exceed container height */
+position: absolute; /* Absolute positioning to fit in the container */
 }
 
 .canvas-container {
-  position: absolute; /* Overlay canvas on the image */
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-left: 0px;
-  z-index: 2000;
+position: absolute; /* Overlay canvas on the image */
+top: 0;
+left: 0;
+right: 0;
+bottom: 0;
+display: flex;
+justify-content: center;
+align-items: center;
+margin-left: 0px;
+z-index: 2000;
 }
 
 .confirmation-dialog-draw-save {
-  position: fixed;
-  top: 100px;
-  right: -33px;
-  transform: translate(-50%, -50%);
-  width: 100px;
-  padding: 15px;
-  background-color: white;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  z-index: 1500; /* Ensure this is higher than the fullscreen view's z-index */
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  border-radius: 5px;
+position: fixed;
+top: 100px;
+right: -33px;
+transform: translate(-50%, -50%);
+width: 100px;
+padding: 15px;
+background-color: white;
+box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+z-index: 1500; /* Ensure this is higher than the fullscreen view's z-index */
+display: flex;
+flex-direction: column;
+align-items: center;
+border-radius: 5px;
 }
 
 .confirmation-dialog-draw-close {
-  position: fixed;
-  top: 155px;
-  right: -33px;
-  transform: translate(-50%, -50%);
-  width: 100px;
-  padding: 15px;
-  background-color: white;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  z-index: 1500; /* Ensure this is higher than the fullscreen view's z-index */
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  border-radius: 5px;
+position: fixed;
+top: 155px;
+right: -33px;
+transform: translate(-50%, -50%);
+width: 100px;
+padding: 15px;
+background-color: white;
+box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+z-index: 1500; /* Ensure this is higher than the fullscreen view's z-index */
+display: flex;
+flex-direction: column;
+align-items: center;
+border-radius: 5px;
 }
 
 .draw-btn {
-  position: absolute;
-  bottom: 20px;
-  left: 20px;
-  cursor: pointer;
-  padding: 15px 25px;
-  background-color: #30A875;
-  color: white;
-  border-radius: 5px;
-  font-size: 24px;
-  z-index: 3000;
+position: absolute;
+bottom: 20px;
+left: 20px;
+cursor: pointer;
+padding: 15px 25px;
+background-color: #30A875;
+color: white;
+border-radius: 5px;
+font-size: 24px;
+z-index: 3000;
 }
 
 .image-info {
-  position: absolute;
-  bottom: 0%;
-  background-color: rgba(0, 0, 0, 0.8);
-  color: white;
-  padding: 10px;
-  border-radius: 5px;
+position: absolute;
+bottom: 0%;
+background-color: rgba(0, 0, 0, 0.8);
+color: white;
+padding: 10px;
+border-radius: 5px;
 }
 
 .image-caption {
-  color: white;
-  margin: 0;
+color: white;
+margin: 0;
 }
 
 .nav-btn {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  background-color: transparent;
-  border: none;
-  color: white;
-  font-size: 85px;
-  cursor: pointer;
-  z-index: 10;
+position: absolute;
+top: 50%;
+transform: translateY(-50%);
+background-color: transparent;
+border: none;
+color: white;
+font-size: 85px;
+cursor: pointer;
+z-index: 10;
 }
 
 .left-nav {
-  left: 20px;
+left: 20px;
 }
 
 .right-nav {
-  right: 20px;
+right: 20px;
 }
 
 .close-fullscreen-btn {
-  position: absolute;
-  bottom: 20px;
-  right: 20px;
-  cursor: pointer;
-  padding: 15px 25px;
-  background-color:  #30A875;
-  color: white;
-  border-radius: 5px;
-  font-size: 24px;
+position: absolute;
+bottom: 20px;
+right: 20px;
+cursor: pointer;
+padding: 15px 25px;
+background-color:  #30A875;
+color: white;
+border-radius: 5px;
+font-size: 24px;
 }
 
 .remove-btn {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  cursor: pointer;
-  padding: 6px 8px;
-  background-color:  red;
-  color: white;
-  border-radius: 5px;
-  font-size: 14px;
+position: absolute;
+top: 20px;
+right: 20px;
+cursor: pointer;
+padding: 6px 8px;
+background-color:  red;
+color: white;
+border-radius: 5px;
+font-size: 14px;
 }
 
 /* Upload Section Styles */
 .upload-section {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 10px;
-  margin-top: 20px;
+display: flex;
+flex-direction: column;
+align-items: flex-start;
+gap: 10px;
+margin-top: 20px;
 }
 
 .file-upload-label {
-  padding: 5px 10px;
-  float: right;
-  background-color: #30A875;
-  color: white !important;
-  border-radius: 3px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
+padding: 5px 10px;
+float: right;
+background-color: #30A875;
+color: white !important;
+border-radius: 3px;
+cursor: pointer;
+transition: background-color 0.3s ease;
 }
 
 .file-upload-label:hover {
-  background-color: #267356;
+background-color: #267356;
 }
 
 .upload-section input[type="text"] {
-  width: 95%;
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+width: 95%;
+padding: 8px;
+border: 1px solid #ccc;
+border-radius: 4px;
 }
 
 .upload-section button {
-  padding: 10px 15px;
-  background-color: #30A875;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
+padding: 10px 15px;
+background-color: #30A875;
+color: white;
+border: none;
+border-radius: 4px;
+cursor: pointer;
+transition: background-color 0.3s ease;
 }
 
 .upload-section button:hover {
-  background-color: #267356;
+background-color: #267356;
 }
 
 .confirmation-dialog {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: auto;
-  padding: 20px;
-  background-color: white;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  z-index: 1500; /* Ensure this is higher than the fullscreen view's z-index */
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  border-radius: 5px;
+position: fixed;
+top: 50%;
+left: 50%;
+transform: translate(-50%, -50%);
+width: auto;
+padding: 20px;
+background-color: white;
+box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+z-index: 1500; /* Ensure this is higher than the fullscreen view's z-index */
+display: flex;
+flex-direction: column;
+align-items: center;
+border-radius: 5px;
 }
 
 .confirmation-dialog p {
-  margin: 0 0 20px 0;
-  text-align: center;
+margin: 0 0 20px 0;
+text-align: center;
 }
 
 .confirmation-dialog button {
-  padding: 10px 20px;
-  margin: 10px 10px;
-  background-color: #30A875;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
+padding: 10px 20px;
+margin: 10px 10px;
+background-color: #30A875;
+color: white;
+border: none;
+border-radius: 5px;
+cursor: pointer;
 }
 
 .confirmation-dialog button:hover {
-  background-color: #267356;
+background-color: #267356;
 }
 
 .overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-color: rgba(0, 0, 0, 0.5);
-  z-index: 1400; /* Just below the confirmation dialog */
+position: fixed;
+top: 0;
+left: 0;
+width: 100vw;
+height: 100vh;
+background-color: rgba(0, 0, 0, 0.5);
+z-index: 1400; /* Just below the confirmation dialog */
 }
 
 .image-container {
-    position: relative; /* Container holding the image */
+  position: relative; /* Container holding the image */
 }
 
 .canvas-container {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
 }
 
 /* Ensure the parent container has a defined height and overflow property */
 .content-area {
-  height: calc(100vh - (TopBarHeight + AnyOtherOffset)); /* Adjust TopBarHeight and AnyOtherOffset based on your layout */
-  overflow-y: auto; /* Enables scrolling within the container */
-  position: relative; /* Needed for sticky positioning context */
+height: calc(100vh - (TopBarHeight + AnyOtherOffset)); /* Adjust TopBarHeight and AnyOtherOffset based on your layout */
+overflow-y: auto; /* Enables scrolling within the container */
+position: relative; /* Needed for sticky positioning context */
 }
 
 /* Adjustments for the marked-rows-info to make it sticky */
 .marked-rows-info {
-  position: sticky;
-  bottom: 0;
-  background: #f9f9f9; /* or any other background color */
-  padding: 10px;
-  border-top: 1px solid #ccc; /* optional */
-  z-index: 10; /* Ensure it's above other content */
+position: sticky;
+bottom: 0;
+background: #f9f9f9; /* or any other background color */
+padding: 10px;
+border-top: 1px solid #ccc; /* optional */
+z-index: 10; /* Ensure it's above other content */
 }
 
 
 
 .marked-rows-info button {
-    padding: 5px 7px;
-    background-color: #30A875;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    margin-left: 15px;
+  padding: 5px 7px;
+  background-color: #30A875;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-left: 15px;
+}
+.draggable-map-adjuster {
+  cursor: ns-resize; /* Cursor indicates vertical resize */
+  background-color: #30A875; /* Using the same green color as other buttons */
+  color: white;
+  padding: 3px 6px;
+  border-radius: 5px;
+  border: none;
+  margin-top: -20px; /* Spacing from the map container */
+  float: right !important; /* Positioned to the right */
+  position: relative; /* Positioned relative to the map container */
+  /*left: 0px; /* Positioned a bit from the right edge of the map container */
+  /*right: 10px; /* Positioned a bit from the right edge of the map container */
+  /*top: 50%; /* Start at the middle of the map container */
+  /*transform: translateY(-50%); /* Center it vertically */
+  z-index: 1000; /* Ensure it's above the map layers */
+  user-select: none; /* Prevent text selection during drag */
 }
 
+.draggable-map-adjuster:hover {
+  background-color: #267356; /* Slightly darker green on hover, for feedback */
+}

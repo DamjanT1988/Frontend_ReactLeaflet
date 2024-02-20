@@ -109,11 +109,65 @@ L.drawLocal.edit.handlers.remove.tooltip = {
     text: 'Klicka på en funktion för att ta bort',
 };
 
-
-
 window.toggleAttributeContainer = (id, attributes) => {
     // Function implementation will be set in the component
 };
+
+const DraggableButton = ({ onDrag }) => {
+    const buttonRef = useRef(null);
+    const lastDragTime = useRef(Date.now());
+    const dragUpdateScheduled = useRef(false);
+
+    const handleDrag = (movementY) => {
+        // Use requestAnimationFrame for smoother updates
+        if (!dragUpdateScheduled.current) {
+            dragUpdateScheduled.current = true;
+            requestAnimationFrame(() => {
+                // Ensure at least a small delay between updates to smooth out the dragging
+                const now = Date.now();
+                if (now - lastDragTime.current > 50) { // Adjust the delay as needed for smoother dragging
+                    onDrag(movementY);
+                    lastDragTime.current = now;
+                }
+                dragUpdateScheduled.current = false;
+            });
+        }
+    };
+
+    useEffect(() => {
+        const button = buttonRef.current;
+
+        const startDrag = (e) => {
+            e.preventDefault(); // Prevent default to avoid text selection
+
+            const initialY = e.clientY;
+
+            const doDrag = (e) => {
+                const movementY = e.clientY - initialY;
+                handleDrag(movementY);
+            };
+
+            const stopDrag = () => {
+                window.removeEventListener('mousemove', doDrag);
+                window.removeEventListener('mouseup', stopDrag);
+            };
+
+            window.addEventListener('mousemove', doDrag);
+            window.addEventListener('mouseup', stopDrag);
+        };
+
+        button.addEventListener('mousedown', startDrag);
+
+        return () => {
+            button.removeEventListener('mousedown', startDrag);
+        };
+    }, [onDrag]);
+
+    // Use the new CSS class here
+    return <div ref={buttonRef} className="draggable-map-adjuster">Justera karta</div>;
+};
+
+
 
 
 // Define the Map component
@@ -152,9 +206,14 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
     const [showReplacePrompt, setShowReplacePrompt] = useState(false);
     const [pendingDrawing, setPendingDrawing] = useState(null);
     const [showSavePrompt, setSavePrompt] = useState(false);
-    const [mapHeight, setMapHeight] = useState("59vh"); // Default height
+    //const [mapHeight, setMapHeight] = useState("59vh"); // Default height
     const mapRef = useRef(null);
     const [mapInstance, setMapInstance] = useState(null);
+    const [mapHeight, setMapHeight] = useState(550); // Initial map height
+
+    const handleDrag = (movementY) => {
+        setMapHeight((prevHeight) => Math.max(prevHeight + movementY, 0)); // Update height, with a minimum limit (e.g., 100px)
+    };
 
 
     const handleSliderChange = (e) => {
@@ -1781,7 +1840,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
         }, {});
 
         return (
-            <div className="attributes-container">
+            <div className="attributes-container-object">
                 <h3>Objektattribut</h3>
                 {Object.entries(editableAttributesObject).map(([key, value], index) => (
                     <div key={index} className="attribute-field">
@@ -2136,9 +2195,9 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                         <button className={activeTab === 'Linjer' ? 'active' : ''} onClick={() => setActiveTab('Linjer')}>Linjer</button>
                         <button className={activeTab === 'Polygoner' ? 'active' : ''} onClick={() => setActiveTab('Polygoner')}>Polygoner</button>
                         <button className={activeTab === 'Selekterade' ? 'active' : ''} onClick={() => setActiveTab('Selekterade')}>Selekterade</button>
-
+                        
                     </div>
-
+                    <DraggableButton onDrag={handleDrag} className="drag-button"/>
                     <table>
                         <thead>
                             <tr>
@@ -2186,9 +2245,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                                 ))}
                         </tbody>
                     </table>
-
-                </div>
-                <div className="marked-rows-info">
+                    <div className="marked-rows-info">
                     {`${highlightedIds.size} av ${filteredFeatures.length} markerade`}
                     {activeTab !== 'Selekterade' && (
                         <button onClick={addSelectedToSavedObjects}>
@@ -2202,6 +2259,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                     )}
                 </div>
 
+                </div>
             </div>
         );
     };
@@ -2461,7 +2519,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                     <button className="top-bar-button">Export</button>
                 </div>
 
-
+                {/*
                 <div className="slider-container">
                     <label htmlFor="map-height-slider">Justera karthöjd</label><br />
                     <input
@@ -2474,7 +2532,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                         className="height-slider"
                     />
                 </div>
-
+                */}
 
                 {renderAttributeSectionList()}
 
