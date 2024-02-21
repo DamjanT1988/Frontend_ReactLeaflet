@@ -249,7 +249,7 @@ z-index: 2000;
 }
 
 .confirmation-dialog-draw-save {
-position: fixed;
+position: absolute;
 top: 100px;
 right: -33px;
 transform: translate(-50%, -50%);
@@ -265,7 +265,7 @@ border-radius: 5px;
 }
 
 .confirmation-dialog-draw-close {
-position: fixed;
+position: absolute;
 top: 155px;
 right: -33px;
 transform: translate(-50%, -50%);
@@ -506,4 +506,10 @@ z-index: 10; /* Ensure it's above other content */
   background-color: grey;
   cursor: ns-resize;
    /* Adjust as needed to position under the "Spara projekt" button */
+}
+
+.addStatus {
+  margin-left: 10px;
+  color: red;
+  font-weight: bold;
 }

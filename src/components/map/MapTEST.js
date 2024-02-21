@@ -207,13 +207,19 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
     const [mapInstance, setMapInstance] = useState(null);
     const [mapHeight, setMapHeight] = useState(550); // Initial map height
     const [attributesContainerHeight, setAttributesContainerHeight] = useState(300); // Initial height for the attributes container
+    const [allItems, setAllItems] = useState([]); // State to store all items
+    const [selectedItems, setSelectedItems] = useState(new Set()); // State to track selected item IDs
+    const [viewMode, setViewMode] = useState('all'); // 'all' or 'selected'
+    const [addStatus, setAddStatus] = useState(''); // State for the add status message
+
+
+
 
     const handleDrag = (movementY) => {
         setMapHeight((prevHeight) => Math.max(prevHeight + movementY, 0), mapHeight); // Ensure map height doesn't go below a minimum (e.g., 100px)
         setAttributesContainerHeight((prevHeight) => Math.max(prevHeight - movementY, 0)); // Increase attributes container height as map height decreases
     };
 
-    
     const Canvas = ({ width, height, onClose, onSave }) => {
         const canvasRef = useRef(null);
 
@@ -2055,13 +2061,17 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                     return feature.geometry.type === 'LineString' || feature.geometry.type === 'MultiLineString';
                 case 'Polygoner':
                     return feature.geometry.type === 'Polygon' || feature.geometry.type === 'MultiPolygon' || feature.properties.isCircleMarker || feature.properties.isCircle;
+                case 'Alla':
+                    return '';
                 case 'Selekterade':
-                    // Only include features with IDs contained in savedObjectIds for the 'Sparade objekt' tab
                     return savedObjectIds.has(feature.properties.id);
+                case 'Rensa':
+                    return '';
                 default:
                     return true;
             }
         });
+
 
 
         const highlightFeature = (featureId) => {
@@ -2146,24 +2156,52 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
             setGeoJsonData(updatedGeoJsonData);
         };
 
+        const toggleSelection = (itemId) => {
+            setSelectedItems((prevSelectedItems) => {
+                const newSelectedItems = new Set(prevSelectedItems);
+                if (newSelectedItems.has(itemId)) {
+                    newSelectedItems.delete(itemId);
+                } else {
+                    newSelectedItems.add(itemId);
+                }
+                return newSelectedItems;
+            });
+        };
+
+        const showSelectedItems = () => {
+            const filteredItems = allItems.filter(item => selectedItems.has(item.id));
+            // Update your state or variable that controls the displayed items in the attribute table
+            setViewMode('selected');
+        };
+
+        const showAllItems = () => {
+            setViewMode('all');
+        };
+
+
         // New function to add selected features to savedObjectIDs
         const addSelectedToSavedObjects = () => {
             console.log('selectedRowIds:', selectedRowIds);
             console.log('selectedId:', selectedId);
             setSavedObjectIds(new Set([...savedObjectIds, ...selectedRowIds, ...selectedId]));
-        };
+            setAddStatus('Selekterade objekt lades till'); // Set the status message
+        setTimeout(() => setAddStatus(''), 3000); // Clear the message after 3 seconds
+    };
 
         // Function to clear savedObjectIds
         const clearSavedObjectIds = () => {
             setSavedObjectIds(new Set()); // Clears the set
+            setAddStatus('Selekterade objekt rensades'); // Set the status message
+            setTimeout(() => setAddStatus(''), 3000); // Clear the message after 3 seconds
         };
 
 
+        // Existing component code...
+
         return (
-            <div >
+            <div>
                 {shouldHideDataView && <div className="elementToHide">
                     <button className="toggle-form-button-2" onClick={saveDataToServer}>Spara projekt! {saveStatus}</button>
-                    
                 </div>}
                 <DraggableLine onDrag={handleDrag} />
                 <div className="attributes-container" style={{ maxHeight: `${attributesContainerHeight}px` }}>
@@ -2172,10 +2210,8 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                         <button className={activeTab === 'Punkter' ? 'active' : ''} onClick={() => setActiveTab('Punkter')}>Punkter</button>
                         <button className={activeTab === 'Linjer' ? 'active' : ''} onClick={() => setActiveTab('Linjer')}>Linjer</button>
                         <button className={activeTab === 'Polygoner' ? 'active' : ''} onClick={() => setActiveTab('Polygoner')}>Polygoner</button>
-                        <button className={activeTab === 'Selekterade' ? 'active' : ''} onClick={() => setActiveTab('Selekterade')}>Selekterade</button>
-                        
                     </div>
-                    <table >
+                    <table>
                         <thead>
                             <tr>
                                 <th className='th-index'>#</th>
@@ -2185,61 +2221,58 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                                 ))}
                             </tr>
                         </thead>
-                        <tbody className="attributes-container-table" >
-                            {
+                        <tbody className="attributes-container-table">
+                            {viewMode === 'all' ? (
                                 filteredFeatures.map((feature, featureIndex) => (
-                                    feature.properties.attributes ? (
-                                        <tr key={featureIndex} className={highlightedIds.has(feature.properties.id) ? 'highlighted-row' : ''}
-                                            onClick={(event) => handleRowClick(feature.properties.id, feature.properties.attributes, event)}>
-                                            <td>
-                                                <span style={{ marginLeft: '0px' }}>{featureIndex + 1}</span>
-                                            </td>
-
-                                            <td className='td-markera'>
-                                                <button
-                                                    className={highlightedId === feature.properties.id ? 'highlighted' : ''}
-                                                    onClick={() => highlightFeature(feature.properties.id)}
-                                                >
-                                                    O
-                                                </button>
-
-                                            </td>
-                                            {attributeNames.map((name, index) => (
-                                                <td key={`${featureIndex}-${index}`}>
-                                                    <input
-                                                        type="text"
-                                                        value={feature.properties.attributes[name] || ''}
-                                                        onChange={(e) => handleAttributeValueChange(feature.properties.id, name, e.target.value)}
-                                                    />
-
-
-                                                </td>
-
-                                            ))}
-                                        </tr>
-
-                                    ) : null
-                                ))}
+                                    feature.properties.attributes ? renderTableRow(feature, featureIndex) : null
+                                ))
+                            ) : (
+                                Array.from(savedObjectIds).map((featureId, index) => {
+                                    const feature = filteredFeatures.find(feature => feature.properties.id === featureId);
+                                    return feature ? renderTableRow(feature, index) : null;
+                                })
+                            )}
                         </tbody>
                     </table>
                     <div className="marked-rows-info">
-                    {`${highlightedIds.size} av ${filteredFeatures.length} markerade`}
-                    {activeTab !== 'Selekterade' && (
-                        <button onClick={addSelectedToSavedObjects}>
-                            Lägg till valda objekt till sparade
-                        </button>
-                    )}
-                    {activeTab === 'Selekterade' && (
-                        <button onClick={clearSavedObjectIds}>
-                            Rensa hela listan
-                        </button>
-                    )}
-                </div>
-
+                        {`${highlightedIds.size} av ${filteredFeatures.length} markerade`}
+                        <button onClick={showAllItems}>Visa alla</button>
+                        <button onClick={showSelectedItems}>Visa selekterade</button>
+                        <button onClick={addSelectedToSavedObjects}>Lägg till</button>
+                        <button onClick={clearSavedObjectIds}>Rensa selekterade</button>
+                        <span className='addStatus'>{addStatus}</span>
+                    </div>
                 </div>
             </div>
         );
-    };
+
+        // Helper function to render table row
+        function renderTableRow(feature, index) {
+            return (
+                <tr key={index} className={highlightedIds.has(feature.properties.id) ? 'highlighted-row' : ''}
+                    onClick={(event) => handleRowClick(feature.properties.id, feature.properties.attributes, event)}>
+                    <td><span style={{ marginLeft: '0px' }}>{index + 1}</span></td>
+                    <td className='td-markera'>
+                        <button
+                            className={highlightedId === feature.properties.id ? 'highlighted' : ''}
+                            onClick={() => highlightFeature(feature.properties.id)}
+                        >
+                            O
+                        </button>
+                    </td>
+                    {attributeNames.map((name, attrIndex) => (
+                        <td key={`${index}-${attrIndex}`}>
+                            <input
+                                type="text"
+                                value={feature.properties.attributes[name] || ''}
+                                onChange={(e) => handleAttributeValueChange(feature.properties.id, name, e.target.value)}
+                            />
+                        </td>
+                    ))}
+                </tr>
+            );
+        }
+    }
 
 
     const renderMap = () => {
