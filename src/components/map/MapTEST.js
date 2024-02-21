@@ -740,8 +740,6 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                         } else {
                             layer.addTo(featureGroupRef.current);
                         }
-
-
                     }
                 })
 
@@ -1438,6 +1436,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
             species: ' ',
             habitatQualities: ' ',
             valueElements: ' ',
+            kartlaggningsTyp: ' ',
         };
 
         let feature;
