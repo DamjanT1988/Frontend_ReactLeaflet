@@ -265,7 +265,18 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
             <div>
                 {isDrawingMode && (
                     <>
-                        <div className="canvas-container" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 10 }}>
+                        <div className="canvas-container" style={{ 
+                            position: 'absolute', 
+                            top: 0, 
+                            bottom: 0,
+                            left: 0,
+                            right: 0, 
+                            width: '100%', 
+                            height: '100%',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            display: 'flex', 
+                            zIndex: 100 }}>
                             <canvas ref={canvasRef} width={width} height={height} onMouseDown={handleMouseDown} />
                             <button className='confirmation-dialog-draw-close' onClick={onClose}>Stäng</button>
                             <button className='confirmation-dialog-draw-save' onClick={captureDrawing}>Spara</button>
@@ -2185,14 +2196,14 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
             console.log('selectedId:', selectedId);
             setSavedObjectIds(new Set([...savedObjectIds, ...selectedRowIds, ...selectedId]));
             setAddStatus('Selekterade objekt lades till'); // Set the status message
-        setTimeout(() => setAddStatus(''), 3000); // Clear the message after 3 seconds
+        setTimeout(() => setAddStatus(''), 2000); // Clear the message after 3 seconds
     };
 
         // Function to clear savedObjectIds
         const clearSavedObjectIds = () => {
             setSavedObjectIds(new Set()); // Clears the set
             setAddStatus('Selekterade objekt rensades'); // Set the status message
-            setTimeout(() => setAddStatus(''), 3000); // Clear the message after 3 seconds
+            setTimeout(() => setAddStatus(''), 2000); // Clear the message after 3 seconds
         };
 
 
