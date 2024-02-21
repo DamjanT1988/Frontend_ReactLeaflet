@@ -211,7 +211,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
     const [selectedItems, setSelectedItems] = useState(new Set()); // State to track selected item IDs
     const [viewMode, setViewMode] = useState('all'); // 'all' or 'selected'
     const [addStatus, setAddStatus] = useState(''); // State for the add status message
-
+    const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
 
 
 
@@ -265,18 +265,19 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
             <div>
                 {isDrawingMode && (
                     <>
-                        <div className="canvas-container" style={{ 
-                            position: 'absolute', 
-                            top: 0, 
+                        <div className="canvas-container" style={{
+                            position: 'absolute',
+                            top: 0,
                             bottom: 0,
                             left: 0,
-                            right: 0, 
-                            width: '100%', 
+                            right: 0,
+                            width: '100%',
                             height: '100%',
                             justifyContent: 'center',
                             alignItems: 'center',
-                            display: 'flex', 
-                            zIndex: 100 }}>
+                            display: 'flex',
+                            zIndex: 100
+                        }}>
                             <canvas ref={canvasRef} width={width} height={height} onMouseDown={handleMouseDown} />
                             <button className='confirmation-dialog-draw-close' onClick={onClose}>Stäng</button>
                             <button className='confirmation-dialog-draw-save' onClick={captureDrawing}>Spara</button>
@@ -2039,6 +2040,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
     }
 
     const renderAttributeTable = () => {
+
         // Ensure geoJsonData is not null and has features before proceeding
         if (!geoJsonData || !geoJsonData.features) {
             return <div>Loading data...</div>; // Or any other placeholder content
@@ -2192,22 +2194,69 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
 
         // New function to add selected features to savedObjectIDs
         const addSelectedToSavedObjects = () => {
-            console.log('selectedRowIds:', selectedRowIds);
-            console.log('selectedId:', selectedId);
             setSavedObjectIds(new Set([...savedObjectIds, ...selectedRowIds, ...selectedId]));
             setAddStatus('Selekterade objekt lades till'); // Set the status message
-        setTimeout(() => setAddStatus(''), 2000); // Clear the message after 3 seconds
-    };
+            setTimeout(() => setAddStatus(''), 2000); // Clear the message after 3 seconds
+        };
 
         // Function to clear savedObjectIds
         const clearSavedObjectIds = () => {
             setSavedObjectIds(new Set()); // Clears the set
-            setAddStatus('Selekterade objekt rensades'); // Set the status message
+            setAddStatus('Alla selekterade objekt rensades'); // Set the status message
             setTimeout(() => setAddStatus(''), 2000); // Clear the message after 3 seconds
         };
 
 
-        // Existing component code...
+        const deleteSelectedObjects = () => {
+            // Update savedObjectIds by removing highlightedIds or selectedRowIds
+            setSavedObjectIds(prevSavedObjectIds => {
+                // Create a new Set based on previous savedObjectIds to ensure immutability
+                const updatedSavedObjectIds = new Set(prevSavedObjectIds);
+
+                // Remove each highlightedId from the updatedSavedObjectIds
+                highlightedIds.forEach(id => updatedSavedObjectIds.delete(id));
+
+                // Alternatively, if you want to remove selectedRowIds, use:
+                // selectedRowIds.forEach(id => updatedSavedObjectIds.delete(id));
+
+                return updatedSavedObjectIds;
+            });
+
+            // Optionally, clear highlightedIds or selectedRowIds if needed
+            setHighlightedIds(new Set());
+            // setSelectedRowIds(new Set()); // Uncomment this line if you use selectedRowIds
+
+            setAddStatus('Selekterade objekt borttagna'); // Set the status message
+            setTimeout(() => setAddStatus(''), 2000); // Clear the message after 3 seconds
+        };
+
+
+
+        const handleSort = (key) => {
+            let direction = 'ascending';
+            if (sortConfig.key === key && sortConfig.direction === 'ascending') {
+                direction = 'descending';
+            }
+            setSortConfig({ key, direction });
+        };
+
+        // Function to compare values for sorting
+        const compare = (a, b) => {
+            if (a < b) {
+                return sortConfig.direction === 'ascending' ? -1 : 1;
+            }
+            if (a > b) {
+                return sortConfig.direction === 'ascending' ? 1 : -1;
+            }
+            return 0;
+        };
+
+        // Apply sorting to the data before rendering the table
+        const sortedData = geoJsonData.features.sort((a, b) => {
+            const aValue = a.properties.attributes[sortConfig.key];
+            const bValue = b.properties.attributes[sortConfig.key];
+            return compare(aValue, bValue);
+        });
 
         return (
             <div>
@@ -2228,15 +2277,28 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                                 <th className='th-index'>#</th>
                                 <th className='th-karta'>Karta</th>
                                 {attributeNames.map((name, index) => (
-                                    <th key={index}>{attributeDisplayNameMap[name] || name}</th>
+                                    <th key={index} onClick={() => handleSort(name)} style={{ cursor: 'pointer' }}>
+                                        {attributeDisplayNameMap[name] || name}
+                                        <span className="sort-arrows">
+                                            {sortConfig.key === name ? (
+                                                sortConfig.direction === 'ascending' ? ' ▲' : ' ▼'
+                                            ) : ' ↕'}
+                                        </span>
+                                    </th>
                                 ))}
                             </tr>
                         </thead>
                         <tbody className="attributes-container-table">
                             {viewMode === 'all' ? (
-                                filteredFeatures.map((feature, featureIndex) => (
-                                    feature.properties.attributes ? renderTableRow(feature, featureIndex) : null
-                                ))
+                                filteredFeatures
+                                    .sort((a, b) => {
+                                        const aValue = a.properties.attributes[sortConfig.key];
+                                        const bValue = b.properties.attributes[sortConfig.key];
+                                        return compare(aValue, bValue);
+                                    })
+                                    .map((feature, featureIndex) => (
+                                        feature.properties.attributes ? renderTableRow(feature, featureIndex) : null
+                                    ))
                             ) : (
                                 Array.from(savedObjectIds).map((featureId, index) => {
                                     const feature = filteredFeatures.find(feature => feature.properties.id === featureId);
@@ -2247,10 +2309,11 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                     </table>
                     <div className="marked-rows-info">
                         {`${highlightedIds.size} av ${filteredFeatures.length} markerade`}
-                        <button onClick={showAllItems}>Visa alla</button>
+                        <button onClick={showAllItems}>Visa alla objekt</button>
                         <button onClick={showSelectedItems}>Visa selekterade</button>
                         <button onClick={addSelectedToSavedObjects}>Lägg till</button>
-                        <button onClick={clearSavedObjectIds}>Rensa selekterade</button>
+                        <button onClick={deleteSelectedObjects}>Ta bort</button>
+                        <button onClick={clearSavedObjectIds}>Rensa selektlistan</button>
                         <span className='addStatus'>{addStatus}</span>
                     </div>
                 </div>

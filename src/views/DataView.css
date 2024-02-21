@@ -444,20 +444,22 @@ position: relative; /* Needed for sticky positioning context */
 position: sticky;
 bottom: 0;
 background: #f9f9f9; /* or any other background color */
-padding: 10px;
+padding: 5px;
+margin-left: 10px;
 border-top: 1px solid #ccc; /* optional */
 z-index: 10; /* Ensure it's above other content */
+font-weight: bold;
 }
 
 .marked-rows-info button {
-  padding: 5px 7px;
+  padding: 2px 5px;
   background-color: #30A875;
   color: white;
   border: none;
   border-radius: 5px;
   cursor: pointer;
   transition: background-color 0.3s ease;
-  margin-left: 15px;
+  margin-left: 10px;
 }
 .draggable-map-adjuster {
   cursor: ns-resize; /* Cursor indicates vertical resize */
@@ -492,4 +494,10 @@ z-index: 10; /* Ensure it's above other content */
   margin-left: 10px;
   color: red;
   font-weight: bold;
+}
+
+.sort-arrows {
+  margin-left: 5px; /* Space between header text and arrows */
+  font-size: 0.8em; /* Smaller arrow icons */
+  color: #666; /* Lighter color for the arrows */
 }

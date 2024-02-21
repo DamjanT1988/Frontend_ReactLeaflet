@@ -1040,6 +1040,16 @@ h3 {
     white-space: nowrap;
 }
 
+.attributes-container-object button {
+    font-size: 70%;
+    padding: 3.5px 10px;
+    border-radius: 3px;
+    font-weight: bold;
+    text-align: center;
+    color: white;
+    background-color: #30A875;
+    margin-left: 5px
+}
 
 @media (max-width: 768px) {
     .attributes-container {
