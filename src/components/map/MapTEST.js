@@ -979,49 +979,37 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                 let layerFeature = layer.toGeoJSON();
 
                 if (layer.isMask) {
-                    console.log('return mask: ', layer);
+                    // Skip mask layers
                     return;
                 }
 
+                // Use existing ID if present, otherwise assign a new unique ID
+                layerFeature.properties.id = layerFeature.properties.id;
 
-                // Assign unique ID if not already present
-                if (!layerFeature.properties.id) {
-                    layerFeature.properties.id = uuidv4();
-                }
+                //console.log('layerFeature ID: ', layerFeature.properties.id);
 
-                // Update attributes for the layer
-                if (!layerFeature.properties.attributes) {
-                    layerFeature.properties.attributes = layer.options.attributes || {
-                        objectNumber: ' ',
-                        inventoryLevel: ' ',
-                        natureValueClass: ' ',
-                        preliminaryAssesment: ' ',
-                        reason: ' ',
-                        natureType: ' ',
-                        habitat: ' ',
-                        date: ' ',
-                        executer: ' ',
-                        organsation: ' ',
-                        projectName: ' ',
-                        area: ' ',
-                        species: ' ',
-                        habitatQualities: ' ',
-                        valueElements: ' ',
-                    };
-                }
-
-                // Handle circle and circle marker radius correctly
-                if (layer instanceof L.Circle || layer instanceof L.CircleMarker) {
-                    const radiusInMeters = layer.getRadius();
+                // Handle circle and circle marker radius and type correctly
+                if (layer instanceof L.Circle) {
+                    // Preserve existing properties and add or update radius and type
                     layerFeature.properties = {
                         ...layerFeature.properties,
-                        radius: radiusInMeters, // Ensure radius is stored in meters
+                        radius: layer.getRadius(),
                         isCircle: layer instanceof L.Circle,
-                        isCircleMarker: layer instanceof L.CircleMarker
                     };
+                    console.log('layerFeature ID: ', layerFeature.properties.id);
+                } 
+                
+                if (layer instanceof L.CircleMarker) {
+                    // Preserve existing properties and add or update radius and type
+                    layerFeature.properties = {
+                        ...layerFeature.properties,
+                        radius: layer.getRadius(),
+                        isCircleMarker: layer instanceof L.CircleMarker,
+                    };
+                    console.log('layerFeature ID: ', layerFeature.properties.id);
                 }
 
-                // Copy other layer properties
+                // Ensure attributes are updated or preserved
                 layerFeature.properties.attributes = {
                     ...layerFeature.properties.attributes,
                     ...layer.options.attributes
@@ -1038,6 +1026,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
             setGeoJsonData(newGeoJsonData);
         }
     };
+
 
 
     const updateGeoJsonCreate = () => {
@@ -1603,9 +1592,9 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
     };
 
     const onDeleted = (e) => {
+        const { layers } = e;
 
         // Check if a rectangle has been deleted
-        const { layers } = e;
         layers.eachLayer((layer) => {
             if (layer.feature && layer.feature.properties.shape === "rectangleCrop") {
                 // Show the RectangleDrawButton if the deleted layer is a rectangle
@@ -1864,7 +1853,9 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                 <input id="file-upload" type="file" onChange={(e) => setSelectedImage(e.target.files[0])} accept="image/*" style={{ display: 'none' }} />
                 {selectedImage && (
                     <>
+                        <br />
                         <input type="text" value={captionText} onChange={(e) => setCaptionText(e.target.value)} placeholder="Lägg till text om bilden.." />
+                        <br />
                         <button onClick={uploadImage}>Ladda upp</button>
                     </>
                 )}
