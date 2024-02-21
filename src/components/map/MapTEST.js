@@ -209,8 +209,8 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
     const [attributesContainerHeight, setAttributesContainerHeight] = useState(300); // Initial height for the attributes container
 
     const handleDrag = (movementY) => {
-        setMapHeight((prevHeight) => Math.max(prevHeight + movementY, 100)); // Ensure map height doesn't go below a minimum (e.g., 100px)
-        setAttributesContainerHeight((prevHeight) => Math.max(prevHeight - movementY, 100)); // Increase attributes container height as map height decreases
+        setMapHeight((prevHeight) => Math.max(prevHeight + movementY, 0), mapHeight); // Ensure map height doesn't go below a minimum (e.g., 100px)
+        setAttributesContainerHeight((prevHeight) => Math.max(prevHeight - movementY, 0)); // Increase attributes container height as map height decreases
     };
 
     
