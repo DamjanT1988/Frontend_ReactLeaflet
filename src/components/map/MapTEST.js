@@ -211,6 +211,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
     const [selectedItems, setSelectedItems] = useState(new Set()); // State to track selected item IDs
     const [viewMode, setViewMode] = useState('all'); // 'all' or 'selected'
     const [addStatus, setAddStatus] = useState(''); // State for the add status message
+    const [addStatusObject, setAddStatusObject] = useState(''); // State for the add status message
     const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
 
 
@@ -1686,6 +1687,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
         // Update GeoJSON state
         setGeoJsonData({ ...geoJsonData, features: updatedFeatures });
         setSelectedId(null); // Deselect the current feature
+        setAddStatusObject('Objektattribut uppdaterat');
     };
 
     // useEffect hook to synchronize layer options with geoJsonData changes
@@ -1857,7 +1859,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                     </div>
 
                 ))}
-                <button onClick={() => saveAttributes()}>Spara</button>
+                <button onClick={() => saveAttributes()}>Spara</button><span className='addStatus'>{addStatusObject}</span>
                 <label htmlFor="file-upload" className="file-upload-label">Lägg till en bild</label>
                 <input id="file-upload" type="file" onChange={(e) => setSelectedImage(e.target.files[0])} accept="image/*" style={{ display: 'none' }} />
                 {selectedImage && (
