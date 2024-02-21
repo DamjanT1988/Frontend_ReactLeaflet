@@ -206,33 +206,14 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
     const mapRef = useRef(null);
     const [mapInstance, setMapInstance] = useState(null);
     const [mapHeight, setMapHeight] = useState(550); // Initial map height
+    const [attributesContainerHeight, setAttributesContainerHeight] = useState(300); // Initial height for the attributes container
 
     const handleDrag = (movementY) => {
-        setMapHeight((prevHeight) => Math.max(prevHeight + movementY, 0)); // Update height, with a minimum limit (e.g., 100px)
+        setMapHeight((prevHeight) => Math.max(prevHeight + movementY, 100)); // Ensure map height doesn't go below a minimum (e.g., 100px)
+        setAttributesContainerHeight((prevHeight) => Math.max(prevHeight - movementY, 100)); // Increase attributes container height as map height decreases
     };
 
-
-    const handleSliderChange = (e) => {
-        const newHeight = `${e.target.value}vh`;
-        setMapHeight(newHeight); // Update state to reflect new height
-
-        // Ensure the mapRef.current is available and then directly update the container's height
-        if (mapRef.current) {
-            const container = mapRef.current.container; // Assuming mapRef.current directly references the container
-            if (container) {
-                container.style.height = newHeight; // Update the height of the container
-            }
-
-            // Invalidate the map size after the container's height adjustment
-            if (mapInstance) {
-                mapInstance.invalidateSize();
-            }
-        }
-    };
-
-
-
-
+    
     const Canvas = ({ width, height, onClose, onSave }) => {
         const canvasRef = useRef(null);
 
@@ -2179,13 +2160,13 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
 
 
         return (
-            <div>
+            <div >
                 {shouldHideDataView && <div className="elementToHide">
                     <button className="toggle-form-button-2" onClick={saveDataToServer}>Spara projekt! {saveStatus}</button>
                     
                 </div>}
                 <DraggableLine onDrag={handleDrag} />
-                <div className="attributes-container">
+                <div className="attributes-container" style={{ maxHeight: `${attributesContainerHeight}px` }}>
 
                     <div className="tabs">
                         <button className={activeTab === 'Punkter' ? 'active' : ''} onClick={() => setActiveTab('Punkter')}>Punkter</button>
@@ -2194,7 +2175,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                         <button className={activeTab === 'Selekterade' ? 'active' : ''} onClick={() => setActiveTab('Selekterade')}>Selekterade</button>
                         
                     </div>
-                    <table>
+                    <table >
                         <thead>
                             <tr>
                                 <th className='th-index'>#</th>
@@ -2204,7 +2185,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                                 ))}
                             </tr>
                         </thead>
-                        <tbody className="attributes-container-table">
+                        <tbody className="attributes-container-table" >
                             {
                                 filteredFeatures.map((feature, featureIndex) => (
                                     feature.properties.attributes ? (

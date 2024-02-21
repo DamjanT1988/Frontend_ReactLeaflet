@@ -1013,7 +1013,7 @@ h3 {
 .attributes-container-object table {
     display: block;
     margin-bottom: 0px;
-    max-height: auto;
+    height: 100%;
     max-width: 100%;
     overflow-x: auto;
     overflow-y: auto;
