@@ -213,7 +213,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
     const [addStatus, setAddStatus] = useState(''); // State for the add status message
     const [addStatusObject, setAddStatusObject] = useState(''); // State for the add status message
     const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
-
+    const [selectedKartlaggningstyp, setSelectedKartlaggningstyp] = useState('');
 
 
     const handleDrag = (movementY) => {
@@ -799,6 +799,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
             species: 'Arter',
             habitatQualities: 'Habitatkvaliteter',
             valueElements: 'Värdeelement',
+            kartlaggningsTyp: 'Kartläggningstyp',
             // Add more mappings as needed
         };
 
@@ -995,8 +996,8 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                         isCircle: layer instanceof L.Circle,
                     };
                     console.log('layerFeature ID: ', layerFeature.properties.id);
-                } 
-                
+                }
+
                 if (layer instanceof L.CircleMarker) {
                     // Preserve existing properties and add or update radius and type
                     layerFeature.properties = {
@@ -1068,6 +1069,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                                     species: ' ',
                                     habitatQualities: ' ',
                                     valueElements: ' ',
+                                    kartlaggningsTyp: ' ',
                                 }
                             }
                         };
@@ -1106,6 +1108,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                                     species: layer.options.attributes.species,
                                     habitatQualities: layer.options.attributes.habitatQualities,
                                     valueElements: layer.options.attributes.valueElements,
+                                    kartlaggningsTyp: layer.options.attributes.kartlaggningsTyp,
 
                                 }
                             }
@@ -1156,7 +1159,8 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                                     area: ' ',
                                     species: ' ',
                                     habitatQualities: ' ',
-                                    valueElements: ' '
+                                    valueElements: ' ',
+                                    kartlaggningsTyp: ' ',
                                 }
                             },
 
@@ -1228,7 +1232,8 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                                     area: ' ',
                                     species: ' ',
                                     habitatQualities: ' ',
-                                    valueElements: ' '
+                                    valueElements: ' ',
+                                    kartlaggningsTyp: ' ',
                                 }
                             },
 
@@ -1273,7 +1278,8 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                                     area: ' ',
                                     species: ' ',
                                     habitatQualities: ' ',
-                                    valueElements: ' '
+                                    valueElements: ' ',
+                                    kartlaggningsTyp: ' ',
                                 }
                             },
 
@@ -1317,7 +1323,8 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                                     area: ' ',
                                     species: ' ',
                                     habitatQualities: ' ',
-                                    valueElements: ' '
+                                    valueElements: ' ',
+                                    kartlaggningsTyp: ' ',
                                 }
                             },
 
@@ -1359,6 +1366,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                                 species: ' ',
                                 habitatQualities: ' ',
                                 valueElements: ' ',
+                                kartlaggningsTyp: ' ',
                             }
                         }
                     };
@@ -1388,6 +1396,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                         species: ' ',
                         habitatQualities: ' ',
                         valueElements: ' ',
+                        kartlaggningsTyp: ' ',
                     };
 
                     features.push(layerFeature);
@@ -1814,6 +1823,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
         reason: "Motivering",
         species: "Arter",
         valueElements: "Värdeelement",
+        kartlaggningsTyp: "Kartläggningstyp",
         // Add more mappings as needed
     };
 
@@ -1824,9 +1834,38 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
             return acc;
         }, {});
 
+        const kartlaggningstypOptions = {
+            KartlaggningBiologiskMangfald: "Kartläggning biologisk mångfald",
+            Artforekomst_punkt: "Artförekomst - punkt",
+            Artforekomst_yta: "Artförekomst - yta",
+            Bottenmiljo_punkt: "Bottenmiljö - punkt",
+            Bottenmiljo_yta: "Bottenmiljö - yta",
+            GenSkBiotopskyddsomr_punkt: "Generellt skyddat biotopskyddsområde - punkt",
+            GenSkBiotopskyddsomr_yta: "Generellt skyddat biotopskyddsområde - yta",
+            Livsmiljo_punkt: "Livsmiljö - punkt",
+            Livsmiljo_yta: "Livsmiljö - yta",
+            Natura2000Naturtyp: "Natura 2000-naturtyp",
+            Naturvardestrad_punkt: "Naturvärdesträd - punkt",
+            Naturvardestrad_yta: "Naturvärdesträd - yta",
+            NVILandskapsomrade: "NVI Landskapsområde",
+            NVINaturvardesbiotop: "NVI Naturvärdesbiotop",
+            OvrigBiotop: "Övrig biotop",
+            SarskSkyddsvTrad_punkt: "Särskilt skyddsvärda träd - punkt",
+            SarskSkyddsvTrad_yta: "Särskilt skyddsvärda träd - yta",
+            Smavatten_punkt: "Småvatten - punkt",
+            Smavatten_yta: "Småvatten - yta",
+            Vardeelement_punkt: "Värdeelement - punkt",
+            Vardeelement_yta: "Värdeelement - yta",
+            VattendragDelstracka: "Vattendrag delsträcka",
+        };
+
+
+        // Check if the current attributesObject has a kartlaggningsTyp that matches one of the options
+        const headline = kartlaggningstypOptions[editableAttributesObject.kartlaggningsTyp] || "Objektattribut";
+
         return (
             <div className="attributes-container-object">
-                <h3>Objektattribut</h3>
+                <h3>{headline}</h3>
                 {Object.entries(editableAttributesObject).map(([key, value], index) => (
                     <div key={index} className="attribute-field">
                         <label htmlFor={`attribute-${key}`}>{attributeDisplayNameMap[key] || key}:</label>
@@ -2033,6 +2072,8 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
 
     const renderAttributeTable = () => {
 
+
+
         // Ensure geoJsonData is not null and has features before proceeding
         if (!geoJsonData || !geoJsonData.features) {
             return <div>Loading data...</div>; // Or any other placeholder content
@@ -2054,28 +2095,35 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
 
 
         const filteredFeatures = geoJsonData.features.filter(feature => {
+            console.log("Processing feature:", feature);
+
             // Exclude rectangleCrop shapes
             if (feature.properties.shape === "rectangleCrop") {
                 return false;
             }
-            // Filter by active tab
+
+            // Check for matching Kartläggningstyp, if any are selected
+            //const matchesKartlaggningstyp = selectedKartlaggningstyp.length === 0 || (feature.properties.attributes && selectedKartlaggningstyp.includes(feature.properties.attributes.kartlaggningsTyp));
+            const matchesKartlaggningstyp = feature.properties.attributes.kartlaggningsTyp === selectedKartlaggningstyp || selectedKartlaggningstyp === '' || selectedKartlaggningstyp === 'Alla';
+            console.log("Feature matches kartlaggningsTyp:", matchesKartlaggningstyp);
+
+            // Filter by active tab, now also checking for Kartläggningstyp match
             switch (activeTab) {
                 case 'Punkter':
-                    return feature.properties.isMarker || feature.properties.isPoint;
+                    return matchesKartlaggningstyp && (feature.properties.isMarker || feature.properties.isPoint);
                 case 'Linjer':
-                    return feature.geometry.type === 'LineString' || feature.geometry.type === 'MultiLineString';
+                    return matchesKartlaggningstyp && (feature.geometry.type === 'LineString' || feature.geometry.type === 'MultiLineString');
                 case 'Polygoner':
-                    return feature.geometry.type === 'Polygon' || feature.geometry.type === 'MultiPolygon' || feature.properties.isCircleMarker || feature.properties.isCircle;
+                    return matchesKartlaggningstyp && (feature.geometry.type === 'Polygon' || feature.geometry.type === 'MultiPolygon' || feature.properties.isCircleMarker || feature.properties.isCircle);
                 case 'Alla':
-                    return '';
+                    return matchesKartlaggningstyp;
                 case 'Selekterade':
-                    return savedObjectIds.has(feature.properties.id);
-                case 'Rensa':
-                    return '';
+                    return matchesKartlaggningstyp && savedObjectIds.has(feature.properties.id);
                 default:
-                    return true;
+                    return matchesKartlaggningstyp;
             }
         });
+
 
 
 
@@ -2250,6 +2298,53 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
             return compare(aValue, bValue);
         });
 
+        /*
+        // Ensure geoJsonData is defined and has features
+        const hasFeatures = geoJsonData && geoJsonData.features && geoJsonData.features.length > 0;
+
+        // Function to determine if there are Point features excluding CircleMarkers
+        const hasPointFeatures = () => {
+            return hasFeatures && geoJsonData.features.some(feature => {
+                const isPoint = feature.geometry.type === 'Point';
+                const isCircleMarker = feature.properties.isCircleMarker; // Check if it's a circle marker
+                return isPoint && !isCircleMarker; // Include only if it's a Point and not a CircleMarker
+            });
+        };
+
+        // Function to determine if there are features for Linjer category
+        const hasLineFeatures = () => {
+            return hasFeatures && geoJsonData.features.some(feature => {
+                return ['LineString', 'MultiLineString'].includes(feature.geometry.type);
+            });
+        };
+
+        // Function to determine if there are features for Polygoner category including CircleMarkers
+        const hasPolygonFeatures = () => {
+            return hasFeatures && geoJsonData.features.some(feature => {
+                const isPolygonType = ['Polygon', 'MultiPolygon', 'Circle'].includes(feature.geometry.type);
+                const isCircleMarker = feature.properties.isCircleMarker; // Check if it's a circle marker
+                return isPolygonType || isCircleMarker; // Include if it's a Polygon type or a CircleMarker
+            });
+        };
+        */
+
+        // Function to determine if there are features for a given geometry type and kartlaggningstyp
+        const hasFeaturesForGeometry = (geometryType) => {
+            return geoJsonData.features.some(feature => {
+                const matchesGeometry = feature.geometry.type === geometryType;
+                const matchesKartlaggningstyp = selectedKartlaggningstyp === '' || (feature.properties.attributes && feature.properties.attributes.kartlaggningsTyp === selectedKartlaggningstyp);
+                return matchesGeometry && matchesKartlaggningstyp;
+            });
+        };
+
+        // Determine available geometries for the selected kartlaggningstyp
+        const availableGeometries = {
+            'Punkter': hasFeaturesForGeometry('Point') || hasFeaturesForGeometry('MultiPoint'),
+            'Linjer': hasFeaturesForGeometry('LineString') || hasFeaturesForGeometry('MultiLineString'),
+            'Polygoner': hasFeaturesForGeometry('Polygon') || hasFeaturesForGeometry('MultiPolygon')
+        };
+
+
         return (
             <div>
                 {shouldHideDataView && <div className="elementToHide">
@@ -2259,10 +2354,11 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                 <div className="attributes-container" style={{ maxHeight: `${attributesContainerHeight}px` }}>
 
                     <div className="tabs">
-                        <button className={activeTab === 'Punkter' ? 'active' : ''} onClick={() => setActiveTab('Punkter')}>Punkter</button>
-                        <button className={activeTab === 'Linjer' ? 'active' : ''} onClick={() => setActiveTab('Linjer')}>Linjer</button>
-                        <button className={activeTab === 'Polygoner' ? 'active' : ''} onClick={() => setActiveTab('Polygoner')}>Polygoner</button>
+                        {availableGeometries['Punkter'] && <button className={activeTab === 'Punkter' ? 'active' : ''} onClick={() => setActiveTab('Punkter')}>Punkter</button>}
+                        {availableGeometries['Linjer'] && <button className={activeTab === 'Linjer' ? 'active' : ''} onClick={() => setActiveTab('Linjer')}>Linjer</button>}
+                        {availableGeometries['Polygoner'] && <button className={activeTab === 'Polygoner' ? 'active' : ''} onClick={() => setActiveTab('Polygoner')}>Polygoner</button>}
                     </div>
+
                     <table>
                         <thead>
                             <tr>
@@ -2386,11 +2482,46 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
         if (!selectedProject) {
             return <div>Laddar..</div>; // Provide a loading message or any other fallback content
         }
+
+        const kartlaggningstypOptions = {
+            KartlaggningBiologiskMangfald: "Kartläggning biologisk mångfald",
+            Artforekomst_punkt: "Artförekomst - punkt",
+            Artforekomst_yta: "Artförekomst - yta",
+            Bottenmiljo_punkt: "Bottenmiljö - punkt",
+            Bottenmiljo_yta: "Bottenmiljö - yta",
+            GenSkBiotopskyddsomr_punkt: "Generellt skyddat biotopskyddsområde - punkt",
+            GenSkBiotopskyddsomr_yta: "Generellt skyddat biotopskyddsområde - yta",
+            Livsmiljo_punkt: "Livsmiljö - punkt",
+            Livsmiljo_yta: "Livsmiljö - yta",
+            Natura2000Naturtyp: "Natura 2000-naturtyp",
+            Naturvardestrad_punkt: "Naturvärdesträd - punkt",
+            Naturvardestrad_yta: "Naturvärdesträd - yta",
+            NVILandskapsomrade: "NVI Landskapsområde",
+            NVINaturvardesbiotop: "NVI Naturvärdesbiotop",
+            OvrigBiotop: "Övrig biotop",
+            SarskSkyddsvTrad_punkt: "Särskilt skyddsvärda träd - punkt",
+            SarskSkyddsvTrad_yta: "Särskilt skyddsvärda träd - yta",
+            Smavatten_punkt: "Småvatten - punkt",
+            Smavatten_yta: "Småvatten - yta",
+            Vardeelement_punkt: "Värdeelement - punkt",
+            Vardeelement_yta: "Värdeelement - yta",
+            VattendragDelstracka: "Vattendrag delsträcka",
+        };
+
         return (
             <div className="left-section">
                 <div className="top-left">
                     <h2>{selectedProject.project_name}</h2>
-                    <button>Kartläggning biologisk mångfald</button>
+                    <div className="kartlaggningstyp-filter">
+                        <label htmlFor="kartlaggningstyp-select">Välj Kartläggningstyp:</label>
+                        <select id="kartlaggningstyp-select" value={selectedKartlaggningstyp} onChange={(e) => setSelectedKartlaggningstyp(e.target.value)}>
+                            <option value="">Alla</option>
+                            {Object.entries(kartlaggningstypOptions).map(([key, value]) => (
+                                <option key={key} value={key}>{value}</option>
+                            ))}
+                        </select>
+                    </div>
+
                     <button>Naturvärdesbiologi</button>
                     <button>Landskapsområden</button>
                     <div className="additional-section">

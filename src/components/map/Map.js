@@ -11,6 +11,7 @@ import shp from 'shpjs';
 import { v4 as uuidv4 } from 'uuid';
 
 
+
 delete L.Icon.Default.prototype._getIconUrl
 L.Icon.Default.mergeOptions({
     iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
@@ -108,10 +109,60 @@ L.drawLocal.edit.handlers.remove.tooltip = {
     text: 'Klicka på en funktion för att ta bort',
 };
 
-
-
 window.toggleAttributeContainer = (id, attributes) => {
     // Function implementation will be set in the component
+};
+
+const DraggableLine = ({ onDrag }) => {
+    const lineRef = useRef(null);
+    const lastDragTime = useRef(Date.now());
+    const dragUpdateScheduled = useRef(false);
+
+    const handleDrag = (movementY) => {
+        // Use requestAnimationFrame for smoother updates
+        if (!dragUpdateScheduled.current) {
+            dragUpdateScheduled.current = true;
+            requestAnimationFrame(() => {
+                // Ensure at least a small delay between updates to smooth out the dragging
+                const now = Date.now();
+                if (now - lastDragTime.current > 50) { // Adjust the delay as needed for smoother dragging
+                    onDrag(movementY);
+                    lastDragTime.current = now;
+                }
+                dragUpdateScheduled.current = false;
+            });
+        }
+    };
+
+    useEffect(() => {
+        const line = lineRef.current;
+
+        const startDrag = (e) => {
+            e.preventDefault(); // Prevent default to avoid text selection
+            const initialY = e.clientY;
+
+            const doDrag = (e) => {
+                const movementY = e.clientY - initialY;
+                handleDrag(movementY);
+            };
+
+            const stopDrag = () => {
+                window.removeEventListener('mousemove', doDrag);
+                window.removeEventListener('mouseup', stopDrag);
+            };
+
+            window.addEventListener('mousemove', doDrag);
+            window.addEventListener('mouseup', stopDrag);
+        };
+
+        line.addEventListener('mousedown', startDrag);
+
+        return () => {
+            line.removeEventListener('mousedown', startDrag);
+        };
+    }, [onDrag]);
+
+    return <div ref={lineRef} className="draggable-line"></div>;
 };
 
 
@@ -151,66 +202,95 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, shouldHideDat
     const [showReplacePrompt, setShowReplacePrompt] = useState(false);
     const [pendingDrawing, setPendingDrawing] = useState(null);
     const [showSavePrompt, setSavePrompt] = useState(false);
+    //const [mapHeight, setMapHeight] = useState("59vh"); // Default height
+    const mapRef = useRef(null);
+    const [mapInstance, setMapInstance] = useState(null);
+    const [mapHeight, setMapHeight] = useState(550); // Initial map height
+    const [attributesContainerHeight, setAttributesContainerHeight] = useState(300); // Initial height for the attributes container
+    const [allItems, setAllItems] = useState([]); // State to store all items
+    const [selectedItems, setSelectedItems] = useState(new Set()); // State to track selected item IDs
+    const [viewMode, setViewMode] = useState('all'); // 'all' or 'selected'
+    const [addStatus, setAddStatus] = useState(''); // State for the add status message
+    const [addStatusObject, setAddStatusObject] = useState(''); // State for the add status message
+    const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
 
 
-        const Canvas = ({ width, height, onClose, onSave }) => {
-            const canvasRef = useRef(null);
-    
-            useEffect(() => {
-                const canvas = canvasRef.current;
-                if (canvas) {
-                    canvas.width = width;
-                    canvas.height = height;
-                }
-            }, [width, height]);
-    
-    
-            const captureDrawing = () => {
-                if (canvasRef.current) {
-                    const dataURL = canvasRef.current.toDataURL('image/png');
-                    onSave(dataURL); // Pass the base64 image data to the onSave callback
-                    console.log('dataURL: ', dataURL);
-                }
-            };
-    
-            const handleMouseDown = (e) => {
-                const canvas = canvasRef.current;
-                const ctx = canvas.getContext('2d');
-                ctx.beginPath();
-                ctx.moveTo(e.nativeEvent.offsetX, e.nativeEvent.offsetY);
-                document.addEventListener('mousemove', handleMouseMove);
-                document.addEventListener('mouseup', handleMouseUp);
-            };
-    
-            const handleMouseMove = (e) => {
-                const canvas = canvasRef.current;
-                const ctx = canvas.getContext('2d');
-                ctx.lineTo(e.offsetX, e.offsetY);
-                ctx.stroke();
-            };
-    
-            const handleMouseUp = () => {
-                document.removeEventListener('mousemove', handleMouseMove);
-                document.removeEventListener('mouseup', handleMouseUp);
-            };
-    
-            return (
-                <div>
-                    {isDrawingMode && (
-                        <>
-                            <div className="canvas-container" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 10 }}>
-                                <canvas ref={canvasRef} width={width} height={height} onMouseDown={handleMouseDown} />
-                                <button className='confirmation-dialog-draw-close' onClick={onClose}>Stäng</button>
-                                <button className='confirmation-dialog-draw-save' onClick={captureDrawing}>Spara</button>
-                            </div>
-                        </>
-                    )}
-                </div>
-            );
-    
+
+    const handleDrag = (movementY) => {
+        setMapHeight((prevHeight) => Math.max(prevHeight + movementY, 0), mapHeight); // Ensure map height doesn't go below a minimum (e.g., 100px)
+        setAttributesContainerHeight((prevHeight) => Math.max(prevHeight - movementY, 0)); // Increase attributes container height as map height decreases
+    };
+
+    const Canvas = ({ width, height, onClose, onSave }) => {
+        const canvasRef = useRef(null);
+
+        useEffect(() => {
+            const canvas = canvasRef.current;
+            if (canvas) {
+                canvas.width = width;
+                canvas.height = height;
+            }
+        }, [width, height]);
+
+
+        const captureDrawing = () => {
+            if (canvasRef.current) {
+                const dataURL = canvasRef.current.toDataURL('image/png');
+                onSave(dataURL); // Pass the base64 image data to the onSave callback
+                console.log('dataURL: ', dataURL);
+            }
         };
 
-        
+        const handleMouseDown = (e) => {
+            const canvas = canvasRef.current;
+            const ctx = canvas.getContext('2d');
+            ctx.beginPath();
+            ctx.moveTo(e.nativeEvent.offsetX, e.nativeEvent.offsetY);
+            document.addEventListener('mousemove', handleMouseMove);
+            document.addEventListener('mouseup', handleMouseUp);
+        };
+
+        const handleMouseMove = (e) => {
+            const canvas = canvasRef.current;
+            const ctx = canvas.getContext('2d');
+            ctx.lineTo(e.offsetX, e.offsetY);
+            ctx.stroke();
+        };
+
+        const handleMouseUp = () => {
+            document.removeEventListener('mousemove', handleMouseMove);
+            document.removeEventListener('mouseup', handleMouseUp);
+        };
+
+        return (
+            <div>
+                {isDrawingMode && (
+                    <>
+                        <div className="canvas-container" style={{
+                            position: 'absolute',
+                            top: 0,
+                            bottom: 0,
+                            left: 0,
+                            right: 0,
+                            width: '100%',
+                            height: '100%',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            display: 'flex',
+                            zIndex: 100
+                        }}>
+                            <canvas ref={canvasRef} width={width} height={height} onMouseDown={handleMouseDown} />
+                            <button className='confirmation-dialog-draw-close' onClick={onClose}>Stäng</button>
+                            <button className='confirmation-dialog-draw-save' onClick={captureDrawing}>Spara</button>
+                        </div>
+                    </>
+                )}
+            </div>
+        );
+
+    };
+
+
     // Function to handle feature click with CTRL key support for multi-selection
     const handleFeatureClick = (featureId, layer, event) => {
         // If CTRL key is not pressed, clear selections and revert styles
@@ -357,12 +437,12 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, shouldHideDat
         }
     };
 
-// useEffect hook to call uploadImage when imageBase64 changes and is not null
-useEffect(() => {
-    if (imageBase64) {
-        uploadImage(); // Call uploadImage here
-    }
-}, [imageBase64]);
+    // useEffect hook to call uploadImage when imageBase64 changes and is not null
+    useEffect(() => {
+        if (imageBase64) {
+            uploadImage(); // Call uploadImage here
+        }
+    }, [imageBase64]);
 
 
 
@@ -660,8 +740,6 @@ useEffect(() => {
                         } else {
                             layer.addTo(featureGroupRef.current);
                         }
-
-
                     }
                 })
 
@@ -721,6 +799,7 @@ useEffect(() => {
             species: 'Arter',
             habitatQualities: 'Habitatkvaliteter',
             valueElements: 'Värdeelement',
+            kartlaggningsTyp: 'Kartläggningstyp',
             // Add more mappings as needed
         };
 
@@ -899,49 +978,37 @@ useEffect(() => {
                 let layerFeature = layer.toGeoJSON();
 
                 if (layer.isMask) {
-                    console.log('return mask: ', layer);
+                    // Skip mask layers
                     return;
                 }
 
+                // Use existing ID if present, otherwise assign a new unique ID
+                layerFeature.properties.id = layerFeature.properties.id;
 
-                // Assign unique ID if not already present
-                if (!layerFeature.properties.id) {
-                    layerFeature.properties.id = uuidv4();
-                }
+                //console.log('layerFeature ID: ', layerFeature.properties.id);
 
-                // Update attributes for the layer
-                if (!layerFeature.properties.attributes) {
-                    layerFeature.properties.attributes = layer.options.attributes || {
-                        objectNumber: ' ',
-                        inventoryLevel: ' ',
-                        natureValueClass: ' ',
-                        preliminaryAssesment: ' ',
-                        reason: ' ',
-                        natureType: ' ',
-                        habitat: ' ',
-                        date: ' ',
-                        executer: ' ',
-                        organsation: ' ',
-                        projectName: ' ',
-                        area: ' ',
-                        species: ' ',
-                        habitatQualities: ' ',
-                        valueElements: ' ',
-                    };
-                }
-
-                // Handle circle and circle marker radius correctly
-                if (layer instanceof L.Circle || layer instanceof L.CircleMarker) {
-                    const radiusInMeters = layer.getRadius();
+                // Handle circle and circle marker radius and type correctly
+                if (layer instanceof L.Circle) {
+                    // Preserve existing properties and add or update radius and type
                     layerFeature.properties = {
                         ...layerFeature.properties,
-                        radius: radiusInMeters, // Ensure radius is stored in meters
+                        radius: layer.getRadius(),
                         isCircle: layer instanceof L.Circle,
-                        isCircleMarker: layer instanceof L.CircleMarker
                     };
+                    console.log('layerFeature ID: ', layerFeature.properties.id);
+                } 
+                
+                if (layer instanceof L.CircleMarker) {
+                    // Preserve existing properties and add or update radius and type
+                    layerFeature.properties = {
+                        ...layerFeature.properties,
+                        radius: layer.getRadius(),
+                        isCircleMarker: layer instanceof L.CircleMarker,
+                    };
+                    console.log('layerFeature ID: ', layerFeature.properties.id);
                 }
 
-                // Copy other layer properties
+                // Ensure attributes are updated or preserved
                 layerFeature.properties.attributes = {
                     ...layerFeature.properties.attributes,
                     ...layer.options.attributes
@@ -958,6 +1025,7 @@ useEffect(() => {
             setGeoJsonData(newGeoJsonData);
         }
     };
+
 
 
     const updateGeoJsonCreate = () => {
@@ -1001,6 +1069,7 @@ useEffect(() => {
                                     species: ' ',
                                     habitatQualities: ' ',
                                     valueElements: ' ',
+                                    kartlaggningsTyp: ' ',
                                 }
                             }
                         };
@@ -1039,6 +1108,7 @@ useEffect(() => {
                                     species: layer.options.attributes.species,
                                     habitatQualities: layer.options.attributes.habitatQualities,
                                     valueElements: layer.options.attributes.valueElements,
+                                    kartlaggningsTyp: layer.options.attributes.kartlaggningsTyp,
 
                                 }
                             }
@@ -1089,7 +1159,8 @@ useEffect(() => {
                                     area: ' ',
                                     species: ' ',
                                     habitatQualities: ' ',
-                                    valueElements: ' '
+                                    valueElements: ' ',
+                                    kartlaggningsTyp: ' ',
                                 }
                             },
 
@@ -1161,7 +1232,8 @@ useEffect(() => {
                                     area: ' ',
                                     species: ' ',
                                     habitatQualities: ' ',
-                                    valueElements: ' '
+                                    valueElements: ' ',
+                                    kartlaggningsTyp: ' ',
                                 }
                             },
 
@@ -1206,7 +1278,8 @@ useEffect(() => {
                                     area: ' ',
                                     species: ' ',
                                     habitatQualities: ' ',
-                                    valueElements: ' '
+                                    valueElements: ' ',
+                                    kartlaggningsTyp: ' ',
                                 }
                             },
 
@@ -1250,7 +1323,8 @@ useEffect(() => {
                                     area: ' ',
                                     species: ' ',
                                     habitatQualities: ' ',
-                                    valueElements: ' '
+                                    valueElements: ' ',
+                                    kartlaggningsTyp: ' ',
                                 }
                             },
 
@@ -1292,6 +1366,7 @@ useEffect(() => {
                                 species: ' ',
                                 habitatQualities: ' ',
                                 valueElements: ' ',
+                                kartlaggningsTyp: ' ',
                             }
                         }
                     };
@@ -1321,6 +1396,7 @@ useEffect(() => {
                         species: ' ',
                         habitatQualities: ' ',
                         valueElements: ' ',
+                        kartlaggningsTyp: ' ',
                     };
 
                     features.push(layerFeature);
@@ -1369,6 +1445,7 @@ useEffect(() => {
             species: ' ',
             habitatQualities: ' ',
             valueElements: ' ',
+            kartlaggningsTyp: ' ',
         };
 
         let feature;
@@ -1523,9 +1600,9 @@ useEffect(() => {
     };
 
     const onDeleted = (e) => {
+        const { layers } = e;
 
         // Check if a rectangle has been deleted
-        const { layers } = e;
         layers.eachLayer((layer) => {
             if (layer.feature && layer.feature.properties.shape === "rectangleCrop") {
                 // Show the RectangleDrawButton if the deleted layer is a rectangle
@@ -1607,6 +1684,7 @@ useEffect(() => {
         // Update GeoJSON state
         setGeoJsonData({ ...geoJsonData, features: updatedFeatures });
         setSelectedId(null); // Deselect the current feature
+        setAddStatusObject('Objektattribut uppdaterat');
     };
 
     // useEffect hook to synchronize layer options with geoJsonData changes
@@ -1745,6 +1823,7 @@ useEffect(() => {
         reason: "Motivering",
         species: "Arter",
         valueElements: "Värdeelement",
+        kartlaggningsTyp: "Kartläggningstyp",
         // Add more mappings as needed
     };
 
@@ -1756,7 +1835,7 @@ useEffect(() => {
         }, {});
 
         return (
-            <div className="attributes-container">
+            <div className="attributes-container-object">
                 <h3>Objektattribut</h3>
                 {Object.entries(editableAttributesObject).map(([key, value], index) => (
                     <div key={index} className="attribute-field">
@@ -1778,12 +1857,14 @@ useEffect(() => {
                     </div>
 
                 ))}
-                <button onClick={() => saveAttributes()}>Spara</button>
+                <button onClick={() => saveAttributes()}>Spara</button><span className='addStatus'>{addStatusObject}</span>
                 <label htmlFor="file-upload" className="file-upload-label">Lägg till en bild</label>
                 <input id="file-upload" type="file" onChange={(e) => setSelectedImage(e.target.files[0])} accept="image/*" style={{ display: 'none' }} />
                 {selectedImage && (
                     <>
+                        <br />
                         <input type="text" value={captionText} onChange={(e) => setCaptionText(e.target.value)} placeholder="Lägg till text om bilden.." />
+                        <br />
                         <button onClick={uploadImage}>Ladda upp</button>
                     </>
                 )}
@@ -1961,6 +2042,7 @@ useEffect(() => {
     }
 
     const renderAttributeTable = () => {
+
         // Ensure geoJsonData is not null and has features before proceeding
         if (!geoJsonData || !geoJsonData.features) {
             return <div>Loading data...</div>; // Or any other placeholder content
@@ -1980,6 +2062,7 @@ useEffect(() => {
         // Convert the Set to an array for mapping
         const attributeNames = Array.from(allAttributeNames);
 
+
         const filteredFeatures = geoJsonData.features.filter(feature => {
             // Exclude rectangleCrop shapes
             if (feature.properties.shape === "rectangleCrop") {
@@ -1993,14 +2076,16 @@ useEffect(() => {
                     return feature.geometry.type === 'LineString' || feature.geometry.type === 'MultiLineString';
                 case 'Polygoner':
                     return feature.geometry.type === 'Polygon' || feature.geometry.type === 'MultiPolygon' || feature.properties.isCircleMarker || feature.properties.isCircle;
+                case 'Alla':
+                    return '';
                 case 'Selekterade':
-                    // Only include features with IDs contained in savedObjectIds for the 'Sparade objekt' tab
                     return savedObjectIds.has(feature.properties.id);
+                case 'Rensa':
+                    return '';
                 default:
                     return true;
             }
         });
-
 
 
 
@@ -2086,104 +2171,191 @@ useEffect(() => {
             setGeoJsonData(updatedGeoJsonData);
         };
 
+        const toggleSelection = (itemId) => {
+            setSelectedItems((prevSelectedItems) => {
+                const newSelectedItems = new Set(prevSelectedItems);
+                if (newSelectedItems.has(itemId)) {
+                    newSelectedItems.delete(itemId);
+                } else {
+                    newSelectedItems.add(itemId);
+                }
+                return newSelectedItems;
+            });
+        };
+
+        const showSelectedItems = () => {
+            const filteredItems = allItems.filter(item => selectedItems.has(item.id));
+            // Update your state or variable that controls the displayed items in the attribute table
+            setViewMode('selected');
+        };
+
+        const showAllItems = () => {
+            setViewMode('all');
+        };
+
+
         // New function to add selected features to savedObjectIDs
         const addSelectedToSavedObjects = () => {
-            console.log('selectedRowIds:', selectedRowIds);
-            console.log('selectedId:', selectedId);
             setSavedObjectIds(new Set([...savedObjectIds, ...selectedRowIds, ...selectedId]));
+            setAddStatus('Selekterade objekt lades till'); // Set the status message
+            setTimeout(() => setAddStatus(''), 2000); // Clear the message after 3 seconds
         };
 
         // Function to clear savedObjectIds
         const clearSavedObjectIds = () => {
             setSavedObjectIds(new Set()); // Clears the set
+            setAddStatus('Alla selekterade objekt rensades'); // Set the status message
+            setTimeout(() => setAddStatus(''), 2000); // Clear the message after 3 seconds
         };
+
+
+        const deleteSelectedObjects = () => {
+            // Update savedObjectIds by removing highlightedIds or selectedRowIds
+            setSavedObjectIds(prevSavedObjectIds => {
+                // Create a new Set based on previous savedObjectIds to ensure immutability
+                const updatedSavedObjectIds = new Set(prevSavedObjectIds);
+
+                // Remove each highlightedId from the updatedSavedObjectIds
+                highlightedIds.forEach(id => updatedSavedObjectIds.delete(id));
+
+                // Alternatively, if you want to remove selectedRowIds, use:
+                // selectedRowIds.forEach(id => updatedSavedObjectIds.delete(id));
+
+                return updatedSavedObjectIds;
+            });
+
+            // Optionally, clear highlightedIds or selectedRowIds if needed
+            setHighlightedIds(new Set());
+            // setSelectedRowIds(new Set()); // Uncomment this line if you use selectedRowIds
+
+            setAddStatus('Selekterade objekt borttagna'); // Set the status message
+            setTimeout(() => setAddStatus(''), 2000); // Clear the message after 3 seconds
+        };
+
+
+
+        const handleSort = (key) => {
+            let direction = 'ascending';
+            if (sortConfig.key === key && sortConfig.direction === 'ascending') {
+                direction = 'descending';
+            }
+            setSortConfig({ key, direction });
+        };
+
+        // Function to compare values for sorting
+        const compare = (a, b) => {
+            if (a < b) {
+                return sortConfig.direction === 'ascending' ? -1 : 1;
+            }
+            if (a > b) {
+                return sortConfig.direction === 'ascending' ? 1 : -1;
+            }
+            return 0;
+        };
+
+        // Apply sorting to the data before rendering the table
+        const sortedData = geoJsonData.features.sort((a, b) => {
+            const aValue = a.properties.attributes[sortConfig.key];
+            const bValue = b.properties.attributes[sortConfig.key];
+            return compare(aValue, bValue);
+        });
 
         return (
             <div>
                 {shouldHideDataView && <div className="elementToHide">
                     <button className="toggle-form-button-2" onClick={saveDataToServer}>Spara projekt! {saveStatus}</button>
                 </div>}
-
-                <div className="attributes-container">
-                    <h3>{activeTab}</h3>
+                <DraggableLine onDrag={handleDrag} />
+                <div className="attributes-container" style={{ maxHeight: `${attributesContainerHeight}px` }}>
 
                     <div className="tabs">
                         <button className={activeTab === 'Punkter' ? 'active' : ''} onClick={() => setActiveTab('Punkter')}>Punkter</button>
                         <button className={activeTab === 'Linjer' ? 'active' : ''} onClick={() => setActiveTab('Linjer')}>Linjer</button>
                         <button className={activeTab === 'Polygoner' ? 'active' : ''} onClick={() => setActiveTab('Polygoner')}>Polygoner</button>
-                        <button className={activeTab === 'Selekterade' ? 'active' : ''} onClick={() => setActiveTab('Selekterade')}>Selekterade</button>
                     </div>
-
                     <table>
                         <thead>
                             <tr>
                                 <th className='th-index'>#</th>
-                                <th className='th-karta'>Karta</th> {/* Additional column for highlight button */}
-                                {/* Assuming attributeNames is defined and accessible */}
+                                <th className='th-karta'>Karta</th>
                                 {attributeNames.map((name, index) => (
-                                    <th key={index}>{attributeDisplayNameMap[name] || name}</th>
+                                    <th key={index} onClick={() => handleSort(name)} style={{ cursor: 'pointer' }}>
+                                        {attributeDisplayNameMap[name] || name}
+                                        <span className="sort-arrows">
+                                            {sortConfig.key === name ? (
+                                                sortConfig.direction === 'ascending' ? ' ▲' : ' ▼'
+                                            ) : ' ↕'}
+                                        </span>
+                                    </th>
                                 ))}
                             </tr>
                         </thead>
-                        <tbody>
-
-                            {/* Mapping through your geoJsonData */}
-                            {
-                                filteredFeatures.map((feature, featureIndex) => (
-                                    feature.properties.attributes ? (
-                                        <tr key={featureIndex} className={highlightedIds.has(feature.properties.id) ? 'highlighted-row' : ''}
-                                            onClick={(event) => handleRowClick(feature.properties.id, feature.properties.attributes, event)}>
-                                            <td>
-                                                <span style={{ marginLeft: '0px' }}>{featureIndex + 1}</span>
-                                            </td>
-
-                                            <td className='td-markera'>
-                                                <button
-                                                    className={highlightedId === feature.properties.id ? 'highlighted' : ''}
-                                                    onClick={() => highlightFeature(feature.properties.id)}
-                                                >
-                                                    O
-                                                </button>
-
-                                            </td>
-                                            {attributeNames.map((name, index) => (
-                                                <td key={`${featureIndex}-${index}`}>
-                                                    <input
-                                                        type="text"
-                                                        value={feature.properties.attributes[name] || ''}
-                                                        onChange={(e) => handleAttributeValueChange(feature.properties.id, name, e.target.value)}
-                                                    />
-
-
-                                                </td>
-
-                                            ))}
-                                        </tr>
-
-                                    ) : null
-                                ))}
+                        <tbody className="attributes-container-table">
+                            {viewMode === 'all' ? (
+                                filteredFeatures
+                                    .sort((a, b) => {
+                                        const aValue = a.properties.attributes[sortConfig.key];
+                                        const bValue = b.properties.attributes[sortConfig.key];
+                                        return compare(aValue, bValue);
+                                    })
+                                    .map((feature, featureIndex) => (
+                                        feature.properties.attributes ? renderTableRow(feature, featureIndex) : null
+                                    ))
+                            ) : (
+                                Array.from(savedObjectIds).map((featureId, index) => {
+                                    const feature = filteredFeatures.find(feature => feature.properties.id === featureId);
+                                    return feature ? renderTableRow(feature, index) : null;
+                                })
+                            )}
                         </tbody>
                     </table>
-                    {activeTab !== 'Sparade' && (
-                        <button onClick={addSelectedToSavedObjects} style={{ marginTop: '10px' }}>
-                            Lägg till valda objekt till sparade
-                        </button>
-                    )}
-                    {activeTab === 'Sparade' && (
-                        <button onClick={clearSavedObjectIds} style={{ marginTop: '10px', marginBottom: '10px' }}>
-                            Rensa hela listan
-                        </button>
-                    )}
+                    <div className="marked-rows-info">
+                        {`${highlightedIds.size} av ${filteredFeatures.length} markerade`}
+                        <button onClick={showAllItems}>Visa alla objekt</button>
+                        <button onClick={showSelectedItems}>Visa selekterade</button>
+                        <button onClick={addSelectedToSavedObjects}>Lägg till</button>
+                        <button onClick={deleteSelectedObjects}>Ta bort</button>
+                        <button onClick={clearSavedObjectIds}>Rensa selektlistan</button>
+                        <span className='addStatus'>{addStatus}</span>
+                    </div>
                 </div>
             </div>
         );
-    };
+
+        // Helper function to render table row
+        function renderTableRow(feature, index) {
+            return (
+                <tr key={index} className={highlightedIds.has(feature.properties.id) ? 'highlighted-row' : ''}
+                    onClick={(event) => handleRowClick(feature.properties.id, feature.properties.attributes, event)}>
+                    <td><span style={{ marginLeft: '0px' }}>{index + 1}</span></td>
+                    <td className='td-markera'>
+                        <button
+                            className={highlightedId === feature.properties.id ? 'highlighted' : ''}
+                            onClick={() => highlightFeature(feature.properties.id)}
+                        >
+                            O
+                        </button>
+                    </td>
+                    {attributeNames.map((name, attrIndex) => (
+                        <td key={`${index}-${attrIndex}`}>
+                            <input
+                                type="text"
+                                value={feature.properties.attributes[name] || ''}
+                                onChange={(e) => handleAttributeValueChange(feature.properties.id, name, e.target.value)}
+                            />
+                        </td>
+                    ))}
+                </tr>
+            );
+        }
+    }
 
 
     const renderMap = () => {
         return (
-            <div>
-                <MapContainer center={position} zoom={zoom} style={{ height: '100vh', width: '100%' }} className="full-width-map">
+            <div ref={mapRef} style={{ height: mapHeight, width: '100%' }}>
+
+                <MapContainer whenCreated={setMapInstance} center={position} zoom={zoom} style={{ height: '100%', width: '100%' }} className="full-width-map">
 
                     <LayersControl position="topright">
                         <BaseLayer checked name="Informationskarta">
@@ -2206,36 +2378,17 @@ useEffect(() => {
                     </FeatureGroup>
                     <RectangleDrawButton isRectangleDrawn={isRectangleDrawn} setIsRectangleDrawn={setIsRectangleDrawn} />
                 </MapContainer>
+
                 {renderAttributeTable()}
+
+
             </div>
         )
     }
 
     // Top Bar JSX
     const renderTopBar = () => {
-        /*
-                return (
-                    <div className="top-bar">
-                        <div className="top-bar-left"><h2>Projekt: {selectedProject.project_name}</h2></div>
-                        <div className="top-bar-center">
-                            <button className="top-bar-button">Filter</button>
-                            <button className="top-bar-button">Rapport</button>
-                            <button className="top-bar-button">Export</button>
-                        </div>
-                        <div className="top-bar-right">
-                            
-                            <div className="user-dropdown">
-                                <span className="user-icon">👤</span>
-                                <select>
-                                    <option>User Info</option>
-                                    <option>Logout</option>
-                                </select>
-                            </div>
-                            
-                        </div>
-                    </div>
-                );
-                */
+
     };
 
     // Left Section JSX
@@ -2325,7 +2478,7 @@ useEffect(() => {
             setShowReplacePrompt(true);
         };
 
-        
+
         const handleReplaceDecision = async (replace) => {
             console.log('Replace decision:', replace);
             //setSelectedId(fullscreenImage.mapObjectId); // Set the selected ID for the image
@@ -2336,10 +2489,10 @@ useEffect(() => {
                     const canvas = document.createElement('canvas');
                     canvas.width = img.width;
                     canvas.height = img.height;
-        
+
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0);
-        
+
                     const drawingImg = new Image();
                     drawingImg.onload = () => {
                         ctx.drawImage(drawingImg, 0, 0);
@@ -2452,10 +2605,25 @@ useEffect(() => {
                     <button className="top-bar-button">Export</button>
                 </div>
 
+                {/*
+                <div className="slider-container">
+                    <label htmlFor="map-height-slider">Justera karthöjd</label><br />
+                    <input
+                        id="map-height-slider"
+                        type="range"
+                        min="0"
+                        max="59"
+                        value={parseInt(mapHeight, 10)}
+                        onChange={handleSliderChange}
+                        className="height-slider"
+                    />
+                </div>
+                */}
+
                 {renderAttributeSectionList()}
 
 
-                <h3>Bilder</h3>
+                <h3>Objektbilder</h3>
                 {fullscreenImage ? fullscreenView : miniatureView}
 
 
