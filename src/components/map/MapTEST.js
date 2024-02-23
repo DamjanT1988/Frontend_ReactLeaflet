@@ -2598,7 +2598,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                         </div>
                     )}
 
-                    <button>{selectedKartlaggningstyp}</button>
+                    <button>{selectedKartlaggningstyp || 'Ingen karteringstyp vald'}</button>
                     <button>Naturvärdesbiologi</button>
                     <button>Landskapsområden</button>
                     <div className="additional-section">
