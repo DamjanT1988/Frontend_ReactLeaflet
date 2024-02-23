@@ -1828,11 +1828,21 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
     };
 
     const renderAttributeSectionList = () => {
+
+
         // Initialize attributesObject with default values if no object is selected
         const editableAttributesObject = attributesObject || Object.keys(attributeDisplayNameMap).reduce((acc, key) => {
             acc[key] = ''; // Initialize all attributes with empty strings or default values
             return acc;
         }, {});
+
+        // Function to handle changes to attribute values
+        const handleAttributeChange = (attributeName, newValue) => {
+            setAttributesObject({
+                ...editableAttributesObject,
+                [attributeName]: newValue,
+            });
+        };
 
         const kartlaggningstypOptions = {
             KartlaggningBiologiskMangfald: "Kartläggning biologisk mångfald",
@@ -1873,18 +1883,9 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                             id={`attribute-${key}`}
                             type="text"
                             value={value}
-                            onChange={(e) => {
-                                // Update attributesObject with new values only if an object is selected
-                                if (selectedId) {
-                                    setAttributesObject({
-                                        ...editableAttributesObject,
-                                        [key]: e.target.value,
-                                    });
-                                }
-                            }}
+                            onChange={(e) => handleAttributeChange(key, e.target.value)}
                         />
                     </div>
-
                 ))}
                 <button onClick={() => saveAttributes()}>Spara</button><span className='addStatus'>{addStatusObject}</span>
                 <label htmlFor="file-upload" className="file-upload-label">Lägg till en bild</label>
@@ -1898,9 +1899,9 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                     </>
                 )}
             </div>
-
         );
     };
+    
 
 
 
@@ -2095,7 +2096,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
 
 
         const filteredFeatures = geoJsonData.features.filter(feature => {
-            console.log("Processing feature:", feature);
+            //console.log("Processing feature:", feature);
 
             // Exclude rectangleCrop shapes
             if (feature.properties.shape === "rectangleCrop") {
@@ -2105,7 +2106,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
             // Check for matching Kartläggningstyp, if any are selected
             //const matchesKartlaggningstyp = selectedKartlaggningstyp.length === 0 || (feature.properties.attributes && selectedKartlaggningstyp.includes(feature.properties.attributes.kartlaggningsTyp));
             const matchesKartlaggningstyp = feature.properties.attributes.kartlaggningsTyp === selectedKartlaggningstyp || selectedKartlaggningstyp === '' || selectedKartlaggningstyp === 'Alla';
-            console.log("Feature matches kartlaggningsTyp:", matchesKartlaggningstyp);
+            //console.log("Feature matches kartlaggningsTyp:", matchesKartlaggningstyp);
 
             // Filter by active tab, now also checking for Kartläggningstyp match
             switch (activeTab) {
