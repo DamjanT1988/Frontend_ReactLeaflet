@@ -2240,19 +2240,30 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
             setViewMode('all');
         };
 
-
-        // New function to add selected features to savedObjectIDs
         const addSelectedToSavedObjects = () => {
-            if (selectedId === null) {
-                setAddStatus('Selektera objekt'); // Set the status message
-                setTimeout(() => setAddStatus(''), 2000); // Clear the message after 3 seconds
-                return 
+            if (!selectedId && selectedRowIds.size === 0) {
+                console.log('No selected objects to add');
+                setAddStatus('Selektera objekt');
+                setTimeout(() => setAddStatus(''), 2000);
+                return;
             }
-            setSavedObjectIds(new Set([...savedObjectIds, ...selectedRowIds, ...selectedId]));
-            console.log("savedObjectIds", savedObjectIds);
-            setAddStatus('Selekterade objekt lades till'); // Set the status message
-            setTimeout(() => setAddStatus(''), 2000); // Clear the message after 3 seconds
+        
+            setSavedObjectIds(prevSavedObjectIds => {
+                const newSavedObjectIds = new Set(prevSavedObjectIds);
+                if (selectedId) {
+                    newSavedObjectIds.add(selectedId);
+                }
+                for (let id of selectedRowIds) {
+                    newSavedObjectIds.add(id);
+                }
+                console.log('Updated savedObjectIds:', newSavedObjectIds);
+                return newSavedObjectIds;
+            });
+        
+            setAddStatus('Selekterade objekt lades till');
+            setTimeout(() => setAddStatus(''), 2000);
         };
+        
 
         // Function to clear savedObjectIds
         const clearSavedObjectIds = () => {
