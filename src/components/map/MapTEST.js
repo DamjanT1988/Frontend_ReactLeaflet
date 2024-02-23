@@ -213,7 +213,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
     const [addStatus, setAddStatus] = useState(''); // State for the add status message
     const [addStatusObject, setAddStatusObject] = useState(''); // State for the add status message
     const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
-    const [selectedKartlaggningstyp, setSelectedKartlaggningstyp] = useState('');
+    const [selectedKartlaggningstyp, setSelectedKartlaggningstyp] = useState('Välj kartering med +');
     const mapObjectClickedRef = useRef(false);
     const [showList, setShowList] = useState(false);
 
@@ -2571,42 +2571,45 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
             setShowList(!showList);
         };
 
+
         return (
-                <div className="left-section">
-                    <div className="top-left">
-                        <h2>{selectedProject.project_name}</h2>
+            <div className="left-section">
+                                <button className="addKartering" onClick={toggleList}>
+                        +
+                    </button>
+
+                <div className="top-left">
+                    <h2>{selectedProject.project_name}</h2>
 
 
-                <button onClick={toggleList}>
-                    Kartläggning biologisk mångfald
-                </button>
 
-                {showList && (
-                    <div className="list-popup">
-                        <div className="kartlaggningstyp-filter">
-                            <label htmlFor="kartlaggningstyp-select">Lägg till kartering:</label>
-                            <select id="kartlaggningstyp-select" value={selectedKartlaggningstyp} onChange={(e) => setSelectedKartlaggningstyp(e.target.value)}>
-                                <option value="">Alla</option>
-                                {Object.entries(kartlaggningstypOptions).map(([key, value]) => (
-                                    <option key={key} value={key}>{value}</option>
-                                ))}
-                            </select>
+                    {showList && (
+                        <div className="list-popup">
+                            <div className="kartlaggningstyp-filter">
+                                <label htmlFor="kartlaggningstyp-select">Lägg till kartering:</label>
+                                <select id="kartlaggningstyp-select" value={selectedKartlaggningstyp} onChange={(e) => setSelectedKartlaggningstyp(e.target.value)}>
+                                    <option value="">Alla</option>
+                                    {Object.entries(kartlaggningstypOptions).map(([key, value]) => (
+                                        <option key={key} value={key}>{value}</option>
+                                    ))}
+                                </select>
+                            </div>
+
                         </div>
+                    )}
 
+                    <button>{selectedKartlaggningstyp}</button>                    
+                    <button>Naturvärdesbiologi</button>
+                    <button>Landskapsområden</button>
+                    <div className="additional-section">
+                        <h3>Tillägg:</h3>
+                        <button>Example Button 1</button>
+                        <button>Example Button 2</button>
                     </div>
-                )}
-
-                        <button>Naturvärdesbiologi</button>
-                        <button>Landskapsområden</button>
-                        <div className="additional-section">
-                            <h3>Tillägg:</h3>
-                            <button>Example Button 1</button>
-                            <button>Example Button 2</button>
-                        </div>
-                    </div>
-                    <button>Lagerhantering</button>
                 </div>
-            
+                <button>Lagerhantering</button>
+            </div>
+
         )
     };
 

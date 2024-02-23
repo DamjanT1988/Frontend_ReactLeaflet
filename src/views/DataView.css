@@ -150,7 +150,7 @@ margin-top: 5px;
 margin-top: -5px;
 font-size: 100%;
 font-weight: 700;
-border-bottom: 4px solid #30A875
+/*border-bottom: 4px solid #30A875*/
 }
 
 
@@ -502,15 +502,6 @@ font-weight: bold;
   color: #666; /* Lighter color for the arrows */
 }
 
-.biodiversity-mapping {
-  /* Styles for the main container */
-  position: relative;
-}
-
-.mapping-button {
-  /* Styles for the button */
-}
-
 .left-section {
   position: relative; /* This is necessary for the absolute positioning of children */
   z-index: 2000; /* Ensure this is higher than the map's z-index */
@@ -520,13 +511,13 @@ font-weight: bold;
 .list-popup {
   position: fixed;
   right: 0; /* Align to the right edge of the left-section */
-  top: 100px;
+  top: 80px;
   left: 250px; /* Align to the top of the left-section or adjust as needed */
   width: 300px; /* Adjust the width as needed */
   background-color: white;
   border: 1px solid #ddd;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  z-index: 210000000000000000000000000000; /* Ensure it's above the left-section and map */
+  z-index: 2100; /* Ensure it's above the left-section and map */
   padding: 10px;
   /* Add more styling as needed */
 }
@@ -545,4 +536,27 @@ font-weight: bold;
 
 .list-popup li:last-child {
   border-bottom: none;
+}
+
+.addKartering {
+  position: absolute; /* Position the button relative to its nearest positioned ancestor */
+  top: 5px; /* Position from the top of the left-section */
+  right: 10px; /* Position from the right of the left-section */
+  width: 25px; /* Width of the button */
+  height: 25px; /* Height of the button, same as width to make it square */
+  background-color: #30A875; /* Background color of the button */
+  color: white; /* Color of the "+" icon */
+  border: none; /* Remove border */
+  border-radius: 5px; /* Slightly rounded corners for the square */
+  font-size: 24px; /* Size of the "+" icon */
+  display: flex; /* Use flexbox for centering */
+  justify-content: center; /* Center horizontally */
+  align-items: center; /* Center vertically */
+  cursor: pointer; /* Change the cursor on hover */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3); /* Add a subtle shadow for depth */
+  z-index: 3000; /* Ensure the button is above other content */
+}
+
+.addKartering:hover {
+  background-color: #267356; /* Slightly darker green on hover for feedback */
 }
