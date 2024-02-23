@@ -784,7 +784,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                                 setHighlightedId(feature.properties.id); // Set the highlighted feature's ID
                                 circle.setStyle({
                                     color: 'red', // Change color to green upon click
-                                    fillColor: 'red', // Change fill color to green upon click
+                                    //fillColor: 'red', // Change fill color to green upon click
                                     fillOpacity: 0.1,
                                     weight: 5,
                                 });
@@ -2574,9 +2574,9 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
 
         return (
             <div className="left-section">
-                                <button className="addKartering" onClick={toggleList}>
-                                {showList ? '-' : '+'} 
-                    </button>
+                <button className="addKartering" onClick={toggleList}>
+                    {showList ? '-' : '+'}
+                </button>
 
                 <div className="top-left">
                     <h2>{selectedProject.project_name}</h2>
@@ -2598,7 +2598,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                         </div>
                     )}
 
-                    <button>{selectedKartlaggningstyp}</button>                    
+                    <button>{selectedKartlaggningstyp}</button>
                     <button>Naturvärdesbiologi</button>
                     <button>Landskapsområden</button>
                     <div className="additional-section">
