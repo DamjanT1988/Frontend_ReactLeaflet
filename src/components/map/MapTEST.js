@@ -2575,7 +2575,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
         return (
             <div className="left-section">
                                 <button className="addKartering" onClick={toggleList}>
-                        +
+                                {showList ? '-' : '+'} 
                     </button>
 
                 <div className="top-left">
