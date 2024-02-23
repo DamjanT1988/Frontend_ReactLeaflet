@@ -215,6 +215,9 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
     const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
     const [selectedKartlaggningstyp, setSelectedKartlaggningstyp] = useState('');
     const mapObjectClickedRef = useRef(false);
+    const [showList, setShowList] = useState(false);
+
+
 
 
     const MapEventsComponent = () => {
@@ -251,13 +254,13 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                                 weight: 2, // Default stroke weight
                             });
                         }
-                        
+
                         // Add additional conditions for other layer types as needed
                     });
                 }
                 mapObjectClickedRef.current = false;
 
-             
+
             },
         });
 
@@ -776,7 +779,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                                 resetAllLayerStyles();
                                 setHighlightedIds(new Set([feature.properties.id]));
                                 //setHighlightedId(null); // Set the highlighted feature's ID
-                                mapObjectClickedRef.current = true; 
+                                mapObjectClickedRef.current = true;
                                 console.log('circle clicked: ', feature.properties.id);
                                 setHighlightedId(feature.properties.id); // Set the highlighted feature's ID
                                 circle.setStyle({
@@ -790,12 +793,12 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                                 setShowAttributeTable(true); // Show the attribute table
                             });
 
-                            
+
                         } else {
                             layer.addTo(featureGroupRef.current);
                         }
 
- 
+
                     }
                 })
 
@@ -2398,6 +2401,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
         };
 
 
+
         return (
             <div>
                 {shouldHideDataView && <div className="elementToHide">
@@ -2562,29 +2566,47 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
             VattendragDelstracka: "Vattendrag delsträcka",
         };
 
-        return (
-            <div className="left-section">
-                <div className="top-left">
-                    <h2>{selectedProject.project_name}</h2>
-                    <div className="kartlaggningstyp-filter">
-                        <label htmlFor="kartlaggningstyp-select">Välj Kartläggningstyp:</label>
-                        <select id="kartlaggningstyp-select" value={selectedKartlaggningstyp} onChange={(e) => setSelectedKartlaggningstyp(e.target.value)}>
-                            <option value="">Alla</option>
-                            {Object.entries(kartlaggningstypOptions).map(([key, value]) => (
-                                <option key={key} value={key}>{value}</option>
-                            ))}
-                        </select>
-                    </div>
 
-                    <button>Naturvärdesbiologi</button>
-                    <button>Landskapsområden</button>
-                    <div className="additional-section">
-                        <h3>Tillägg:</h3>
-                        <button>Example Button 1</button>
-                        <button>Example Button 2</button>
+        const toggleList = () => {
+            setShowList(!showList);
+        };
+
+        return (
+                <div className="left-section">
+                    <div className="top-left">
+                        <h2>{selectedProject.project_name}</h2>
+
+
+                <button onClick={toggleList}>
+                    Kartläggning biologisk mångfald
+                </button>
+
+                {showList && (
+                    <div className="list-popup">
+                        <div className="kartlaggningstyp-filter">
+                            <label htmlFor="kartlaggningstyp-select">Lägg till kartering:</label>
+                            <select id="kartlaggningstyp-select" value={selectedKartlaggningstyp} onChange={(e) => setSelectedKartlaggningstyp(e.target.value)}>
+                                <option value="">Alla</option>
+                                {Object.entries(kartlaggningstypOptions).map(([key, value]) => (
+                                    <option key={key} value={key}>{value}</option>
+                                ))}
+                            </select>
+                        </div>
+
                     </div>
+                )}
+
+                        <button>Naturvärdesbiologi</button>
+                        <button>Landskapsområden</button>
+                        <div className="additional-section">
+                            <h3>Tillägg:</h3>
+                            <button>Example Button 1</button>
+                            <button>Example Button 2</button>
+                        </div>
+                    </div>
+                    <button>Lagerhantering</button>
                 </div>
-            </div>
+            
         )
     };
 
