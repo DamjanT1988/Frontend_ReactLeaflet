@@ -214,6 +214,56 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
     const [addStatusObject, setAddStatusObject] = useState(''); // State for the add status message
     const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
     const [selectedKartlaggningstyp, setSelectedKartlaggningstyp] = useState('');
+    const mapObjectClickedRef = useRef(false);
+
+
+    const MapEventsComponent = () => {
+        const map = useMapEvents({
+            click: () => {
+                if (!mapObjectClickedRef.current) {
+                    console.log("Map clicked, resetting selection and styles");
+
+                    // Reset selection states
+                    setSelectedId(null);
+                    setHighlightedId(null);
+                    setAttributesObject(null);
+
+                    // Reset styles for all layers in the feature group
+                    featureGroupRef.current.eachLayer(layer => {
+                        // Check the type of layer and reset to default styles accordingly
+                        if (layer instanceof L.Marker) {
+                            // Reset marker icon to default
+                            layer.setIcon(dotIconBlue); // Assuming dotIconBlue is your default marker icon
+                        } else if (layer instanceof L.CircleMarker) {
+                            // Reset circle or circle marker style
+                            layer.setStyle({
+                                color: '#3388ff', // Default stroke color
+                                fillColor: '#3388ff', // Default fill color
+                                fillOpacity: 0.2, // Default fill opacity
+                                weight: 2, // Default stroke weight
+                            });
+                        } else if (layer instanceof L.Polygon || layer instanceof L.Polyline) {
+                            // Reset polygon or polyline style
+                            layer.setStyle({
+                                color: '#3388ff', // Default stroke color
+                                fillColor: '#3388ff', // Default fill color
+                                fillOpacity: 0.2, // Default fill opacity
+                                weight: 2, // Default stroke weight
+                            });
+                        }
+                        
+                        // Add additional conditions for other layer types as needed
+                    });
+                }
+                mapObjectClickedRef.current = false;
+
+             
+            },
+        });
+
+        return null; // This component does not render anything
+    };
+
 
 
     const handleDrag = (movementY) => {
@@ -639,6 +689,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                     },
 
                     onEachFeature: (feature, layer) => {
+
                         layer.on('click', (event) => {
                             handleFeatureClick(feature.properties.id, layer, event);
                             // Additional logic for displaying attributes, etc.
@@ -725,6 +776,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                                 resetAllLayerStyles();
                                 setHighlightedIds(new Set([feature.properties.id]));
                                 //setHighlightedId(null); // Set the highlighted feature's ID
+                                mapObjectClickedRef.current = true; 
                                 console.log('circle clicked: ', feature.properties.id);
                                 setHighlightedId(feature.properties.id); // Set the highlighted feature's ID
                                 circle.setStyle({
@@ -737,9 +789,13 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                                 setAttributesObject(feature.properties.attributes || {});
                                 setShowAttributeTable(true); // Show the attribute table
                             });
+
+                            
                         } else {
                             layer.addTo(featureGroupRef.current);
                         }
+
+ 
                     }
                 })
 
@@ -2089,21 +2145,21 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                 });
             }
         });
-    
+
         const attributeNames = Array.from(allAttributeNames);
 
         const filteredFeatures = geoJsonData.features.filter(feature => {
             if (feature.properties.shape === "rectangleCrop") {
                 return false;
             }
-    
+
             const matchesKartlaggningstyp = feature.properties.attributes.kartlaggningsTyp === selectedKartlaggningstyp || selectedKartlaggningstyp === '' || selectedKartlaggningstyp === 'Alla';
-    
+
             // When in 'selected' view mode, apply additional filtering based on the active tab
             if (viewMode === 'selected') {
                 const isSelected = savedObjectIds.has(feature.properties.id);
                 if (!isSelected) return false; // Exclude unselected features
-    
+
                 // Filter by geometric type according to the active tab
                 switch (activeTab) {
                     case 'Punkter':
@@ -2232,10 +2288,10 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
         const showSelectedItems = () => {
             const filteredItems = allItems.filter(item => selectedItems.has(item.id));
             // Update your state or variable that controls the displayed items in the attribute table
-            
+
             setViewMode('selected');
         };
- 
+
         const showAllItems = () => {
             setViewMode('all');
         };
@@ -2247,7 +2303,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                 setTimeout(() => setAddStatus(''), 2000);
                 return;
             }
-        
+
             setSavedObjectIds(prevSavedObjectIds => {
                 const newSavedObjectIds = new Set(prevSavedObjectIds);
                 if (selectedId) {
@@ -2259,11 +2315,11 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                 console.log('Updated savedObjectIds:', newSavedObjectIds);
                 return newSavedObjectIds;
             });
-        
+
             setAddStatus('Selekterade objekt lades till');
             setTimeout(() => setAddStatus(''), 2000);
         };
-        
+
 
         // Function to clear savedObjectIds
         const clearSavedObjectIds = () => {
@@ -2460,6 +2516,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                         ))}
                     </FeatureGroup>
                     <RectangleDrawButton isRectangleDrawn={isRectangleDrawn} setIsRectangleDrawn={setIsRectangleDrawn} />
+                    <MapEventsComponent />
                 </MapContainer>
 
                 {renderAttributeTable()}
@@ -2583,7 +2640,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
             setSelectedImage(selectedFile);
             // Reset or set the caption text as needed
             setCaptionText(''); // Clear or set a default caption text
-          };
+        };
 
         // When setting the fullscreen image, calculate its dimensions
         const handleImageClick = (image) => {
