@@ -1901,7 +1901,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
             </div>
         );
     };
-    
+
 
 
 
@@ -2071,6 +2071,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
         )
     }
 
+
     const renderAttributeTable = () => {
 
 
@@ -2080,8 +2081,6 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
             return <div>Loading data...</div>; // Or any other placeholder content
         }
 
-
-        // Collect all unique attribute names across all features
         const allAttributeNames = new Set();
         geoJsonData.features.forEach(feature => {
             if (feature.properties && feature.properties.attributes) {
@@ -2090,38 +2089,46 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                 });
             }
         });
-
-        // Convert the Set to an array for mapping
+    
         const attributeNames = Array.from(allAttributeNames);
 
-
         const filteredFeatures = geoJsonData.features.filter(feature => {
-            //console.log("Processing feature:", feature);
-
-            // Exclude rectangleCrop shapes
             if (feature.properties.shape === "rectangleCrop") {
                 return false;
             }
-
-            // Check for matching Kartläggningstyp, if any are selected
-            //const matchesKartlaggningstyp = selectedKartlaggningstyp.length === 0 || (feature.properties.attributes && selectedKartlaggningstyp.includes(feature.properties.attributes.kartlaggningsTyp));
+    
             const matchesKartlaggningstyp = feature.properties.attributes.kartlaggningsTyp === selectedKartlaggningstyp || selectedKartlaggningstyp === '' || selectedKartlaggningstyp === 'Alla';
-            //console.log("Feature matches kartlaggningsTyp:", matchesKartlaggningstyp);
-
-            // Filter by active tab, now also checking for Kartläggningstyp match
-            switch (activeTab) {
-                case 'Punkter':
-                    return matchesKartlaggningstyp && (feature.properties.isMarker || feature.properties.isPoint);
-                case 'Linjer':
-                    return matchesKartlaggningstyp && (feature.geometry.type === 'LineString' || feature.geometry.type === 'MultiLineString');
-                case 'Polygoner':
-                    return matchesKartlaggningstyp && (feature.geometry.type === 'Polygon' || feature.geometry.type === 'MultiPolygon' || feature.properties.isCircleMarker || feature.properties.isCircle);
-                case 'Alla':
-                    return matchesKartlaggningstyp;
-                case 'Selekterade':
-                    return matchesKartlaggningstyp && savedObjectIds.has(feature.properties.id);
-                default:
-                    return matchesKartlaggningstyp;
+    
+            // When in 'selected' view mode, apply additional filtering based on the active tab
+            if (viewMode === 'selected') {
+                const isSelected = savedObjectIds.has(feature.properties.id);
+                if (!isSelected) return false; // Exclude unselected features
+    
+                // Filter by geometric type according to the active tab
+                switch (activeTab) {
+                    case 'Punkter':
+                        return feature.properties.isMarker || feature.properties.isPoint;
+                    case 'Linjer':
+                        return feature.geometry.type === 'LineString' || feature.geometry.type === 'MultiLineString';
+                    case 'Polygoner':
+                        return feature.geometry.type === 'Polygon' || feature.geometry.type === 'MultiPolygon' || feature.properties.isCircleMarker || feature.properties.isCircle;
+                    default:
+                        return true; // Include all selected features for 'Alla' or unrecognized tabs
+                }
+            } else {
+                // Normal filtering logic for non-selected view mode
+                switch (activeTab) {
+                    case 'Punkter':
+                        return matchesKartlaggningstyp && (feature.properties.isMarker || feature.properties.isPoint);
+                    case 'Linjer':
+                        return matchesKartlaggningstyp && (feature.geometry.type === 'LineString' || feature.geometry.type === 'MultiLineString');
+                    case 'Polygoner':
+                        return matchesKartlaggningstyp && (feature.geometry.type === 'Polygon' || feature.geometry.type === 'MultiPolygon' || feature.properties.isCircleMarker || feature.properties.isCircle);
+                    case 'Alla':
+                        return matchesKartlaggningstyp;
+                    default:
+                        return matchesKartlaggningstyp;
+                }
             }
         });
 
@@ -2225,9 +2232,10 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
         const showSelectedItems = () => {
             const filteredItems = allItems.filter(item => selectedItems.has(item.id));
             // Update your state or variable that controls the displayed items in the attribute table
+            
             setViewMode('selected');
         };
-
+ 
         const showAllItems = () => {
             setViewMode('all');
         };
@@ -2235,7 +2243,13 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
 
         // New function to add selected features to savedObjectIDs
         const addSelectedToSavedObjects = () => {
+            if (selectedId === null) {
+                setAddStatus('Selektera objekt'); // Set the status message
+                setTimeout(() => setAddStatus(''), 2000); // Clear the message after 3 seconds
+                return 
+            }
             setSavedObjectIds(new Set([...savedObjectIds, ...selectedRowIds, ...selectedId]));
+            console.log("savedObjectIds", savedObjectIds);
             setAddStatus('Selekterade objekt lades till'); // Set the status message
             setTimeout(() => setAddStatus(''), 2000); // Clear the message after 3 seconds
         };
@@ -2299,35 +2313,6 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
             return compare(aValue, bValue);
         });
 
-        /*
-        // Ensure geoJsonData is defined and has features
-        const hasFeatures = geoJsonData && geoJsonData.features && geoJsonData.features.length > 0;
-
-        // Function to determine if there are Point features excluding CircleMarkers
-        const hasPointFeatures = () => {
-            return hasFeatures && geoJsonData.features.some(feature => {
-                const isPoint = feature.geometry.type === 'Point';
-                const isCircleMarker = feature.properties.isCircleMarker; // Check if it's a circle marker
-                return isPoint && !isCircleMarker; // Include only if it's a Point and not a CircleMarker
-            });
-        };
-
-        // Function to determine if there are features for Linjer category
-        const hasLineFeatures = () => {
-            return hasFeatures && geoJsonData.features.some(feature => {
-                return ['LineString', 'MultiLineString'].includes(feature.geometry.type);
-            });
-        };
-
-        // Function to determine if there are features for Polygoner category including CircleMarkers
-        const hasPolygonFeatures = () => {
-            return hasFeatures && geoJsonData.features.some(feature => {
-                const isPolygonType = ['Polygon', 'MultiPolygon', 'Circle'].includes(feature.geometry.type);
-                const isCircleMarker = feature.properties.isCircleMarker; // Check if it's a circle marker
-                return isPolygonType || isCircleMarker; // Include if it's a Polygon type or a CircleMarker
-            });
-        };
-        */
 
         // Function to determine if there are features for a given geometry type and kartlaggningstyp
         const hasFeaturesForGeometry = (geometryType) => {
