@@ -2578,12 +2578,20 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
             </div>
         );
 
+        const handleImageSelection = (event) => {
+            const selectedFile = event.target.files[0];
+            setSelectedImage(selectedFile);
+            // Reset or set the caption text as needed
+            setCaptionText(''); // Clear or set a default caption text
+          };
+
         // When setting the fullscreen image, calculate its dimensions
         const handleImageClick = (image) => {
             const img = new Image();
             img.onload = () => {
                 setImageSize({ width: img.width, height: img.height });
                 setFullscreenImage(image);
+                setCaptionText(image.caption); // Set the caption text
             };
             img.src = image.url;
         };
