@@ -213,7 +213,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
     const [addStatus, setAddStatus] = useState(''); // State for the add status message
     const [addStatusObject, setAddStatusObject] = useState(''); // State for the add status message
     const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
-    const [selectedKartlaggningstyp, setSelectedKartlaggningstyp] = useState('Välj kartering med +');
+    const [selectedKartlaggningstyp, setSelectedKartlaggningstyp] = useState(''); //MUST BE BLANK
     const mapObjectClickedRef = useRef(false);
     const [showList, setShowList] = useState(false);
 
@@ -230,6 +230,10 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                     setSelectedId(null);
                     setHighlightedId(null);
                     setAttributesObject(null);
+                    
+                    if (highlightedId === null && selectedId === null && selectedFeatureIds.size === 0 && savedObjectIds.size === 0) {
+                        setImageList([]);
+                    }
 
                     // Reset styles for all layers in the feature group
                     featureGroupRef.current.eachLayer(layer => {
@@ -701,6 +705,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
 
                         layer.on('click', () => {
                             // Set the selected feature ID and its attributes for editing
+                            mapObjectClickedRef.current = true;
                             setSelectedId(feature.properties.id);
                             setAttributesObject(feature.properties.attributes || {});
                             setShowAttributeTable(true); // Show the attribute table
@@ -1744,6 +1749,9 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
         setGeoJsonData({ ...geoJsonData, features: updatedFeatures });
         setSelectedId(null); // Deselect the current feature
         setAddStatusObject('Objektattribut uppdaterat');
+        setTimeout(() => {
+            setAddStatusObject('');
+        }, 2000);
     };
 
     // useEffect hook to synchronize layer options with geoJsonData changes
