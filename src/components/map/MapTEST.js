@@ -216,6 +216,10 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
     const [selectedKartlaggningstyp, setSelectedKartlaggningstyp] = useState(''); //MUST BE BLANK
     const mapObjectClickedRef = useRef(false);
     const [showList, setShowList] = useState(false);
+    const [selectedKartlaggningOption, setSelectedKartlaggningOption] = useState(null);
+    const [selectedKartlaggningValue, setSelectedKartlaggningValue] = useState(null);
+
+
 
 
 
@@ -230,7 +234,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                     setSelectedId(null);
                     setHighlightedId(null);
                     setAttributesObject(null);
-                    
+
                     if (highlightedId === null && selectedId === null && selectedFeatureIds.size === 0 && savedObjectIds.size === 0) {
                         setImageList([]);
                     }
@@ -2574,9 +2578,19 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
             VattendragDelstracka: "Vattendrag delsträcka",
         };
 
+        // Convert kartlaggningstypOptions to an array and add the "Alla" option
+        const kartlaggningstypOptionsArray = [{ key: '', value: 'Alla' }, ...Object.entries(kartlaggningstypOptions).map(([key, value]) => ({ key, value }))];
 
         const toggleList = () => {
             setShowList(!showList);
+        };
+
+        const handleSelectKartlaggningOption = (optionKey) => {
+            const selectedOption = kartlaggningstypOptionsArray.find(option => option.key === optionKey);
+
+            setSelectedKartlaggningOption(optionKey);
+            setSelectedKartlaggningstyp(optionKey); // Assuming setSelectedKartlaggningstyp is your existing function to set selected kartlaggningstyp
+            setSelectedKartlaggningValue(selectedOption ? selectedOption.value : '');
         };
 
 
@@ -2589,24 +2603,27 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                 <div className="top-left">
                     <h2>{selectedProject.project_name}</h2>
 
-
-
                     {showList && (
                         <div className="list-popup">
-                            <div className="kartlaggningstyp-filter">
-                                <label htmlFor="kartlaggningstyp-select">Lägg till kartering:</label>
-                                <select id="kartlaggningstyp-select" value={selectedKartlaggningstyp} onChange={(e) => setSelectedKartlaggningstyp(e.target.value)}>
-                                    <option value="">Alla</option>
-                                    {Object.entries(kartlaggningstypOptions).map(([key, value]) => (
-                                        <option key={key} value={key}>{value}</option>
-                                    ))}
-                                </select>
-                            </div>
-
+                        <h3>Lägg till kartläggning:</h3>
+                            {kartlaggningstypOptionsArray.map(({ key, value }) => (
+                                <div
+                                    key={key}
+                                    onClick={() => handleSelectKartlaggningOption(key)}
+                                    style={{
+                                        padding: '10px',
+                                        cursor: 'pointer',
+                                        backgroundColor: selectedKartlaggningOption === key ? '#007bff' : 'transparent',
+                                        color: selectedKartlaggningOption === key ? '#ffffff' : '#000000',
+                                    }}
+                                >
+                                    {value}
+                                </div>
+                            ))}
                         </div>
                     )}
 
-                    <button>{selectedKartlaggningstyp || 'Ingen karteringstyp vald'}</button>
+                    <button>{selectedKartlaggningValue || 'Ingen karteringstyp vald'}</button>
                     <button>Naturvärdesbiologi</button>
                     <button>Landskapsområden</button>
                     <div className="additional-section">
@@ -2617,8 +2634,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                 </div>
                 <button>Lagerhantering</button>
             </div>
-
-        )
+        );
     };
 
 

@@ -560,3 +560,12 @@ font-weight: bold;
 .addKartering:hover {
   background-color: #267356; /* Slightly darker green on hover for feedback */
 }
+
+.list-popup {
+  max-height: 500px;
+  overflow-y: scroll;
+}
+
+.list-popup h3 {
+margin: 0px;
+}
