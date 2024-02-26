@@ -215,9 +215,10 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
     const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
     const [selectedKartlaggningstyp, setSelectedKartlaggningstyp] = useState(''); //MUST BE BLANK
     const mapObjectClickedRef = useRef(false);
-    const [showList, setShowList] = useState(false);
+    const [showList, setShowKartlaggningList] = useState(false);
     const [selectedKartlaggningOption, setSelectedKartlaggningOption] = useState(null);
     const [selectedKartlaggningValue, setSelectedKartlaggningValue] = useState(null);
+    const [showLagerhanteringPopup, setShowLagerhanteringPopup] = useState(false);
 
 
     const MapEventsComponent = () => {
@@ -226,14 +227,15 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                 if (!mapObjectClickedRef.current) {
                     console.log("Map clicked, resetting selection and styles");
 
+                    if (highlightedId === null && selectedId === null && selectedFeatureIds.size === 0 && savedObjectIds.size === 0) {
+                        setImageList([]);
+                    } // BEFORE THE RESET - AT TOP
+
                     // Reset selection states
                     setSelectedId(null);
                     setHighlightedId(null);
                     setAttributesObject(null);
 
-                    if (highlightedId === null && selectedId === null && selectedFeatureIds.size === 0 && savedObjectIds.size === 0) {
-                        setImageList([]);
-                    }
 
                     // Reset styles for all layers in the feature group
                     featureGroupRef.current.eachLayer(layer => {
@@ -1011,9 +1013,11 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                     setGeoJsonData(data); // Assuming the GeoJSON data is directly at the top level
                 }
                 if (data.savedObjectIds) {
-                    data.trim(); //TAKES AWAY WHITESPACE
-                    setSavedObjectIds(new Set(data.savedObjectIds)); // Convert array back to Set
-                    console.log('Saved object IDs:', data.savedObjectIds);
+                    // Map over the array and trim whitespace from each string
+                    const trimmedObjectIds = data.savedObjectIds.map(id => id.trim());
+
+                    setSavedObjectIds(new Set(trimmedObjectIds)); // Convert array back to Set
+                    console.log('Saved object IDs:', trimmedObjectIds);
                 }
                 console.log('Loaded data:', data);
                 setSelectedImage(null); // Reset the selected image after successful upload
@@ -2578,8 +2582,12 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
         // Convert kartlaggningstypOptions to an array and add the "Alla" option
         const kartlaggningstypOptionsArray = [{ key: '', value: 'Visa alla' }, ...Object.entries(kartlaggningstypOptions).map(([key, value]) => ({ key, value }))];
 
-        const toggleList = () => {
-            setShowList(!showList);
+        const toggleKartlaggningList = () => {
+            setShowKartlaggningList(!showList);
+        };
+
+        const toggleLagerhanteringPopup = () => {
+            setShowLagerhanteringPopup(!showLagerhanteringPopup);
         };
 
         const handleSelectKartlaggningOption = (optionKey) => {
@@ -2594,7 +2602,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
 
         return (
             <div className="left-section">
-                <button className="addKartering" onClick={toggleList}>
+                <button className="addKartering" onClick={toggleKartlaggningList}>
                     {showList ? '-' : '+'}
                 </button>
 
@@ -2603,7 +2611,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
 
                     {showList && (
                         <div className="list-popup">
-                            <h3>Lägg till kartläggning:</h3>
+                            <h3>Lägg till kartläggning</h3>
                             {kartlaggningstypOptionsArray.map(({ key, value }) => (
                                 <div
                                     key={key}
@@ -2631,7 +2639,17 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                         <button>Example Button 2</button>
                     </div>
                 </div>
-                <button>Lagerhantering</button>
+                <button className="layers-btn" onClick={toggleLagerhanteringPopup}>
+                    <img src={`${process.env.PUBLIC_URL}/media/layers-100.png`} alt="Layers" />
+                </button>
+                {showLagerhanteringPopup && (
+                    <div className="lagerhantering-popup">
+                        {/* Pop-up content goes here */}
+                        <p>Pop-up content for Lagerhantering</p>
+                        {/* Close button */}
+                        <button onClick={() => setShowLagerhanteringPopup(false)}>Stäng</button>
+                    </div>
+                )}
             </div>
         );
     };
@@ -2683,12 +2701,14 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
             </div>
         );
 
+        /*
         const handleImageSelection = (event) => {
             const selectedFile = event.target.files[0];
             setSelectedImage(selectedFile);
             // Reset or set the caption text as needed
             setCaptionText(''); // Clear or set a default caption text
         };
+        */
 
         // When setting the fullscreen image, calculate its dimensions
         const handleImageClick = (image) => {

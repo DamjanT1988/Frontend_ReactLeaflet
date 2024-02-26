@@ -234,7 +234,7 @@
   width: 100vw;
   height: 100vh;
   background-color: rgba(0, 0, 0, 0.8);
-  z-index: 100000;
+  z-index: 10000;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -625,4 +625,43 @@
 .addKartering:hover {
   background-color: #267356;
   /* Slightly darker green on hover for feedback */
+}
+
+.lagerhantering-popup {
+  position: fixed;
+  /*top: 150px;*/
+  /*right: 0;*/
+  /* Align to the right edge of the left-section */
+  /*top: 80px;*/
+  /*left: 250px;*/
+  /* Align to the top of the left-section or adjust as needed */
+  width: 300px;
+  /* Adjust the width as needed */
+  background-color: white;
+  border: 1px solid #ddd;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  z-index: 1000000000000000000000000000000000000 !important;
+  /* Ensure it's above the left-section and map */
+  padding: 1px;
+  max-height: 500px;
+  overflow-y: scroll;
+  /* Add more styling as needed */
+
+}
+
+.layers-btn {
+  position: relative;
+  float: right;
+  top: 150px; /* Adjust based on your layout */
+  right: 0px; /* Adjust based on your layout */
+  border: none;
+  background-color: transparent; /* Makes the button background transparent */
+  cursor: pointer;
+  padding: 5px; /* Adjust the padding as needed */
+}
+
+.layers-btn img {
+  display: block; /* Ensures the image is block-level to remove bottom space */
+  width: 30px; /* Adjust the size of the icon as needed */
+  height: auto; /* Keeps the aspect ratio of the icon */
 }
