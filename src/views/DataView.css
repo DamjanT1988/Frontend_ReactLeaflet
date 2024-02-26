@@ -504,7 +504,7 @@ font-weight: bold;
 
 .left-section {
   position: relative; /* This is necessary for the absolute positioning of children */
-  z-index: 2000; /* Ensure this is higher than the map's z-index */
+  z-index: 100; /* Ensure this is higher than the map's z-index */
   /* Other styles remain unchanged */
 }
 
@@ -517,7 +517,7 @@ font-weight: bold;
   background-color: white;
   border: 1px solid #ddd;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  z-index: 2100; /* Ensure it's above the left-section and map */
+  z-index: 100; /* Ensure it's above the left-section and map */
   padding: 10px;
   /* Add more styling as needed */
 }
@@ -554,7 +554,7 @@ font-weight: bold;
   align-items: center; /* Center vertically */
   cursor: pointer; /* Change the cursor on hover */
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3); /* Add a subtle shadow for depth */
-  z-index: 3000; /* Ensure the button is above other content */
+  z-index: 100; /* Ensure the button is above other content */
 }
 
 .addKartering:hover {

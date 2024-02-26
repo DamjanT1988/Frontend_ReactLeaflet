@@ -793,8 +793,8 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                                 setHighlightedId(feature.properties.id); // Set the highlighted feature's ID
                                 circle.setStyle({
                                     color: 'red', // Change color to green upon click
-                                    //fillColor: 'red', // Change fill color to green upon click
-                                    fillOpacity: 0.1,
+                                    fillColor: '#3388ff', // Change fill color to green upon click
+                                    fillOpacity: 0.2,
                                     weight: 5,
                                 });
                                 setSelectedId(feature.properties.id);
@@ -2579,7 +2579,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
         };
 
         // Convert kartlaggningstypOptions to an array and add the "Alla" option
-        const kartlaggningstypOptionsArray = [{ key: '', value: 'Alla' }, ...Object.entries(kartlaggningstypOptions).map(([key, value]) => ({ key, value }))];
+        const kartlaggningstypOptionsArray = [{ key: '', value: 'Visa alla' }, ...Object.entries(kartlaggningstypOptions).map(([key, value]) => ({ key, value }))];
 
         const toggleList = () => {
             setShowList(!showList);
@@ -2593,6 +2593,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
             setSelectedKartlaggningValue(selectedOption ? selectedOption.value : '');
         };
 
+        const buttonColor = selectedKartlaggningstyp ? 'green' : 'red';
 
         return (
             <div className="left-section">
@@ -2623,7 +2624,8 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                         </div>
                     )}
 
-                    <button>{selectedKartlaggningValue || 'Ingen karteringstyp vald'}</button>
+                    <button  style={{ backgroundColor: buttonColor, color: 'white' }}
+                    >{selectedKartlaggningValue || 'Ingen karteringstyp vald'}</button>
                     <button>Naturvärdesbiologi</button>
                     <button>Landskapsområden</button>
                     <div className="additional-section">
