@@ -220,10 +220,6 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
     const [selectedKartlaggningValue, setSelectedKartlaggningValue] = useState(null);
 
 
-
-
-
-
     const MapEventsComponent = () => {
         const map = useMapEvents({
             click: () => {
@@ -1015,6 +1011,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                     setGeoJsonData(data); // Assuming the GeoJSON data is directly at the top level
                 }
                 if (data.savedObjectIds) {
+                    data.trim(); //TAKES AWAY WHITESPACE
                     setSavedObjectIds(new Set(data.savedObjectIds)); // Convert array back to Set
                     console.log('Saved object IDs:', data.savedObjectIds);
                 }
@@ -2606,7 +2603,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
 
                     {showList && (
                         <div className="list-popup">
-                        <h3>Lägg till kartläggning:</h3>
+                            <h3>Lägg till kartläggning:</h3>
                             {kartlaggningstypOptionsArray.map(({ key, value }) => (
                                 <div
                                     key={key}
@@ -2624,7 +2621,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                         </div>
                     )}
 
-                    <button  style={{ backgroundColor: buttonColor, color: 'white' }}
+                    <button style={{ backgroundColor: buttonColor, color: 'white' }}
                     >{selectedKartlaggningValue || 'Ingen karteringstyp vald'}</button>
                     <button>Naturvärdesbiologi</button>
                     <button>Landskapsområden</button>
