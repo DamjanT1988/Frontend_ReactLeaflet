@@ -1210,6 +1210,7 @@
 
 .list-popup h3 {
   margin: 0px;
+  font-size: 1.15em;
 }
 
 .addKartering {
@@ -1254,7 +1255,7 @@
 
 .lagerhantering-popup {
   position: relative;
-  bottom: -160px;
+  bottom: -50px;
   width: 95%;
   /* Adjust the width as needed */
   background-color: white;
