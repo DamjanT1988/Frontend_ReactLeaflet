@@ -221,6 +221,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
     const [showLagerhanteringPopup, setShowLagerhanteringPopup] = useState(false);
 
 
+    
     const MapEventsComponent = () => {
         const map = useMapEvents({
             click: () => {
@@ -279,6 +280,9 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
         setMapHeight((prevHeight) => Math.max(prevHeight + movementY, 0), mapHeight); // Ensure map height doesn't go below a minimum (e.g., 100px)
         setAttributesContainerHeight((prevHeight) => Math.max(prevHeight - movementY, 0)); // Increase attributes container height as map height decreases
     };
+
+
+
 
     const Canvas = ({ width, height, onClose, onSave }) => {
         const canvasRef = useRef(null);
@@ -350,6 +354,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
     };
 
 
+
     // Function to handle feature click with CTRL key support for multi-selection
     const handleFeatureClick = (featureId, layer, event) => {
         // If CTRL key is not pressed, clear selections and revert styles
@@ -378,10 +383,15 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
     };
 
 
+
+
     const toggleDeleteConfirm = (image) => {
         setImageToDelete(image); // Set the image to delete with the full image object
         setShowDeleteConfirm(!showDeleteConfirm);
     };
+
+
+
 
     const handleDeleteImage = async () => {
         if (!imageToDelete) return; // Ensure imageToDelete is not null or undefined
@@ -410,6 +420,8 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
     };
 
 
+
+    
     const uploadImage = async () => {
         // Ensure there is either an image file or a base64 string, and an ID is selected
         if (!selectedId || (!selectedImage && !imageBase64)) return;
@@ -469,6 +481,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
 
 
 
+
     const fetchImages = async () => {
         try {
             const response = await fetch(`${API_URLS.PROJECT_IMAGE_GET.replace('<int:project_id>', selectedProjectId)}`, {
@@ -496,6 +509,8 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
         }
     };
 
+
+
     // useEffect hook to call uploadImage when imageBase64 changes and is not null
     useEffect(() => {
         if (imageBase64) {
@@ -508,6 +523,9 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
     useEffect(() => {
         fetchImages();
     }, [selectedProjectId]); // Re-fetch images when selectedProjectId changes
+
+
+
 
 
     // Function to reset styles for all layers
@@ -527,6 +545,9 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
             }
         });
     };
+
+
+
 
 
     const RectangleDrawButton = () => {
@@ -595,6 +616,8 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
     };
 
 
+
+
     const removeDuplicateRectangles = () => {
         const layers = featureGroupRef.current.getLayers();
         const rectangles = layers.filter(layer => layer instanceof L.Rectangle);
@@ -640,9 +663,6 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
 
 
 
-
-
-
     useEffect(() => {
         window.toggleAttributeContainer = (id, attributes) => {
             setShowAttributeTable(true); // Always show the attribute table when the button is clicked
@@ -654,6 +674,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
             window.toggleAttributeContainer = undefined; // Clean up
         };
     }, []);
+
 
 
 
@@ -809,7 +830,6 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                     }
                 })
 
-
                 featureGroupRef.current.eachLayer(layer => {
                     if (layer.feature && layer.feature.properties.shape === "rectangleCrop") {
                         layer.setStyle({
@@ -839,6 +859,8 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
             }
         }
     }, [geoJsonData]);
+
+
 
 
     // Function to generate popup content from feature properties
@@ -883,10 +905,6 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                 });
             }
 
-            // Generate content based on properties...
-            //const id = properties.id; // Assume each feature has a unique ID
-            //const attributesJson = JSON.stringify(properties.attributes); // Convert attributes to a JSON string for passing in the onclick handler
-
             const id = properties.id;
             const attributesJson = JSON.stringify(properties.attributes);
             content += `<button className='primary-btn' onclick='window.toggleAttributeContainer("${id}", ${attributesJson})'>Redigera objektattribut</button>`;
@@ -895,6 +913,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
             return content;
         }
     };
+
 
 
     const createInvertedMask = (rectangleLayer) => {
@@ -935,6 +954,8 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
         invertedPolygon.isMask = true;
     };
 
+
+
     const updateInvertedMask = (rectangleLayer, invertedMask) => {
         const bounds = rectangleLayer.getBounds();
         const largeBounds = [[90, -180], [-90, 180]];
@@ -956,9 +977,10 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
         ];
 
         invertedMask.setLatLngs([newOuterCoords, newInnerCoords]);
-
-
     };
+
+
+
 
     // Function to save GeoJSON data and saved objects to the server
     const saveDataToServer = async () => {
@@ -997,6 +1019,8 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
             }, 2000);
         }
     };
+
+
 
 
     const loadDataFromServer = async () => {
@@ -1187,10 +1211,6 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                         console.log('Circlefeature after 2: ', circleFeature);
                     }
                 }
-
-
-
-
 
                 else if (layer instanceof L.Rectangle) {
                     const bounds = layer.getBounds();
@@ -1483,14 +1503,12 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                 features: features
             };
 
-
             setGeoJsonData(geoJson);
-
-
             console.log('updateGeojson: ', geoJson);
 
         }
     };
+
 
 
     const onCreate = (e) => {
@@ -1553,8 +1571,6 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                 }
             };
         }
-
-
 
 
         if (newLayer instanceof L.Polygon && !(newLayer instanceof L.Rectangle)) {
@@ -1640,9 +1656,6 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
             };
         }
 
-
-
-
         if (feature) {
             setGeoJsonData((prevData) => ({
                 // Use a fallback for prevData in case it's null or undefined
@@ -1668,6 +1681,8 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
         updateGeoJsonEditDel(); // Update GeoJSON when shapes are edited
     };
 
+
+
     const onDeleted = (e) => {
         const { layers } = e;
 
@@ -1681,6 +1696,8 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
 
         updateGeoJsonEditDel(); // Update GeoJSON data if necessary
     };
+
+
 
 
     const handleFileUploadShape = async (e) => {
@@ -1735,6 +1752,8 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
             reader.readAsArrayBuffer(file);
         }
     };
+
+
 
     const saveAttributes = () => {
         const updatedFeatures = geoJsonData.features.map((feature) => {
@@ -1869,15 +1888,6 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
     }, [highlightedIds]);
 
 
-
-
-
-    // Call updateMapHighlights in useEffect to ensure highlights are updated when highlightedIds changes
-    useEffect(() => {
-        updateMapHighlights();
-    }, [highlightedIds]);
-
-
     // Mapping of attribute property keys to custom display names
     const attributeDisplayNameMap = {
         area: "Area",
@@ -1898,6 +1908,8 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
         kartlaggningsTyp: "Kartläggningstyp",
         // Add more mappings as needed
     };
+
+
 
     const renderAttributeSectionList = () => {
 
@@ -2130,8 +2142,6 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                             </div>
                         )}
 
-
-
                         <label htmlFor="file-upload" className="custom-file-upload">
                             Importera shapefil
                         </label>
@@ -2145,9 +2155,6 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
 
 
     const renderAttributeTable = () => {
-
-
-
         // Ensure geoJsonData is not null and has features before proceeding
         if (!geoJsonData || !geoJsonData.features) {
             return <div>Loading data...</div>; // Or any other placeholder content
@@ -2204,9 +2211,6 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
             }
         });
 
-
-
-
         const highlightFeature = (featureId) => {
             if (featureGroupRef.current) {
                 setHighlightedId(featureId); // Set the highlighted feature's ID
@@ -2231,8 +2235,6 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                         });
                     }
 
-
-
                     // Reset to default marker icon for non-highlighted markers
 
                     if (layer instanceof L.Marker && !(highlightedIds.size > 1)) {
@@ -2240,9 +2242,6 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                         console.log("highlightedIds", highlightedIds);
                         console.log("selectedRowIds", selectedRowIds);
                     }
-
-
-
 
                     // Apply the highlight style to the target feature
                     if (layer.options.id === featureId || layer.feature && layer.feature.properties.id === featureId) {
@@ -2595,7 +2594,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
 
             setSelectedKartlaggningOption(optionKey);
             setSelectedKartlaggningstyp(optionKey); // Assuming setSelectedKartlaggningstyp is your existing function to set selected kartlaggningstyp
-            setSelectedKartlaggningValue(selectedOption ? selectedOption.value : '');
+            setSelectedKartlaggningValue(selectedOption ? selectedOption.value : '');  
         };
 
         const buttonColor = selectedKartlaggningstyp ? 'green' : 'red';
@@ -2701,15 +2700,6 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
             </div>
         );
 
-        /*
-        const handleImageSelection = (event) => {
-            const selectedFile = event.target.files[0];
-            setSelectedImage(selectedFile);
-            // Reset or set the caption text as needed
-            setCaptionText(''); // Clear or set a default caption text
-        };
-        */
-
         // When setting the fullscreen image, calculate its dimensions
         const handleImageClick = (image) => {
             const img = new Image();
@@ -2793,9 +2783,6 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
             setShowReplacePrompt(false);
             setPendingDrawing(null);
         };
-
-
-
         const ReplacePrompt = () => (
             <div className="overlay">
                 <div className="confirmation-dialog">
@@ -2805,9 +2792,6 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                 </div>
             </div>
         );
-
-
-
 
         const fullscreenView = fullscreenImage && (
             <div className="fullscreen-view">
@@ -2846,8 +2830,6 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
 
         );
 
-
-
         return (
             <div className="right-section">
                 <div className="top-right">
@@ -2856,36 +2838,14 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                     <button className="top-bar-button">Export</button>
                 </div>
 
-                {/*
-                <div className="slider-container">
-                    <label htmlFor="map-height-slider">Justera karthöjd</label><br />
-                    <input
-                        id="map-height-slider"
-                        type="range"
-                        min="0"
-                        max="59"
-                        value={parseInt(mapHeight, 10)}
-                        onChange={handleSliderChange}
-                        className="height-slider"
-                    />
-                </div>
-                */}
-
                 {renderAttributeSectionList()}
-
 
                 <h3>Objektbilder</h3>
                 {fullscreenImage ? fullscreenView : miniatureView}
 
-
-
-
             </div>
         );
     };
-
-
-
 
     // Main Render Function (within MapTest component)
     return (
@@ -2898,7 +2858,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
             </div>
         </div>
     );
-
 };
+
 // Export the Map component
 export default MapTest;
