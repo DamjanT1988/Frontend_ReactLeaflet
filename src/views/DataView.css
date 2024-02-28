@@ -1184,6 +1184,8 @@
   background-color: white;
   border: 1px solid #ddd;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  font-size: 80%;
+  font-weight: bold;
   z-index: 10000;
   /* Ensure it's above the left-section and map */
   padding: 10px;

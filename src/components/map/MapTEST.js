@@ -216,12 +216,12 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
     const [selectedKartlaggningstyp, setSelectedKartlaggningstyp] = useState(''); //MUST BE BLANK
     const mapObjectClickedRef = useRef(false);
     const [showList, setShowKartlaggningList] = useState(false);
-    const [selectedKartlaggningOption, setSelectedKartlaggningOption] = useState(null);
+    const [selectedKartlaggningOptions, setSelectedKartlaggningOptions] = useState([]);
     const [selectedKartlaggningValue, setSelectedKartlaggningValue] = useState(null);
     const [showLagerhanteringPopup, setShowLagerhanteringPopup] = useState(false);
 
 
-    
+
     const MapEventsComponent = () => {
         const map = useMapEvents({
             click: () => {
@@ -274,14 +274,10 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
         return null; // This component does not render anything
     };
 
-
-
     const handleDrag = (movementY) => {
         setMapHeight((prevHeight) => Math.max(prevHeight + movementY, 0), mapHeight); // Ensure map height doesn't go below a minimum (e.g., 100px)
         setAttributesContainerHeight((prevHeight) => Math.max(prevHeight - movementY, 0)); // Increase attributes container height as map height decreases
     };
-
-
 
 
     const Canvas = ({ width, height, onClose, onSave }) => {
@@ -354,7 +350,6 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
     };
 
 
-
     // Function to handle feature click with CTRL key support for multi-selection
     const handleFeatureClick = (featureId, layer, event) => {
         // If CTRL key is not pressed, clear selections and revert styles
@@ -383,14 +378,10 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
     };
 
 
-
-
     const toggleDeleteConfirm = (image) => {
         setImageToDelete(image); // Set the image to delete with the full image object
         setShowDeleteConfirm(!showDeleteConfirm);
     };
-
-
 
 
     const handleDeleteImage = async () => {
@@ -420,8 +411,6 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
     };
 
 
-
-    
     const uploadImage = async () => {
         // Ensure there is either an image file or a base64 string, and an ID is selected
         if (!selectedId || (!selectedImage && !imageBase64)) return;
@@ -480,8 +469,6 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
     };
 
 
-
-
     const fetchImages = async () => {
         try {
             const response = await fetch(`${API_URLS.PROJECT_IMAGE_GET.replace('<int:project_id>', selectedProjectId)}`, {
@@ -510,7 +497,6 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
     };
 
 
-
     // useEffect hook to call uploadImage when imageBase64 changes and is not null
     useEffect(() => {
         if (imageBase64) {
@@ -519,13 +505,9 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
     }, [imageBase64]);
 
 
-
     useEffect(() => {
         fetchImages();
     }, [selectedProjectId]); // Re-fetch images when selectedProjectId changes
-
-
-
 
 
     // Function to reset styles for all layers
@@ -545,9 +527,6 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
             }
         });
     };
-
-
-
 
 
     const RectangleDrawButton = () => {
@@ -616,8 +595,6 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
     };
 
 
-
-
     const removeDuplicateRectangles = () => {
         const layers = featureGroupRef.current.getLayers();
         const rectangles = layers.filter(layer => layer instanceof L.Rectangle);
@@ -662,7 +639,6 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
     };
 
 
-
     useEffect(() => {
         window.toggleAttributeContainer = (id, attributes) => {
             setShowAttributeTable(true); // Always show the attribute table when the button is clicked
@@ -674,8 +650,6 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
             window.toggleAttributeContainer = undefined; // Clean up
         };
     }, []);
-
-
 
 
     useEffect(() => {
@@ -861,8 +835,6 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
     }, [geoJsonData]);
 
 
-
-
     // Function to generate popup content from feature properties
     const generatePopupContent = (properties) => {
         // Check if the feature is a rectangle and return null or empty content
@@ -915,7 +887,6 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
     };
 
 
-
     const createInvertedMask = (rectangleLayer) => {
         const bounds = rectangleLayer.getBounds();
 
@@ -955,7 +926,6 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
     };
 
 
-
     const updateInvertedMask = (rectangleLayer, invertedMask) => {
         const bounds = rectangleLayer.getBounds();
         const largeBounds = [[90, -180], [-90, 180]];
@@ -978,8 +948,6 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
 
         invertedMask.setLatLngs([newOuterCoords, newInnerCoords]);
     };
-
-
 
 
     // Function to save GeoJSON data and saved objects to the server
@@ -1021,8 +989,6 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
     };
 
 
-
-
     const loadDataFromServer = async () => {
         try {
             const response = await fetch(`${API_URLS.PROJECT_FILES_GET}/${userID}/${selectedProjectId}/file`, {
@@ -1054,13 +1020,11 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
     };
 
 
-
     // useEffect hook to call loadDataFromServer on component mount
     useEffect(() => {
         loadDataFromServer();
 
     }, []);
-
 
 
     const updateGeoJsonEditDel = () => {
@@ -1118,7 +1082,6 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
             setGeoJsonData(newGeoJsonData);
         }
     };
-
 
 
     const updateGeoJsonCreate = () => {
@@ -1510,7 +1473,6 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
     };
 
 
-
     const onCreate = (e) => {
         const newLayer = e.layer;
         newLayer.options.id = uuidv4(); // Ensure each layer has a unique ID
@@ -1682,7 +1644,6 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
     };
 
 
-
     const onDeleted = (e) => {
         const { layers } = e;
 
@@ -1696,8 +1657,6 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
 
         updateGeoJsonEditDel(); // Update GeoJSON data if necessary
     };
-
-
 
 
     const handleFileUploadShape = async (e) => {
@@ -1754,7 +1713,6 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
     };
 
 
-
     const saveAttributes = () => {
         const updatedFeatures = geoJsonData.features.map((feature) => {
             if (feature.properties.id === selectedId) {
@@ -1782,7 +1740,6 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
     useEffect(() => {
         syncLayerAttributes();
     }, [geoJsonData]); // Dependency array ensures this runs only when geoJsonData changes
-
 
 
     const syncLayerAttributes = () => {
@@ -1909,8 +1866,6 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
         // Add more mappings as needed
     };
 
-
-
     const renderAttributeSectionList = () => {
 
 
@@ -1985,8 +1940,6 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
             </div>
         );
     };
-
-
 
 
     const renderAttributeList = () => {
@@ -2171,45 +2124,6 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
 
         const attributeNames = Array.from(allAttributeNames);
 
-        const filteredFeatures = geoJsonData.features.filter(feature => {
-            if (feature.properties.shape === "rectangleCrop") {
-                return false;
-            }
-
-            const matchesKartlaggningstyp = feature.properties.attributes.kartlaggningsTyp === selectedKartlaggningstyp || selectedKartlaggningstyp === '' || selectedKartlaggningstyp === 'Alla';
-
-            // When in 'selected' view mode, apply additional filtering based on the active tab
-            if (viewMode === 'selected') {
-                const isSelected = savedObjectIds.has(feature.properties.id);
-                if (!isSelected) return false; // Exclude unselected features
-
-                // Filter by geometric type according to the active tab
-                switch (activeTab) {
-                    case 'Punkter':
-                        return feature.properties.isMarker || feature.properties.isPoint;
-                    case 'Linjer':
-                        return feature.geometry.type === 'LineString' || feature.geometry.type === 'MultiLineString';
-                    case 'Polygoner':
-                        return feature.geometry.type === 'Polygon' || feature.geometry.type === 'MultiPolygon' || feature.properties.isCircleMarker || feature.properties.isCircle;
-                    default:
-                        return true; // Include all selected features for 'Alla' or unrecognized tabs
-                }
-            } else {
-                // Normal filtering logic for non-selected view mode
-                switch (activeTab) {
-                    case 'Punkter':
-                        return matchesKartlaggningstyp && (feature.properties.isMarker || feature.properties.isPoint);
-                    case 'Linjer':
-                        return matchesKartlaggningstyp && (feature.geometry.type === 'LineString' || feature.geometry.type === 'MultiLineString');
-                    case 'Polygoner':
-                        return matchesKartlaggningstyp && (feature.geometry.type === 'Polygon' || feature.geometry.type === 'MultiPolygon' || feature.properties.isCircleMarker || feature.properties.isCircle);
-                    case 'Alla':
-                        return matchesKartlaggningstyp;
-                    default:
-                        return matchesKartlaggningstyp;
-                }
-            }
-        });
 
         const highlightFeature = (featureId) => {
             if (featureGroupRef.current) {
@@ -2368,7 +2282,6 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
         };
 
 
-
         const handleSort = (key) => {
             let direction = 'ascending';
             if (sortConfig.key === key && sortConfig.direction === 'ascending') {
@@ -2412,7 +2325,46 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
             'Polygoner': hasFeaturesForGeometry('Polygon') || hasFeaturesForGeometry('MultiPolygon')
         };
 
+        // Filter features based on selected criteria
+        const filteredFeatures = geoJsonData.features.filter(feature => {
+            if (feature.properties.shape === "rectangleCrop") {
+                return false;
+            }
 
+            const matchesKartlaggningstyp = selectedKartlaggningOptions.length === 0 || selectedKartlaggningOptions.includes(feature.properties.attributes?.kartlaggningsTyp);
+
+            // When in 'selected' view mode, apply additional filtering based on the active tab
+            if (viewMode === 'selected') {
+                const isSelected = savedObjectIds.has(feature.properties.id);
+                if (!isSelected) return false; // Exclude unselected features
+
+                // Filter by geometric type according to the active tab
+                switch (activeTab) {
+                    case 'Punkter':
+                        return feature.properties.isMarker || feature.properties.isPoint;
+                    case 'Linjer':
+                        return feature.geometry.type === 'LineString' || feature.geometry.type === 'MultiLineString';
+                    case 'Polygoner':
+                        return feature.geometry.type === 'Polygon' || feature.geometry.type === 'MultiPolygon' || feature.properties.isCircleMarker || feature.properties.isCircle;
+                    default:
+                        return true; // Include all selected features for 'Alla' or unrecognized tabs
+                }
+            } else {
+                // Normal filtering logic for non-selected view mode
+                switch (activeTab) {
+                    case 'Punkter':
+                        return matchesKartlaggningstyp && (feature.properties.isMarker || feature.properties.isPoint);
+                    case 'Linjer':
+                        return matchesKartlaggningstyp && (feature.geometry.type === 'LineString' || feature.geometry.type === 'MultiLineString');
+                    case 'Polygoner':
+                        return matchesKartlaggningstyp && (feature.geometry.type === 'Polygon' || feature.geometry.type === 'MultiPolygon' || feature.properties.isCircleMarker || feature.properties.isCircle);
+                    case 'Alla':
+                        return matchesKartlaggningstyp;
+                    default:
+                        return matchesKartlaggningstyp;
+                }
+            }
+        });
 
         return (
             <div>
@@ -2423,45 +2375,25 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                 <div className="attributes-container" style={{ maxHeight: `${attributesContainerHeight}px` }}>
 
                     <div className="tabs">
-                        {availableGeometries['Punkter'] && <button className={activeTab === 'Punkter' ? 'active' : ''} onClick={() => setActiveTab('Punkter')}>Punkter</button>}
-                        {availableGeometries['Linjer'] && <button className={activeTab === 'Linjer' ? 'active' : ''} onClick={() => setActiveTab('Linjer')}>Linjer</button>}
-                        {availableGeometries['Polygoner'] && <button className={activeTab === 'Polygoner' ? 'active' : ''} onClick={() => setActiveTab('Polygoner')}>Polygoner</button>}
+                        <button className={activeTab === 'Punkter' ? 'active' : ''} onClick={() => setActiveTab('Punkter')}>Punkter</button>
+                        <button className={activeTab === 'Linjer' ? 'active' : ''} onClick={() => setActiveTab('Linjer')}>Linjer</button>
+                        <button className={activeTab === 'Polygoner' ? 'active' : ''} onClick={() => setActiveTab('Polygoner')}>Polygoner</button>
                     </div>
 
                     <table>
                         <thead>
                             <tr>
-                                <th className='th-index'>#</th>
-                                <th className='th-karta'>Karta</th>
+                                <th>#</th>
+                                <th>Karta</th>
                                 {attributeNames.map((name, index) => (
-                                    <th key={index} onClick={() => handleSort(name)} style={{ cursor: 'pointer' }}>
+                                    <th key={index} onClick={() => handleSort(name)}>
                                         {attributeDisplayNameMap[name] || name}
-                                        <span className="sort-arrows">
-                                            {sortConfig.key === name ? (
-                                                sortConfig.direction === 'ascending' ? ' ▲' : ' ▼'
-                                            ) : ' ↕'}
-                                        </span>
                                     </th>
                                 ))}
                             </tr>
                         </thead>
-                        <tbody className="attributes-container-table">
-                            {viewMode === 'all' ? (
-                                filteredFeatures
-                                    .sort((a, b) => {
-                                        const aValue = a.properties.attributes[sortConfig.key];
-                                        const bValue = b.properties.attributes[sortConfig.key];
-                                        return compare(aValue, bValue);
-                                    })
-                                    .map((feature, featureIndex) => (
-                                        feature.properties.attributes ? renderTableRow(feature, featureIndex) : null
-                                    ))
-                            ) : (
-                                Array.from(savedObjectIds).map((featureId, index) => {
-                                    const feature = filteredFeatures.find(feature => feature.properties.id === featureId);
-                                    return feature ? renderTableRow(feature, index) : null;
-                                })
-                            )}
+                        <tbody>
+                            {filteredFeatures.map((feature, index) => renderTableRow(feature, index))}
                         </tbody>
                     </table>
                     <div className="marked-rows-info">
@@ -2479,6 +2411,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
 
         // Helper function to render table row
         function renderTableRow(feature, index) {
+            // Row rendering logic
             return (
                 <tr key={index} className={highlightedIds.has(feature.properties.id) ? 'highlighted-row' : ''}
                     onClick={(event) => handleRowClick(feature.properties.id, feature.properties.attributes, event)}>
@@ -2503,7 +2436,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                 </tr>
             );
         }
-    }
+    };
 
 
     const renderMap = () => {
@@ -2590,12 +2523,31 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
         };
 
         const handleSelectKartlaggningOption = (optionKey) => {
-            const selectedOption = kartlaggningstypOptionsArray.find(option => option.key === optionKey);
-
-            setSelectedKartlaggningOption(optionKey);
-            setSelectedKartlaggningstyp(optionKey); // Assuming setSelectedKartlaggningstyp is your existing function to set selected kartlaggningstyp
-            setSelectedKartlaggningValue(selectedOption ? selectedOption.value : '');  
+            console.log('Selected kartlaggning option:', optionKey);
+            console.log('Selected kartlaggning value:', kartlaggningstypOptions[optionKey]);
+            console.log('Selected kartlaggning options:', selectedKartlaggningOptions);
+            if (optionKey === '') {
+                setSelectedKartlaggningOptions([]); // Clear the selection
+                // Optionally, clear other selections related to mapping objects here
+                // For example, clear highlighted features, selected rows, etc.
+                setHighlightedIds(new Set());
+                setSelectedRowIds(new Set());
+                // Any other state resets related to the selection of mapping objects can go here
+            } else {
+                // Handle selection for other options as before
+                setSelectedKartlaggningOptions(prevOptions => {
+                    const isSelected = prevOptions.includes(optionKey);
+                    if (isSelected) {
+                        // If already selected, remove it from the selection
+                        return prevOptions.filter(key => key !== optionKey);
+                    } else {
+                        // If not selected, add it to the selection
+                        return [...prevOptions, optionKey];
+                    }
+                });
+            }
         };
+
 
         const buttonColor = selectedKartlaggningstyp ? 'green' : 'red';
 
@@ -2611,32 +2563,47 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                     {showList && (
                         <div className="list-popup">
                             <h3>Lägg till kartläggning</h3>
-                            {kartlaggningstypOptionsArray.map(({ key, value }) => (
+                            {kartlaggningstypOptionsArray.map(({ key, value }, index) => (
                                 <div
                                     key={key}
                                     onClick={() => handleSelectKartlaggningOption(key)}
                                     style={{
                                         padding: '10px',
                                         cursor: 'pointer',
-                                        backgroundColor: selectedKartlaggningOption === key ? '#007bff' : 'transparent',
-                                        color: selectedKartlaggningOption === key ? '#ffffff' : '#000000',
+                                        backgroundColor: selectedKartlaggningOptions.includes(key) ? 'grey' : 'transparent', // Change background color if selected
+                                        color: selectedKartlaggningOptions.includes(key) ? '#ffffff' : '#000000',
+                                        display: 'flex',
+                                        alignItems: 'center',
                                     }}
                                 >
+                                    {/* Render the "+" symbol inside a green circle for all except the first item */}
+                                    {index !== 0 && !selectedKartlaggningOptions.includes(key) && (
+                                        <span style={{
+                                            marginRight: '5px',
+                                            display: 'inline-block',
+                                            width: '20px',
+                                            height: '20px',
+                                            borderRadius: '50%',
+                                            backgroundColor: 'green',
+                                            color: 'white',
+                                            textAlign: 'center',
+                                            lineHeight: '20px',
+                                            fontSize: '15px',
+                                        }}>
+                                            +
+                                        </span>
+                                    )}
                                     {value}
                                 </div>
                             ))}
                         </div>
                     )}
 
-                    <button style={{ backgroundColor: buttonColor, color: 'white' }}
-                    >{selectedKartlaggningValue || 'Ingen karteringstyp vald'}</button>
+                    <button style={{ backgroundColor: selectedKartlaggningOptions.length > 0 ? 'green' : 'red', color: 'white' }}>
+                        {selectedKartlaggningOptions.length > 0 ? 'Kartering vald' : 'Ingen karteringstyp vald'}
+                    </button>
                     <button>Naturvärdesbiologi</button>
                     <button>Landskapsområden</button>
-                    <div className="additional-section">
-                        <h3>Tillägg:</h3>
-                        <button>Example Button 1</button>
-                        <button>Example Button 2</button>
-                    </div>
                 </div>
                 <button className="layers-btn" onClick={toggleLagerhanteringPopup}>
                     <img src={`${process.env.PUBLIC_URL}/media/layers-100.png`} alt="Layers" />
