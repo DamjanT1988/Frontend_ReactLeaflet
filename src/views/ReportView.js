@@ -104,6 +104,7 @@ const ReportView = () => {
           selectedProjectId={selectedProject.id}
           geoJsonData={geoJsonData}
           userID={selectedProject.user}
+          projectKarteringar={selectedProject.karteringar}
           selectedProject={selectedProject}
           shouldHideDataView={true}
         />

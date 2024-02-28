@@ -167,7 +167,7 @@ const DraggableLine = ({ onDrag }) => {
 
 
 // Define the Map component
-const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHideDataView }) => {
+const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, projectKarteringar, shouldHideDataView }) => {
     const featureGroupRef = useRef(null);
     const position = [51.505, -0.09];
     const zoom = 11;
@@ -985,6 +985,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                 },
                 body: JSON.stringify(dataToSave),
             });
+            console.log('Server response: ', response);
             if (response.ok) {
                 setSaveStatus('... kartdata sparad!');
                 console.log('Data saved successfully', dataToSave);
@@ -1020,6 +1021,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                 const data = await response.json();
                 if (data.features) {
                     setGeoJsonData(data); // Assuming the GeoJSON data is directly at the top level
+
                 }
                 if (data.savedObjectIds) {
                     // Map over the array and trim whitespace from each string
