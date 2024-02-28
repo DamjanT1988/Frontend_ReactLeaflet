@@ -236,6 +236,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
         VattendragDelstracka: "Vattendrag delsträcka",
     });
     const [showValueElementOptions, setShowValueElementOptions] = useState(false);
+    const [geometryFilter , setGeometryFilter] = useState(null);
 
 
 
@@ -2293,7 +2294,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
         }
     };
 
-    
+
     const renderAttributeList = () => {
 
         return (
@@ -2506,33 +2507,6 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
             return <div>Laddar..</div>; // Provide a loading message or any other fallback content
         }
 
-        /*
-                const kartlaggningstypOptions = {
-                    KartlaggningBiologiskMangfald: "Kartläggning biologisk mångfald",
-                    Artforekomst_punkt: "Artförekomst - punkt",
-                    Artforekomst_yta: "Artförekomst - yta",
-                    Bottenmiljo_punkt: "Bottenmiljö - punkt",
-                    Bottenmiljo_yta: "Bottenmiljö - yta",
-                    GenSkBiotopskyddsomr_punkt: "Generellt skyddat biotopskyddsområde - punkt",
-                    GenSkBiotopskyddsomr_yta: "Generellt skyddat biotopskyddsområde - yta",
-                    Livsmiljo_punkt: "Livsmiljö - punkt",
-                    Livsmiljo_yta: "Livsmiljö - yta",
-                    Natura2000Naturtyp: "Natura 2000-naturtyp",
-                    Naturvardestrad_punkt: "Naturvärdesträd - punkt",
-                    Naturvardestrad_yta: "Naturvärdesträd - yta",
-                    NVILandskapsomrade: "NVI Landskapsområde",
-                    NVINaturvardesbiotop: "NVI Naturvärdesbiotop",
-                    OvrigBiotop: "Övrig biotop",
-                    SarskSkyddsvTrad_punkt: "Särskilt skyddsvärda träd - punkt",
-                    SarskSkyddsvTrad_yta: "Särskilt skyddsvärda träd - yta",
-                    Smavatten_punkt: "Småvatten - punkt",
-                    Smavatten_yta: "Småvatten - yta",
-                    Vardeelement_punkt: "Värdeelement - punkt",
-                    Vardeelement_yta: "Värdeelement - yta",
-                    VattendragDelstracka: "Vattendrag delsträcka",
-                };
-        */
-
         // Convert kartlaggningstypOptions to an array and add the "Alla" option
         const kartlaggningstypOptionsArray = [{ key: '', value: 'Visa alla' }, ...Object.entries(kartlaggningstypOptions).map(([key, value]) => ({ key, value }))];
 
@@ -2570,12 +2544,25 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
             }
         };
 
-        // Function to handle clicks on value element options
-        const onValueElementOptionClick = (optionType) => {
-            console.log(`${optionType} clicked`);
-            // Placeholder for future function activation
-            // activateFunction(optionType);
-        };
+
+
+// Function to handle clicks on value element options
+const onValueElementOptionClick = (optionType) => {
+    console.log(`${optionType} clicked`);
+
+    // Determine the geometric type to filter by based on the option clicked
+    let geometricTypeToFilter;
+    if (optionType === 'Dot') {
+        geometricTypeToFilter = 'Point';
+        setGeometryFilter(geometricTypeToFilter);
+    } else if (optionType === 'Triangle') {
+        geometricTypeToFilter = 'Polygon';
+        setGeometryFilter(geometricTypeToFilter);
+    }
+
+    // Set the geometric filter state based on the clicked option
+    setGeometryFilter(geometricTypeToFilter);
+};
 
 
         return (
@@ -2630,17 +2617,17 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                         {selectedKartlaggningOptions.length > 0 ? 'Kartering vald' : 'Ingen karteringstyp vald'}
                     </button>
                     <button>Naturvärdesbiologi</button>
-                    
-        <button>Värdeelement</button>
-        <div className="value-element-options">
-            <div className="value-element-option" onClick={() => onValueElementOptionClick('Dot')}>
-                <img src={`${process.env.PUBLIC_URL}/media/point-100.png`} alt="Dot in Box" /> {/* Replace with actual path */}
-            </div>
-            <div className="value-element-option" onClick={() => onValueElementOptionClick('Triangle')}>
-                <img src={`${process.env.PUBLIC_URL}/media/polygon-100.png`} alt="Triangle in Box" /> {/* Replace with actual path */}
-            </div>
-        </div>
-    </div>
+
+                    <button>Värdeelement</button>
+                    <div className="value-element-options">
+                        <div className="value-element-option" onClick={() => onValueElementOptionClick('Dot')}>
+                            <img src={`${process.env.PUBLIC_URL}/media/point-100.png`} alt="Dot in Box" /> {/* Replace with actual path */}
+                        </div>
+                        <div className="value-element-option" onClick={() => onValueElementOptionClick('Triangle')}>
+                            <img src={`${process.env.PUBLIC_URL}/media/polygon-100.png`} alt="Triangle in Box" /> {/* Replace with actual path */}
+                        </div>
+                    </div>
+                </div>
 
 
 
