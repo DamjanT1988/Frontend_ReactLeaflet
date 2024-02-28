@@ -219,6 +219,23 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
     const [selectedKartlaggningOptions, setSelectedKartlaggningOptions] = useState([]);
     const [selectedKartlaggningValue, setSelectedKartlaggningValue] = useState(null);
     const [showLagerhanteringPopup, setShowLagerhanteringPopup] = useState(false);
+    const [kartlaggningstypOptions, setKartlaggningstypOptions] = useState({
+        KartlaggningBiologiskMangfald: "Kartläggning biologisk mångfald",
+        Artforekomst: "Artförekomst",
+        Bottenmiljo: "Bottenmiljö",
+        GenSkBiotopskyddsomr: "Generellt skyddat biotopskyddsområde",
+        LivsmiljO: "Livsmiljö",
+        Natura2000Naturtyp: "Natura 2000-naturtyp",
+        Naturvardestrad: "Naturvärdesträd",
+        NVILandskapsomrade: "NVI Landskapsområde",
+        NVINaturvardesbiotop: "NVI Naturvärdesbiotop",
+        OvrigBiotop: "Övrig biotop",
+        SarskSkyddsvTrad: "Särskilt skyddsvärda träd",
+        Smavatten: "Småvatten",
+        Vardeelement: "Värdeelement",
+        VattendragDelstracka: "Vattendrag delsträcka",
+    });
+    const [showValueElementOptions, setShowValueElementOptions] = useState(false);
 
 
 
@@ -1866,6 +1883,9 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
         // Add more mappings as needed
     };
 
+
+
+
     const renderAttributeSectionList = () => {
 
 
@@ -1883,30 +1903,6 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
             });
         };
 
-        const kartlaggningstypOptions = {
-            KartlaggningBiologiskMangfald: "Kartläggning biologisk mångfald",
-            Artforekomst_punkt: "Artförekomst - punkt",
-            Artforekomst_yta: "Artförekomst - yta",
-            Bottenmiljo_punkt: "Bottenmiljö - punkt",
-            Bottenmiljo_yta: "Bottenmiljö - yta",
-            GenSkBiotopskyddsomr_punkt: "Generellt skyddat biotopskyddsområde - punkt",
-            GenSkBiotopskyddsomr_yta: "Generellt skyddat biotopskyddsområde - yta",
-            Livsmiljo_punkt: "Livsmiljö - punkt",
-            Livsmiljo_yta: "Livsmiljö - yta",
-            Natura2000Naturtyp: "Natura 2000-naturtyp",
-            Naturvardestrad_punkt: "Naturvärdesträd - punkt",
-            Naturvardestrad_yta: "Naturvärdesträd - yta",
-            NVILandskapsomrade: "NVI Landskapsområde",
-            NVINaturvardesbiotop: "NVI Naturvärdesbiotop",
-            OvrigBiotop: "Övrig biotop",
-            SarskSkyddsvTrad_punkt: "Särskilt skyddsvärda träd - punkt",
-            SarskSkyddsvTrad_yta: "Särskilt skyddsvärda träd - yta",
-            Smavatten_punkt: "Småvatten - punkt",
-            Smavatten_yta: "Småvatten - yta",
-            Vardeelement_punkt: "Värdeelement - punkt",
-            Vardeelement_yta: "Värdeelement - yta",
-            VattendragDelstracka: "Vattendrag delsträcka",
-        };
 
 
         // Check if the current attributesObject has a kartlaggningsTyp that matches one of the options
@@ -1941,170 +1937,6 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
         );
     };
 
-
-    const renderAttributeList = () => {
-
-        return (
-            <div>
-                {!shouldHideDataView &&
-                    <div className='map-container elementToHide'>
-                        <h3>Projektkarta</h3>
-                        <button className="toggle-form-button" onClick={saveDataToServer}>Spara projekt!</button>
-                        <span className="save-status">{saveStatus}</span>
-                        <p>Tryck på kartobjekt för att se attribut.</p>
-                        {selectedId && attributesObject && showAttributeTable && (
-                            <div className="attributes-container">
-                                <h3>Objektattribut</h3>
-                                <label>
-                                    Objektnummer:
-                                    <input
-                                        type="text"
-                                        value={attributesObject.objectNumber || ''}
-                                        onChange={(e) => setAttributesObject({ ...attributesObject, objectNumber: e.target.value })}
-                                    />
-                                </label>
-                                <label>
-                                    Inventeringsnivå:
-                                    <input
-                                        type="text"
-                                        value={attributesObject.inventoryLevel || ''}
-                                        onChange={(e) => setAttributesObject({ ...attributesObject, inventoryLevel: e.target.value })}
-                                    />
-                                </label>
-                                <label>
-                                    Naturvärdesklass:
-                                    <input
-                                        type="text"
-                                        value={attributesObject.natureValueClass || ''}
-                                        onChange={(e) => setAttributesObject({ ...attributesObject, natureValueClass: e.target.value })}
-                                    />
-                                </label>
-                                <label>
-                                    Preliminär bedömning:
-                                    <input
-                                        type="text"
-                                        value={attributesObject.preliminaryAssessment || ''}
-                                        onChange={(e) => setAttributesObject({ ...attributesObject, preliminaryAssessment: e.target.value })}
-                                    />
-                                </label>
-                                <label>
-                                    Motivering:
-                                    <input
-                                        type="text"
-                                        value={attributesObject.reason || ''}
-                                        onChange={(e) => setAttributesObject({ ...attributesObject, reason: e.target.value })}
-                                    />
-                                </label>
-                                <label>
-                                    Naturtyp:
-                                    <input
-                                        type="text"
-                                        value={attributesObject.natureType || ''}
-                                        onChange={(e) => setAttributesObject({ ...attributesObject, natureType: e.target.value })}
-                                    />
-                                </label>
-                                <label>
-                                    Biotop:
-                                    <input
-                                        type="text"
-                                        value={attributesObject.habitat || ''}
-                                        onChange={(e) => setAttributesObject({ ...attributesObject, habitat: e.target.value })}
-                                    />
-                                </label>
-                                <label>
-                                    Datum:
-                                    <input
-                                        type="date"
-                                        value={attributesObject.date || ''}
-                                        onChange={(e) => setAttributesObject({ ...attributesObject, date: e.target.value })}
-                                    />
-                                </label>
-                                <label>
-                                    Utförare:
-                                    <input
-                                        type="text"
-                                        value={attributesObject.executor || ''}
-                                        onChange={(e) => setAttributesObject({ ...attributesObject, executor: e.target.value })}
-                                    />
-                                </label>
-                                <label>
-                                    Organisation:
-                                    <input
-                                        type="text"
-                                        value={attributesObject.organization || ''}
-                                        onChange={(e) => setAttributesObject({ ...attributesObject, organization: e.target.value })}
-                                    />
-                                </label>
-                                <label>
-                                    Projektnamn:
-                                    <input
-                                        type="text"
-                                        value={attributesObject.projectName || ''}
-                                        onChange={(e) => setAttributesObject({ ...attributesObject, projectName: e.target.value })}
-                                    />
-                                </label>
-                                <label>
-                                    Area:
-                                    <input
-                                        type="number"
-                                        value={attributesObject.area || ''}
-                                        onChange={(e) => setAttributesObject({ ...attributesObject, area: e.target.value })}
-                                    />
-                                </label>
-
-
-                                <button
-                                    className="toggle-additional-fields"
-                                    onClick={() => setShowAdditionalFields(!showAdditionalFields)}
-                                >
-                                    Tillägg
-                                </button>
-
-                                {showAdditionalFields && (
-                                    <>
-                                        <label>
-                                            Arter:
-                                            <input
-                                                type="text"
-                                                value={attributesObject.species || ''}
-                                                onChange={(e) => setAttributesObject({ ...attributesObject, species: e.target.value })}
-                                            />
-                                        </label>
-                                        <label>
-                                            Habitatkvaliteter:
-                                            <input
-                                                type="text"
-                                                value={attributesObject.habitatQualities || ''}
-                                                onChange={(e) => setAttributesObject({ ...attributesObject, habitatQualities: e.target.value })}
-                                            />
-                                        </label>
-                                        <label>
-                                            Värdeelement:
-                                            <input
-                                                type="text"
-                                                value={attributesObject.valueElements || ''}
-                                                onChange={(e) => setAttributesObject({ ...attributesObject, valueElements: e.target.value })}
-                                            />
-                                        </label>
-                                    </>
-                                )}
-
-                                {/* Additional attributes like Species, Habitat Qualities, Value Elements can be added similarly */}
-                                <button className="save-attributes-btn" onClick={saveAttributes}>Spara</button>
-                                <button className="cancel-btn" onClick={() => setSelectedId(null)}>Avbryt</button>
-                            </div>
-                        )}
-
-                        <label htmlFor="file-upload" className="custom-file-upload">
-                            Importera shapefil
-                        </label>
-                        <input id="file-upload" className="project-import-input" type="file" onChange={handleFileUploadShape} style={{ display: 'none' }} />
-
-                    </div>
-                }
-            </div>
-        )
-    }
 
 
     const renderAttributeTable = () => {
@@ -2366,6 +2198,23 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
             }
         });
 
+        // Function to filter features based on geometry type and selected kartlaggningstyp
+        const filterByGeometryType = (type) => {
+            return geoJsonData.features.filter(feature => {
+                const geometryType = feature.geometry.type;
+                const isMatchingType = geometryType === type || (type === 'Point' && (geometryType === 'Point' || geometryType === 'MultiPoint'));
+                const matchesKartlaggningstyp = selectedKartlaggningOptions.length === 0 || selectedKartlaggningOptions.includes(feature.properties.attributes?.kartlaggningsTyp);
+
+                return isMatchingType && matchesKartlaggningstyp;
+            });
+        };
+
+        // Check if there are any objects for each category
+        const hasPunkter = filterByGeometryType('Point').length > 0;
+        const hasLinjer = filterByGeometryType('LineString').length > 0;
+        const hasPolygoner = filterByGeometryType('Polygon').length > 0;
+
+
         return (
             <div>
                 {shouldHideDataView && <div className="elementToHide">
@@ -2375,9 +2224,15 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                 <div className="attributes-container" style={{ maxHeight: `${attributesContainerHeight}px` }}>
 
                     <div className="tabs">
-                        <button className={activeTab === 'Punkter' ? 'active' : ''} onClick={() => setActiveTab('Punkter')}>Punkter</button>
-                        <button className={activeTab === 'Linjer' ? 'active' : ''} onClick={() => setActiveTab('Linjer')}>Linjer</button>
-                        <button className={activeTab === 'Polygoner' ? 'active' : ''} onClick={() => setActiveTab('Polygoner')}>Polygoner</button>
+                        {hasPunkter && (
+                            <button className={activeTab === 'Punkter' ? 'active' : ''} onClick={() => setActiveTab('Punkter')}>Punkter</button>
+                        )}
+                        {hasLinjer && (
+                            <button className={activeTab === 'Linjer' ? 'active' : ''} onClick={() => setActiveTab('Linjer')}>Linjer</button>
+                        )}
+                        {hasPolygoner && (
+                            <button className={activeTab === 'Polygoner' ? 'active' : ''} onClick={() => setActiveTab('Polygoner')}>Polygoner</button>
+                        )}
                     </div>
 
                     <table>
@@ -2438,6 +2293,171 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
         }
     };
 
+    
+    const renderAttributeList = () => {
+
+        return (
+            <div>
+                {!shouldHideDataView &&
+                    <div className='map-container elementToHide'>
+                        <h3>Projektkarta</h3>
+                        <button className="toggle-form-button" onClick={saveDataToServer}>Spara projekt!</button>
+                        <span className="save-status">{saveStatus}</span>
+                        <p>Tryck på kartobjekt för att se attribut.</p>
+                        {selectedId && attributesObject && showAttributeTable && (
+                            <div className="attributes-container">
+                                <h3>Objektattribut</h3>
+                                <label>
+                                    Objektnummer:
+                                    <input
+                                        type="text"
+                                        value={attributesObject.objectNumber || ''}
+                                        onChange={(e) => setAttributesObject({ ...attributesObject, objectNumber: e.target.value })}
+                                    />
+                                </label>
+                                <label>
+                                    Inventeringsnivå:
+                                    <input
+                                        type="text"
+                                        value={attributesObject.inventoryLevel || ''}
+                                        onChange={(e) => setAttributesObject({ ...attributesObject, inventoryLevel: e.target.value })}
+                                    />
+                                </label>
+                                <label>
+                                    Naturvärdesklass:
+                                    <input
+                                        type="text"
+                                        value={attributesObject.natureValueClass || ''}
+                                        onChange={(e) => setAttributesObject({ ...attributesObject, natureValueClass: e.target.value })}
+                                    />
+                                </label>
+                                <label>
+                                    Preliminär bedömning:
+                                    <input
+                                        type="text"
+                                        value={attributesObject.preliminaryAssessment || ''}
+                                        onChange={(e) => setAttributesObject({ ...attributesObject, preliminaryAssessment: e.target.value })}
+                                    />
+                                </label>
+                                <label>
+                                    Motivering:
+                                    <input
+                                        type="text"
+                                        value={attributesObject.reason || ''}
+                                        onChange={(e) => setAttributesObject({ ...attributesObject, reason: e.target.value })}
+                                    />
+                                </label>
+                                <label>
+                                    Naturtyp:
+                                    <input
+                                        type="text"
+                                        value={attributesObject.natureType || ''}
+                                        onChange={(e) => setAttributesObject({ ...attributesObject, natureType: e.target.value })}
+                                    />
+                                </label>
+                                <label>
+                                    Biotop:
+                                    <input
+                                        type="text"
+                                        value={attributesObject.habitat || ''}
+                                        onChange={(e) => setAttributesObject({ ...attributesObject, habitat: e.target.value })}
+                                    />
+                                </label>
+                                <label>
+                                    Datum:
+                                    <input
+                                        type="date"
+                                        value={attributesObject.date || ''}
+                                        onChange={(e) => setAttributesObject({ ...attributesObject, date: e.target.value })}
+                                    />
+                                </label>
+                                <label>
+                                    Utförare:
+                                    <input
+                                        type="text"
+                                        value={attributesObject.executor || ''}
+                                        onChange={(e) => setAttributesObject({ ...attributesObject, executor: e.target.value })}
+                                    />
+                                </label>
+                                <label>
+                                    Organisation:
+                                    <input
+                                        type="text"
+                                        value={attributesObject.organization || ''}
+                                        onChange={(e) => setAttributesObject({ ...attributesObject, organization: e.target.value })}
+                                    />
+                                </label>
+                                <label>
+                                    Projektnamn:
+                                    <input
+                                        type="text"
+                                        value={attributesObject.projectName || ''}
+                                        onChange={(e) => setAttributesObject({ ...attributesObject, projectName: e.target.value })}
+                                    />
+                                </label>
+                                <label>
+                                    Area:
+                                    <input
+                                        type="number"
+                                        value={attributesObject.area || ''}
+                                        onChange={(e) => setAttributesObject({ ...attributesObject, area: e.target.value })}
+                                    />
+                                </label>
+
+
+                                <button
+                                    className="toggle-additional-fields"
+                                    onClick={() => setShowAdditionalFields(!showAdditionalFields)}
+                                >
+                                    Tillägg
+                                </button>
+
+                                {showAdditionalFields && (
+                                    <>
+                                        <label>
+                                            Arter:
+                                            <input
+                                                type="text"
+                                                value={attributesObject.species || ''}
+                                                onChange={(e) => setAttributesObject({ ...attributesObject, species: e.target.value })}
+                                            />
+                                        </label>
+                                        <label>
+                                            Habitatkvaliteter:
+                                            <input
+                                                type="text"
+                                                value={attributesObject.habitatQualities || ''}
+                                                onChange={(e) => setAttributesObject({ ...attributesObject, habitatQualities: e.target.value })}
+                                            />
+                                        </label>
+                                        <label>
+                                            Värdeelement:
+                                            <input
+                                                type="text"
+                                                value={attributesObject.valueElements || ''}
+                                                onChange={(e) => setAttributesObject({ ...attributesObject, valueElements: e.target.value })}
+                                            />
+                                        </label>
+                                    </>
+                                )}
+
+                                {/* Additional attributes like Species, Habitat Qualities, Value Elements can be added similarly */}
+                                <button className="save-attributes-btn" onClick={saveAttributes}>Spara</button>
+                                <button className="cancel-btn" onClick={() => setSelectedId(null)}>Avbryt</button>
+                            </div>
+                        )}
+
+                        <label htmlFor="file-upload" className="custom-file-upload">
+                            Importera shapefil
+                        </label>
+                        <input id="file-upload" className="project-import-input" type="file" onChange={handleFileUploadShape} style={{ display: 'none' }} />
+
+                    </div>
+                }
+            </div>
+        )
+    }
+
 
     const renderMap = () => {
         return (
@@ -2486,30 +2506,32 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
             return <div>Laddar..</div>; // Provide a loading message or any other fallback content
         }
 
-        const kartlaggningstypOptions = {
-            KartlaggningBiologiskMangfald: "Kartläggning biologisk mångfald",
-            Artforekomst_punkt: "Artförekomst - punkt",
-            Artforekomst_yta: "Artförekomst - yta",
-            Bottenmiljo_punkt: "Bottenmiljö - punkt",
-            Bottenmiljo_yta: "Bottenmiljö - yta",
-            GenSkBiotopskyddsomr_punkt: "Generellt skyddat biotopskyddsområde - punkt",
-            GenSkBiotopskyddsomr_yta: "Generellt skyddat biotopskyddsområde - yta",
-            Livsmiljo_punkt: "Livsmiljö - punkt",
-            Livsmiljo_yta: "Livsmiljö - yta",
-            Natura2000Naturtyp: "Natura 2000-naturtyp",
-            Naturvardestrad_punkt: "Naturvärdesträd - punkt",
-            Naturvardestrad_yta: "Naturvärdesträd - yta",
-            NVILandskapsomrade: "NVI Landskapsområde",
-            NVINaturvardesbiotop: "NVI Naturvärdesbiotop",
-            OvrigBiotop: "Övrig biotop",
-            SarskSkyddsvTrad_punkt: "Särskilt skyddsvärda träd - punkt",
-            SarskSkyddsvTrad_yta: "Särskilt skyddsvärda träd - yta",
-            Smavatten_punkt: "Småvatten - punkt",
-            Smavatten_yta: "Småvatten - yta",
-            Vardeelement_punkt: "Värdeelement - punkt",
-            Vardeelement_yta: "Värdeelement - yta",
-            VattendragDelstracka: "Vattendrag delsträcka",
-        };
+        /*
+                const kartlaggningstypOptions = {
+                    KartlaggningBiologiskMangfald: "Kartläggning biologisk mångfald",
+                    Artforekomst_punkt: "Artförekomst - punkt",
+                    Artforekomst_yta: "Artförekomst - yta",
+                    Bottenmiljo_punkt: "Bottenmiljö - punkt",
+                    Bottenmiljo_yta: "Bottenmiljö - yta",
+                    GenSkBiotopskyddsomr_punkt: "Generellt skyddat biotopskyddsområde - punkt",
+                    GenSkBiotopskyddsomr_yta: "Generellt skyddat biotopskyddsområde - yta",
+                    Livsmiljo_punkt: "Livsmiljö - punkt",
+                    Livsmiljo_yta: "Livsmiljö - yta",
+                    Natura2000Naturtyp: "Natura 2000-naturtyp",
+                    Naturvardestrad_punkt: "Naturvärdesträd - punkt",
+                    Naturvardestrad_yta: "Naturvärdesträd - yta",
+                    NVILandskapsomrade: "NVI Landskapsområde",
+                    NVINaturvardesbiotop: "NVI Naturvärdesbiotop",
+                    OvrigBiotop: "Övrig biotop",
+                    SarskSkyddsvTrad_punkt: "Särskilt skyddsvärda träd - punkt",
+                    SarskSkyddsvTrad_yta: "Särskilt skyddsvärda träd - yta",
+                    Smavatten_punkt: "Småvatten - punkt",
+                    Smavatten_yta: "Småvatten - yta",
+                    Vardeelement_punkt: "Värdeelement - punkt",
+                    Vardeelement_yta: "Värdeelement - yta",
+                    VattendragDelstracka: "Vattendrag delsträcka",
+                };
+        */
 
         // Convert kartlaggningstypOptions to an array and add the "Alla" option
         const kartlaggningstypOptionsArray = [{ key: '', value: 'Visa alla' }, ...Object.entries(kartlaggningstypOptions).map(([key, value]) => ({ key, value }))];
@@ -2548,8 +2570,13 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
             }
         };
 
+        // Function to handle clicks on value element options
+        const onValueElementOptionClick = (optionType) => {
+            console.log(`${optionType} clicked`);
+            // Placeholder for future function activation
+            // activateFunction(optionType);
+        };
 
-        const buttonColor = selectedKartlaggningstyp ? 'green' : 'red';
 
         return (
             <div className="left-section">
@@ -2603,8 +2630,20 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                         {selectedKartlaggningOptions.length > 0 ? 'Kartering vald' : 'Ingen karteringstyp vald'}
                     </button>
                     <button>Naturvärdesbiologi</button>
-                    <button>Landskapsområden</button>
-                </div>
+                    
+        <button>Värdeelement</button>
+        <div className="value-element-options">
+            <div className="value-element-option" onClick={() => onValueElementOptionClick('Dot')}>
+                <img src={`${process.env.PUBLIC_URL}/media/point-100.png`} alt="Dot in Box" /> {/* Replace with actual path */}
+            </div>
+            <div className="value-element-option" onClick={() => onValueElementOptionClick('Triangle')}>
+                <img src={`${process.env.PUBLIC_URL}/media/polygon-100.png`} alt="Triangle in Box" /> {/* Replace with actual path */}
+            </div>
+        </div>
+    </div>
+
+
+
                 <button className="layers-btn" onClick={toggleLagerhanteringPopup}>
                     <img src={`${process.env.PUBLIC_URL}/media/layers-100.png`} alt="Layers" />
                 </button>

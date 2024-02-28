@@ -1177,7 +1177,7 @@
 
 .list-popup {
   position: relative;
-  width: 90%;
+  width: 99%;
   top: 0;
   left: 0;
   /* Adjust the width as needed */
@@ -1188,7 +1188,8 @@
   font-weight: bold;
   z-index: 10000;
   /* Ensure it's above the left-section and map */
-  padding: 10px;
+  padding: 1px;
+  padding-top: 5px;
   max-height: 500px;
   overflow-y: scroll;
   /* Add more styling as needed */
@@ -1293,4 +1294,27 @@
   display: block; /* Ensures the image is block-level to remove bottom space */
   width: 30px; /* Adjust the size of the icon as needed */
   height: auto; /* Keeps the aspect ratio of the icon */
+}
+
+.value-element-container {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* Adjust the space between elements as needed */
+}
+
+.value-element-options {
+  display: flex;
+  gap: 10px; /* Adjust the space between options as needed */
+}
+
+.value-element-option {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  border: 1px solid #ccc;
+}
+
+.value-element-option img {
+  width: 24px; /* Adjust as needed */
+  height: 24px; /* Adjust as needed */
 }
