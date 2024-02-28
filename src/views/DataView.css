@@ -1318,3 +1318,7 @@
   width: 24px; /* Adjust as needed */
   height: 24px; /* Adjust as needed */
 }
+
+.value-element-option.selected {
+  background-color: grey;
+}

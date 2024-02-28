@@ -236,7 +236,8 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
         VattendragDelstracka: "Vattendrag delsträcka",
     });
     const [showValueElementOptions, setShowValueElementOptions] = useState(false);
-    const [geometryFilter , setGeometryFilter] = useState(null);
+    const [geometryFilterPoint, setGeometryFilterPoint] = useState(false);
+    const [geometryFilterPolygon, setGeometryFilterPolygon] = useState(false);
 
 
 
@@ -2166,6 +2167,17 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
 
             const matchesKartlaggningstyp = selectedKartlaggningOptions.length === 0 || selectedKartlaggningOptions.includes(feature.properties.attributes?.kartlaggningsTyp);
 
+            // Apply geometry filters
+            if (geometryFilterPoint && feature.geometry.type !== 'Point' && feature.geometry.type !== 'MultiPoint') {
+               
+                return false; // Exclude features that are not points when point filter is active
+            }
+
+            if (geometryFilterPolygon && feature.geometry.type !== 'Polygon' && feature.geometry.type !== 'MultiPolygon') {
+                
+                return false; // Exclude features that are not polygons when polygon filter is active
+            }
+
             // When in 'selected' view mode, apply additional filtering based on the active tab
             if (viewMode === 'selected') {
                 const isSelected = savedObjectIds.has(feature.properties.id);
@@ -2225,13 +2237,13 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                 <div className="attributes-container" style={{ maxHeight: `${attributesContainerHeight}px` }}>
 
                     <div className="tabs">
-                        {hasPunkter && (
+                        {hasPunkter && !geometryFilterPolygon && (
                             <button className={activeTab === 'Punkter' ? 'active' : ''} onClick={() => setActiveTab('Punkter')}>Punkter</button>
                         )}
                         {hasLinjer && (
                             <button className={activeTab === 'Linjer' ? 'active' : ''} onClick={() => setActiveTab('Linjer')}>Linjer</button>
                         )}
-                        {hasPolygoner && (
+                        {hasPolygoner && !geometryFilterPoint && (
                             <button className={activeTab === 'Polygoner' ? 'active' : ''} onClick={() => setActiveTab('Polygoner')}>Polygoner</button>
                         )}
                     </div>
@@ -2545,24 +2557,32 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
         };
 
 
-
-// Function to handle clicks on value element options
-const onValueElementOptionClick = (optionType) => {
-    console.log(`${optionType} clicked`);
-
-    // Determine the geometric type to filter by based on the option clicked
-    let geometricTypeToFilter;
-    if (optionType === 'Dot') {
-        geometricTypeToFilter = 'Point';
-        setGeometryFilter(geometricTypeToFilter);
-    } else if (optionType === 'Triangle') {
-        geometricTypeToFilter = 'Polygon';
-        setGeometryFilter(geometricTypeToFilter);
-    }
-
-    // Set the geometric filter state based on the clicked option
-    setGeometryFilter(geometricTypeToFilter);
-};
+        const onValueElementOptionClick = (optionType) => {
+            if (optionType === 'Dot') {
+                // If already selected, reset both filters and default to 'Punkter' tab
+                if (geometryFilterPoint) {
+                    setGeometryFilterPoint(false);
+                    setGeometryFilterPolygon(false);
+                    setActiveTab('Punkter'); // Default to 'Punkter' tab
+                } else {
+                    setGeometryFilterPoint(true); // Enable point filter
+                    setGeometryFilterPolygon(false); // Disable polygon filter
+                    setActiveTab('Punkter'); // Switch to 'Punkter' tab
+                }
+            } else if (optionType === 'Triangle') {
+                // If already selected, reset both filters and default to 'Punkter' tab
+                if (geometryFilterPolygon) {
+                    setGeometryFilterPoint(false);
+                    setGeometryFilterPolygon(false);
+                    setActiveTab('Punkter'); // Default to 'Punkter' tab
+                } else {
+                    setGeometryFilterPoint(false); // Disable point filter
+                    setGeometryFilterPolygon(true); // Enable polygon filter
+                    setActiveTab('Polygoner'); // Switch to 'Polygoner' tab
+                }
+            }
+        };
+        
 
 
         return (
@@ -2617,13 +2637,12 @@ const onValueElementOptionClick = (optionType) => {
                         {selectedKartlaggningOptions.length > 0 ? 'Kartering vald' : 'Ingen karteringstyp vald'}
                     </button>
                     <button>Naturvärdesbiologi</button>
-
                     <button>Värdeelement</button>
                     <div className="value-element-options">
-                        <div className="value-element-option" onClick={() => onValueElementOptionClick('Dot')}>
+                        <div className={`value-element-option ${geometryFilterPoint ? 'selected' : ''}`} onClick={() => onValueElementOptionClick('Dot')}>
                             <img src={`${process.env.PUBLIC_URL}/media/point-100.png`} alt="Dot in Box" /> {/* Replace with actual path */}
                         </div>
-                        <div className="value-element-option" onClick={() => onValueElementOptionClick('Triangle')}>
+                        <div className={`value-element-option ${geometryFilterPolygon ? 'selected' : ''}`} onClick={() => onValueElementOptionClick('Triangle')}>
                             <img src={`${process.env.PUBLIC_URL}/media/polygon-100.png`} alt="Triangle in Box" /> {/* Replace with actual path */}
                         </div>
                     </div>
