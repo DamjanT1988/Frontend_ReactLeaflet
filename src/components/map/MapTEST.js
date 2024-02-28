@@ -2173,7 +2173,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                 return false; // Exclude features that are not points when point filter is active
             }
 
-            if (geometryFilterPolygon && feature.geometry.type !== 'Polygon' && feature.geometry.type !== 'MultiPolygon') {
+            if (geometryFilterPolygon && feature.geometry.type !== 'Polygon' && feature.geometry.type !== 'MultiPolygon' && feature.properties.isCircleMarker && feature.properties.isCircle ) {
                 
                 return false; // Exclude features that are not polygons when polygon filter is active
             }
@@ -2240,7 +2240,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, shouldHid
                         {hasPunkter && !geometryFilterPolygon && (
                             <button className={activeTab === 'Punkter' ? 'active' : ''} onClick={() => setActiveTab('Punkter')}>Punkter</button>
                         )}
-                        {hasLinjer && (
+                        {hasLinjer && !geometryFilterPoint && !geometryFilterPolygon && (
                             <button className={activeTab === 'Linjer' ? 'active' : ''} onClick={() => setActiveTab('Linjer')}>Linjer</button>
                         )}
                         {hasPolygoner && !geometryFilterPoint && (
