@@ -221,18 +221,26 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, projectKa
     const [showLagerhanteringPopup, setShowLagerhanteringPopup] = useState(false);
     const [kartlaggningstypOptions, setKartlaggningstypOptions] = useState({
         KartlaggningBiologiskMangfald: "Kartläggning biologisk mångfald",
-        Artforekomst: "Artförekomst",
-        Bottenmiljo: "Bottenmiljö",
-        GenSkBiotopskyddsomr: "Generellt skyddat biotopskyddsområde",
-        LivsmiljO: "Livsmiljö",
+        Artforekomst_punkt: "Artförekomst P",
+        Artforekomst_yta: "Artförekomst Y",
+        Bottenmiljo_punkt: "Bottenmiljö P",
+        Bottenmiljo_yta: "Bottenmiljö Y",
+        GenSkBiotopskyddsomr_punkt: "Generellt skyddat biotopskyddsomr. P",
+        GenSkBiotopskyddsomr_yta: "Generellt skyddat biotopskyddsomr. Y",
+        LivsmiljO_punkt: "Livsmiljö P",
+        LivsmiljO_yta: "Livsmiljö Y",
         Natura2000Naturtyp: "Natura 2000-naturtyp",
-        Naturvardestrad: "Naturvärdesträd",
+        Naturvardestrad_punkt: "Naturvärdesträd P",
+        Naturvardestrad_yta: "Naturvärdesträd Y",
         NVILandskapsomrade: "NVI Landskapsområde",
         NVINaturvardesbiotop: "NVI Naturvärdesbiotop",
         OvrigBiotop: "Övrig biotop",
-        SarskSkyddsvTrad: "Särskilt skyddsvärda träd",
-        Smavatten: "Småvatten",
-        Vardeelement: "Värdeelement",
+        SarskSkyddsvTrad_punkt: "Särskilt skyddsvärda träd P",
+        SarskSkyddsvTrad_yta: "Särskilt skyddsvärda träd Y",
+        Smavatten_punkt: "Småvatten P",
+        Smavatten_yta: "Småvatten Y",
+        Vardeelement_punkt: "Värdeelement P",
+        Vardeelement_yta: "Värdeelement Y",
         VattendragDelstracka: "Vattendrag delsträcka",
     });
     const [showValueElementOptions, setShowValueElementOptions] = useState(false);
@@ -879,6 +887,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, projectKa
             habitatQualities: 'Habitatkvaliteter',
             valueElements: 'Värdeelement',
             kartlaggningsTyp: 'Kartläggningstyp',
+            kartlaggningsKategori: 'Kartläggningskategori'
             // Add more mappings as needed
         };
 
@@ -1131,22 +1140,23 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, projectKa
                                 radius: layer.getRadius(),
                                 id: layer.options.id,
                                 attributes: {
-                                    objectNumber: ' ',
-                                    inventoryLevel: ' ',
-                                    natureValueClass: ' ',
-                                    preliminaryAssesment: ' ',
-                                    reason: ' ',
-                                    natureType: ' ',
-                                    habitat: ' ',
-                                    date: ' ',
-                                    executer: ' ',
-                                    organsation: ' ',
-                                    projectName: ' ',
-                                    area: ' ',
-                                    species: ' ',
-                                    habitatQualities: ' ',
-                                    valueElements: ' ',
-                                    kartlaggningsTyp: ' ',
+                                    objectNumber: '',
+                                    inventoryLevel: '',
+                                    natureValueClass: '',
+                                    preliminaryAssesment: '',
+                                    reason: '',
+                                    natureType: '',
+                                    habitat: '',
+                                    date: '',
+                                    executer: '',
+                                    organsation: '',
+                                    projectName: '',
+                                    area: '',
+                                    species: '',
+                                    habitatQualities: '',
+                                    valueElements: '',
+                                    kartlaggningsTyp: '',
+                                    kartlaggningsKategori: ''
                                 }
                             }
                         };
@@ -1186,6 +1196,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, projectKa
                                     habitatQualities: layer.options.attributes.habitatQualities,
                                     valueElements: layer.options.attributes.valueElements,
                                     kartlaggningsTyp: layer.options.attributes.kartlaggningsTyp,
+                                    kartlaggningsKategori: layer.options.attributes.kartlaggningsKategori
 
                                 }
                             }
@@ -1218,22 +1229,23 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, projectKa
                                 isRectangle: true,
                                 id: layer.options.id,
                                 attributes: {
-                                    objectNumber: ' ',
-                                    inventoryLevel: ' ',
-                                    natureValueClass: ' ',
-                                    preliminaryAssesment: ' ',
-                                    reason: ' ',
-                                    natureType: ' ',
-                                    habitat: ' ',
-                                    date: ' ',
-                                    executer: ' ',
-                                    organsation: ' ',
-                                    projectName: ' ',
-                                    area: ' ',
+                                    objectNumber: '',
+                                    inventoryLevel: '',
+                                    natureValueClass: '',
+                                    preliminaryAssesment: '',
+                                    reason: '',
+                                    natureType: '',
+                                    habitat: '',
+                                    date: '',
+                                    executer: '',
+                                    organsation: '',
+                                    projectName: '',
+                                    area: '',
                                     species: ' ',
-                                    habitatQualities: ' ',
-                                    valueElements: ' ',
-                                    kartlaggningsTyp: ' ',
+                                    habitatQualities: '',
+                                    valueElements: '',
+                                    kartlaggningsTyp: '',
+                                    kartlaggningsKategori: ''
                                 }
                             },
 
@@ -1291,22 +1303,23 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, projectKa
                                 isPolygon: true,
                                 id: layer.options.id,
                                 attributes: layer.options.attributes ? { ...layer.options.attributes } : {
-                                    objectNumber: ' ',
-                                    inventoryLevel: ' ',
-                                    natureValueClass: ' ',
-                                    preliminaryAssesment: ' ',
-                                    reason: ' ',
-                                    natureType: ' ',
-                                    habitat: ' ',
-                                    date: ' ',
-                                    executer: ' ',
-                                    organsation: ' ',
-                                    projectName: ' ',
-                                    area: ' ',
-                                    species: ' ',
-                                    habitatQualities: ' ',
-                                    valueElements: ' ',
-                                    kartlaggningsTyp: ' ',
+                                    objectNumber: '',
+                                    inventoryLevel: '',
+                                    natureValueClass: '',
+                                    preliminaryAssesment: '',
+                                    reason: '',
+                                    natureType: '',
+                                    habitat: '',
+                                    date: '',
+                                    executer: '',
+                                    organsation: '',
+                                    projectName: '',
+                                    area: '',
+                                    species: '',
+                                    habitatQualities: '',
+                                    valueElements: '',
+                                    kartlaggningsTyp: '',
+                                    kartlaggningsKategori: ''
                                 }
                             },
 
@@ -1337,22 +1350,23 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, projectKa
                                 isPolyline: true,
                                 id: layer.options.id,
                                 attributes: layer.options.attributes ? { ...layer.options.attributes } : {
-                                    objectNumber: ' ',
-                                    inventoryLevel: ' ',
-                                    natureValueClass: ' ',
-                                    preliminaryAssesment: ' ',
-                                    reason: ' ',
-                                    natureType: ' ',
-                                    habitat: ' ',
-                                    date: ' ',
-                                    executer: ' ',
-                                    organsation: ' ',
-                                    projectName: ' ',
-                                    area: ' ',
-                                    species: ' ',
-                                    habitatQualities: ' ',
-                                    valueElements: ' ',
-                                    kartlaggningsTyp: ' ',
+                                    objectNumber: '',
+                                    inventoryLevel: '',
+                                    natureValueClass: '',
+                                    preliminaryAssesment: '',
+                                    reason: '',
+                                    natureType: '',
+                                    habitat: '',
+                                    date: '',
+                                    executer: '',
+                                    organsation: '',
+                                    projectName: '',
+                                    area: '',
+                                    species: '',
+                                    habitatQualities: '',
+                                    valueElements: '',
+                                    kartlaggningsTyp: '',
+                                    kartlaggningsKategori: ''
                                 }
                             },
 
@@ -1382,22 +1396,23 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, projectKa
                                 id: layer.options.id,
                                 radius: layer.getRadius(), // Radius in pixels
                                 attributes: layer.options.attributes ? { ...layer.options.attributes } : {
-                                    objectNumber: ' ',
-                                    inventoryLevel: ' ',
-                                    natureValueClass: ' ',
-                                    preliminaryAssesment: ' ',
-                                    reason: ' ',
-                                    natureType: ' ',
-                                    habitat: ' ',
-                                    date: ' ',
-                                    executer: ' ',
-                                    organsation: ' ',
-                                    projectName: ' ',
-                                    area: ' ',
-                                    species: ' ',
-                                    habitatQualities: ' ',
-                                    valueElements: ' ',
-                                    kartlaggningsTyp: ' ',
+                                    objectNumber: '',
+                                    inventoryLevel: '',
+                                    natureValueClass: '',
+                                    preliminaryAssesment: '',
+                                    reason: '',
+                                    natureType: '',
+                                    habitat: '',
+                                    date: '',
+                                    executer: '',
+                                    organsation: '',
+                                    projectName: '',
+                                    area: '',
+                                    species: '',
+                                    habitatQualities: '',
+                                    valueElements: '',
+                                    kartlaggningsTyp: '',
+                                    kartlaggningsKategori: ''
                                 }
                             },
 
@@ -1424,22 +1439,23 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, projectKa
                             id: layer.options.id || uuidv4(), // Ensure each feature has a unique ID
                             attributes: layer.options.attributes || {
                                 // Default attributes, can be customized
-                                objectNumber: ' ',
-                                inventoryLevel: ' ',
-                                natureValueClass: ' ',
-                                preliminaryAssessment: ' ',
-                                reason: ' ',
-                                natureType: ' ',
-                                habitat: ' ',
-                                date: ' ',
-                                executor: ' ',
-                                organization: ' ',
-                                projectName: ' ',
-                                area: ' ',
-                                species: ' ',
-                                habitatQualities: ' ',
-                                valueElements: ' ',
-                                kartlaggningsTyp: ' ',
+                                objectNumber: '',
+                                inventoryLevel: '',
+                                natureValueClass: '',
+                                preliminaryAssesment: '',
+                                reason: '',
+                                natureType: '',
+                                habitat: '',
+                                date: '',
+                                executer: '',
+                                organsation: '',
+                                projectName: '',
+                                area: '',
+                                species: '',
+                                habitatQualities: '',
+                                valueElements: '',
+                                kartlaggningsTyp: '',
+                                kartlaggningsKategori: ''
                             }
                         }
                     };
@@ -1454,22 +1470,23 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, projectKa
                     const UUID = uuidv4();
                     layerFeature.properties.id = UUID;
                     layerFeature.properties.attributes = {
-                        objectNumber: ' ',
-                        inventoryLevel: ' ',
-                        natureValueClass: ' ',
-                        preliminaryAssesment: ' ',
-                        reason: ' ',
-                        natureType: ' ',
-                        habitat: ' ',
-                        date: ' ',
-                        executer: ' ',
-                        organsation: ' ',
-                        projectName: ' ',
-                        area: ' ',
-                        species: ' ',
-                        habitatQualities: ' ',
-                        valueElements: ' ',
-                        kartlaggningsTyp: ' ',
+                        objectNumber: '',
+                        inventoryLevel: '',
+                        natureValueClass: '',
+                        preliminaryAssesment: '',
+                        reason: '',
+                        natureType: '',
+                        habitat: '',
+                        date: '',
+                        executer: '',
+                        organsation: '',
+                        projectName: '',
+                        area: '',
+                        species: '',
+                        habitatQualities: '',
+                        valueElements: '',
+                        kartlaggningsTyp: '',
+                        kartlaggningsKategori: ''
                     };
 
                     features.push(layerFeature);
@@ -1500,22 +1517,23 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, projectKa
 
         // Default attributes for all shapes
         newLayer.options.attributes = {
-            objectNumber: ' ',
-            inventoryLevel: ' ',
-            natureValueClass: ' ',
-            preliminaryAssesment: ' ',
-            reason: ' ',
-            natureType: ' ',
-            habitat: ' ',
-            date: ' ',
-            executer: ' ',
-            organsation: ' ',
-            projectName: ' ',
-            area: ' ',
-            species: ' ',
-            habitatQualities: ' ',
-            valueElements: ' ',
-            kartlaggningsTyp: ' ',
+            objectNumber: '',
+                                    inventoryLevel: '',
+                                    natureValueClass: '',
+                                    preliminaryAssesment: '',
+                                    reason: '',
+                                    natureType: '',
+                                    habitat: '',
+                                    date: '',
+                                    executer: '',
+                                    organsation: '',
+                                    projectName: '',
+                                    area: '',
+                                    species: '',
+                                    habitatQualities: '',
+                                    valueElements: '',
+                                    kartlaggningsTyp: '',
+                                    kartlaggningsKategori: ''
         };
 
         let feature;
@@ -1884,6 +1902,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, projectKa
         species: "Arter",
         valueElements: "Värdeelement",
         kartlaggningsTyp: "Kartläggningstyp",
+        kartlaggningsKategori: "Kartläggningskategori"
         // Add more mappings as needed
     };
 
@@ -2174,14 +2193,14 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, projectKa
 
                 return false; // Exclude features that are not points when point filter is active
             }
-   // Apply geometry filter for polygons, including circles
-   if (geometryFilterPolygon) {
-    const isPolygonType = feature.geometry.type === 'Polygon' || feature.geometry.type === 'MultiPolygon';
-    const isCircle = feature.properties.isCircleMarker || feature.properties.isCircle;
-    if (!isPolygonType && !isCircle) {
-        return false; // Exclude features that are neither polygons nor circles when polygon filter is active
-    }
-}
+            // Apply geometry filter for polygons, including circles
+            if (geometryFilterPolygon) {
+                const isPolygonType = feature.geometry.type === 'Polygon' || feature.geometry.type === 'MultiPolygon';
+                const isCircle = feature.properties.isCircleMarker || feature.properties.isCircle;
+                if (!isPolygonType && !isCircle) {
+                    return false; // Exclude features that are neither polygons nor circles when polygon filter is active
+                }
+            }
 
             // When in 'selected' view mode, apply additional filtering based on the active tab
             if (viewMode === 'selected') {
