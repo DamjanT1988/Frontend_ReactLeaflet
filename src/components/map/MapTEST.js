@@ -238,7 +238,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, projectKa
     const [showValueElementOptions, setShowValueElementOptions] = useState(false);
     const [geometryFilterPoint, setGeometryFilterPoint] = useState(false);
     const [geometryFilterPolygon, setGeometryFilterPolygon] = useState(false);
-
+    const [showNewKartering, setShowNewKartering] = useState(false);
 
 
     const MapEventsComponent = () => {
@@ -2171,14 +2171,17 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, projectKa
 
             // Apply geometry filters
             if (geometryFilterPoint && feature.geometry.type !== 'Point' && feature.geometry.type !== 'MultiPoint') {
-               
+
                 return false; // Exclude features that are not points when point filter is active
             }
-
-            if (geometryFilterPolygon && feature.geometry.type !== 'Polygon' && feature.geometry.type !== 'MultiPolygon' && feature.properties.isCircleMarker && feature.properties.isCircle ) {
-                
-                return false; // Exclude features that are not polygons when polygon filter is active
-            }
+   // Apply geometry filter for polygons, including circles
+   if (geometryFilterPolygon) {
+    const isPolygonType = feature.geometry.type === 'Polygon' || feature.geometry.type === 'MultiPolygon';
+    const isCircle = feature.properties.isCircleMarker || feature.properties.isCircle;
+    if (!isPolygonType && !isCircle) {
+        return false; // Exclude features that are neither polygons nor circles when polygon filter is active
+    }
+}
 
             // When in 'selected' view mode, apply additional filtering based on the active tab
             if (viewMode === 'selected') {
@@ -2522,7 +2525,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, projectKa
         }
 
         // Convert kartlaggningstypOptions to an array and add the "Alla" option
-        const kartlaggningstypOptionsArray = [{ key: '', value: 'Visa alla' }, ...Object.entries(kartlaggningstypOptions).map(([key, value]) => ({ key, value }))];
+        const kartlaggningstypOptionsArray = [/*{ key: '', value: 'Visa alla' },*/ ...Object.entries(kartlaggningstypOptions).map(([key, value]) => ({ key, value }))];
 
         const toggleKartlaggningList = () => {
             setShowKartlaggningList(!showList);
@@ -2584,7 +2587,22 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, projectKa
                 }
             }
         };
-        
+
+        // Assuming karteringar is already an array of objects with used_karteringar property
+        const karteringList = selectedProject.karteringar || [];
+
+        /*
+                // Combine karteringList with kartlaggningstypOptionsArray, ensuring karteringList is at the top
+                const combinedOptions = [...karteringList.map(kartering => ({
+                    key: kartering.used_karteringar, // Assuming 'used_karteringar' is the key you want to use
+                    value: kartering.used_karteringar, // Adjust if you have a specific value field
+                    isKartering: true // Custom property to identify karteringList items
+                })), ...kartlaggningstypOptionsArray];
+        */
+
+        const toggleNewKarteringList = () => {
+            setShowNewKartering(!showNewKartering);
+        };
 
 
         return (
@@ -2598,22 +2616,21 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, projectKa
 
                     {showList && (
                         <div className="list-popup">
-                            <h3>Lägg till kartläggning</h3>
-                            {kartlaggningstypOptionsArray.map(({ key, value }, index) => (
+                            <h3>Gjorda karteringar</h3>
+                            {karteringList.map((kartering, index) => (
                                 <div
-                                    key={key}
-                                    onClick={() => handleSelectKartlaggningOption(key)}
+                                    key={index}
+                                    onClick={() => handleSelectKartlaggningOption(kartering.used_karteringar)}
                                     style={{
                                         padding: '10px',
                                         cursor: 'pointer',
-                                        backgroundColor: selectedKartlaggningOptions.includes(key) ? 'grey' : 'transparent', // Change background color if selected
-                                        color: selectedKartlaggningOptions.includes(key) ? '#ffffff' : '#000000',
+                                        backgroundColor: selectedKartlaggningOptions.includes(kartering.used_karteringar) ? 'grey' : 'transparent',
+                                        color: selectedKartlaggningOptions.includes(kartering.used_karteringar) ? '#ffffff' : '#000000',
                                         display: 'flex',
                                         alignItems: 'center',
                                     }}
                                 >
-                                    {/* Render the "+" symbol inside a green circle for all except the first item */}
-                                    {index !== 0 && !selectedKartlaggningOptions.includes(key) && (
+                                    {!selectedKartlaggningOptions.includes(kartering.used_karteringar) && (
                                         <span style={{
                                             marginRight: '5px',
                                             display: 'inline-block',
@@ -2629,9 +2646,57 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, projectKa
                                             +
                                         </span>
                                     )}
-                                    {value}
+                                    {kartering.used_karteringar}
+                                    <span style={{ marginLeft: 'auto' }}>➡</span>
                                 </div>
                             ))}
+
+                            {/* Separator Line */}
+                            <hr style={{ margin: '10px 0' }} />
+
+                            {/* Button to toggle "Lägg till ny kartering" section */}
+                            <button className="top-bar-button" onClick={toggleNewKarteringList}>
+                                Lägg till ny kartering
+                            </button>
+
+                            {/* Conditional rendering of "Lägg till ny kartering" section */}
+                            {showNewKartering && (
+                                <>
+                                    {/* Render new kartering options */}
+                                    {kartlaggningstypOptionsArray.map(({ key, value }, index) => (
+                                        <div
+                                            key={key}
+                                            onClick={() => handleSelectKartlaggningOption(key)}
+                                            style={{
+                                                padding: '10px',
+                                                cursor: 'pointer',
+                                                backgroundColor: selectedKartlaggningOptions.includes(key) ? 'grey' : 'transparent',
+                                                color: selectedKartlaggningOptions.includes(key) ? '#ffffff' : '#000000',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                            }}
+                                        >
+                                            {!selectedKartlaggningOptions.includes(key) && (
+                                                <span style={{
+                                                    marginRight: '5px',
+                                                    display: 'inline-block',
+                                                    width: '20px',
+                                                    height: '20px',
+                                                    borderRadius: '50%',
+                                                    backgroundColor: 'green',
+                                                    color: 'white',
+                                                    textAlign: 'center',
+                                                    lineHeight: '20px',
+                                                    fontSize: '15px',
+                                                }}>
+                                                    +
+                                                </span>
+                                            )}
+                                            {value}
+                                        </div>
+                                    ))}
+                                </>
+                            )}
                         </div>
                     )}
 
@@ -2648,22 +2713,24 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, projectKa
                             <img src={`${process.env.PUBLIC_URL}/media/polygon-100.png`} alt="Triangle in Box" /> {/* Replace with actual path */}
                         </div>
                     </div>
-                </div>
+                </div >
 
 
 
                 <button className="layers-btn" onClick={toggleLagerhanteringPopup}>
                     <img src={`${process.env.PUBLIC_URL}/media/layers-100.png`} alt="Layers" />
                 </button>
-                {showLagerhanteringPopup && (
-                    <div className="lagerhantering-popup">
-                        {/* Pop-up content goes here */}
-                        <p>Pop-up content for Lagerhantering</p>
-                        {/* Close button */}
-                        <button onClick={() => setShowLagerhanteringPopup(false)}>Stäng</button>
-                    </div>
-                )}
-            </div>
+                {
+                    showLagerhanteringPopup && (
+                        <div className="lagerhantering-popup">
+                            {/* Pop-up content goes here */}
+                            <p>Pop-up content for Lagerhantering</p>
+                            {/* Close button */}
+                            <button onClick={() => setShowLagerhanteringPopup(false)}>Stäng</button>
+                        </div>
+                    )
+                }
+            </div >
         );
     };
 
