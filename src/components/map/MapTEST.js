@@ -887,8 +887,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, projectKa
             habitatQualities: 'Habitatkvaliteter',
             valueElements: 'Värdeelement',
             kartlaggningsTyp: 'Kartläggningstyp',
-            kartlaggningsKategori: 'Kartläggningskategori'
-            // Add more mappings as needed
+            kartlaggningsGeometry: 'Kartläggningsgeometri'
         };
 
         if (!shouldHideDataView) {
@@ -1156,7 +1155,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, projectKa
                                     habitatQualities: '',
                                     valueElements: '',
                                     kartlaggningsTyp: '',
-                                    kartlaggningsKategori: ''
+                                    kartlaggningsGeometry: ''
                                 }
                             }
                         };
@@ -1196,7 +1195,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, projectKa
                                     habitatQualities: layer.options.attributes.habitatQualities,
                                     valueElements: layer.options.attributes.valueElements,
                                     kartlaggningsTyp: layer.options.attributes.kartlaggningsTyp,
-                                    kartlaggningsKategori: layer.options.attributes.kartlaggningsKategori
+                                    kartlaggningsGeometry: layer.options.attributes.kartlaggningsGeometry
 
                                 }
                             }
@@ -1245,7 +1244,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, projectKa
                                     habitatQualities: '',
                                     valueElements: '',
                                     kartlaggningsTyp: '',
-                                    kartlaggningsKategori: ''
+                                    kartlaggningsGeometry: ''
                                 }
                             },
 
@@ -1319,7 +1318,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, projectKa
                                     habitatQualities: '',
                                     valueElements: '',
                                     kartlaggningsTyp: '',
-                                    kartlaggningsKategori: ''
+                                    kartlaggningsGeometry: ''
                                 }
                             },
 
@@ -1366,7 +1365,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, projectKa
                                     habitatQualities: '',
                                     valueElements: '',
                                     kartlaggningsTyp: '',
-                                    kartlaggningsKategori: ''
+                                    kartlaggningsGeometry: ''
                                 }
                             },
 
@@ -1412,7 +1411,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, projectKa
                                     habitatQualities: '',
                                     valueElements: '',
                                     kartlaggningsTyp: '',
-                                    kartlaggningsKategori: ''
+                                    kartlaggningsGeometry: ''
                                 }
                             },
 
@@ -1455,7 +1454,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, projectKa
                                 habitatQualities: '',
                                 valueElements: '',
                                 kartlaggningsTyp: '',
-                                kartlaggningsKategori: ''
+                                kartlaggningsGeometry: ''
                             }
                         }
                     };
@@ -1486,7 +1485,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, projectKa
                         habitatQualities: '',
                         valueElements: '',
                         kartlaggningsTyp: '',
-                        kartlaggningsKategori: ''
+                        kartlaggningsGeometry: ''
                     };
 
                     features.push(layerFeature);
@@ -1518,22 +1517,22 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, projectKa
         // Default attributes for all shapes
         newLayer.options.attributes = {
             objectNumber: '',
-                                    inventoryLevel: '',
-                                    natureValueClass: '',
-                                    preliminaryAssesment: '',
-                                    reason: '',
-                                    natureType: '',
-                                    habitat: '',
-                                    date: '',
-                                    executer: '',
-                                    organsation: '',
-                                    projectName: '',
-                                    area: '',
-                                    species: '',
-                                    habitatQualities: '',
-                                    valueElements: '',
-                                    kartlaggningsTyp: '',
-                                    kartlaggningsKategori: ''
+            inventoryLevel: '',
+            natureValueClass: '',
+            preliminaryAssesment: '',
+            reason: '',
+            natureType: '',
+            habitat: '',
+            date: '',
+            executer: '',
+            organsation: '',
+            projectName: '',
+            area: '',
+            species: '',
+            habitatQualities: '',
+            valueElements: '',
+            kartlaggningsTyp: '',
+            kartlaggningsGeometry: ''
         };
 
         let feature;
