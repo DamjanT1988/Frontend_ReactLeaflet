@@ -1190,6 +1190,8 @@
   /* Ensure it's above the left-section and map */
   padding: 1px;
   padding-top: 5px;
+  padding-bottom: 3px;
+  margin-bottom: 10px;
   max-height: 500px;
   overflow-y: scroll;
   /* Add more styling as needed */
@@ -1321,4 +1323,38 @@
 
 .value-element-option.selected {
   background-color: grey;
+}
+
+.selected-karteringstyp-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 10px; /* Spacing from the list or any other elements above */
+}
+
+.selected-karteringstyp-buttons button {
+  margin: 5px;
+  background-color: #30A875; /* Primary color for consistency */
+  color: white; /* Text color for readability */
+  border: none; /* Remove default border */
+  padding: 8px 12px; /* Padding for better touch area and aesthetics */
+  border-radius: 5px; /* Rounded corners for a modern look */
+  cursor: pointer; /* Indicate it's clickable */
+  transition: background-color 0.3s ease; /* Smooth transition for hover effect */
+  font-size: 0.85em; /* Adjust based on your design requirements */
+  white-space: nowrap; /* Prevent button text from wrapping */
+  overflow: hidden; /* Hide overflow */
+  text-overflow: ellipsis; /* Add ellipsis for overflow text */
+  width: 100%; /* Maximum width for each button */
+}
+
+.selected-karteringstyp-buttons button:hover {
+  background-color: #267356; /* Darker shade for hover state */
+}
+
+/* Responsive adjustments if needed */
+@media (max-width: 768px) {
+  .selected-karteringstyp-buttons button {
+    flex: 1 0 45%; /* Adjust button width in smaller screens */
+    max-width: none; /* Remove max-width restriction */
+  }
 }

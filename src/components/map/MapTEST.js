@@ -2187,6 +2187,8 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, projectKa
 
             const matchesKartlaggningstyp = selectedKartlaggningOptions.length === 0 || selectedKartlaggningOptions.includes(feature.properties.attributes?.kartlaggningsTyp);
 
+            console.log(selectedKartlaggningOptions + ' ' + feature.properties.attributes?.kartlaggningsTyp);
+
             // Apply geometry filters
             if (geometryFilterPoint && feature.geometry.type !== 'Point' && feature.geometry.type !== 'MultiPoint') {
 
@@ -2234,22 +2236,26 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, projectKa
             }
         });
 
-        // Function to filter features based on geometry type and selected kartlaggningstyp
         const filterByGeometryType = (type) => {
             return geoJsonData.features.filter(feature => {
                 const geometryType = feature.geometry.type;
                 const isMatchingType = geometryType === type || (type === 'Point' && (geometryType === 'Point' || geometryType === 'MultiPoint'));
                 const matchesKartlaggningstyp = selectedKartlaggningOptions.length === 0 || selectedKartlaggningOptions.includes(feature.properties.attributes?.kartlaggningsTyp);
-
-                return isMatchingType && matchesKartlaggningstyp;
+        
+                const isMatch = isMatchingType && matchesKartlaggningstyp;
+                console.log(`Feature ID: ${feature.properties.id}, Geometry Type: ${geometryType}, Matching Type: ${isMatchingType}, Matching Kartlaggningstyp: ${matchesKartlaggningstyp}, Is Match: ${isMatch}`);
+        
+                return isMatch;
             });
         };
+        
 
         // Check if there are any objects for each category
         const hasPunkter = filterByGeometryType('Point').length > 0;
         const hasLinjer = filterByGeometryType('LineString').length > 0;
         const hasPolygoner = filterByGeometryType('Polygon').length > 0;
 
+        console.log('hasPunktr: ', hasPunkter);
 
         return (
             <div>
@@ -2579,6 +2585,12 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, projectKa
             }
         };
 
+        /*
+        const handleDeselectKartlaggningOption = (optionKey) => {
+            setSelectedKartlaggningOptions(prevOptions => prevOptions.filter(key => key !== optionKey));
+        };
+        */
+
 
         const onValueElementOptionClick = (optionType) => {
             if (optionType === 'Dot') {
@@ -2635,39 +2647,43 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, projectKa
                     {showList && (
                         <div className="list-popup">
                             <h3>Gjorda karteringar</h3>
-                            {karteringList.map((kartering, index) => (
-                                <div
-                                    key={index}
-                                    onClick={() => handleSelectKartlaggningOption(kartering.used_karteringar)}
-                                    style={{
-                                        padding: '10px',
-                                        cursor: 'pointer',
-                                        backgroundColor: selectedKartlaggningOptions.includes(kartering.used_karteringar) ? 'grey' : 'transparent',
-                                        color: selectedKartlaggningOptions.includes(kartering.used_karteringar) ? '#ffffff' : '#000000',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                    }}
-                                >
-                                    {!selectedKartlaggningOptions.includes(kartering.used_karteringar) && (
-                                        <span style={{
-                                            marginRight: '5px',
-                                            display: 'inline-block',
-                                            width: '20px',
-                                            height: '20px',
-                                            borderRadius: '50%',
-                                            backgroundColor: 'green',
-                                            color: 'white',
-                                            textAlign: 'center',
-                                            lineHeight: '20px',
-                                            fontSize: '15px',
-                                        }}>
-                                            +
-                                        </span>
-                                    )}
-                                    {kartering.used_karteringar}
-                                    <span style={{ marginLeft: 'auto' }}>➡</span>
-                                </div>
-                            ))}
+                            {karteringList.map((kartering, index) => {
+                                // Find the display value for each kartering's used_karteringar in kartlaggningstypOptions
+                                const displayValue = kartlaggningstypOptions[kartering.used_karteringar] || kartering.used_karteringar; // Fallback to used_karteringar if no match found
+                                return (
+                                    <div
+                                        key={index}
+                                        onClick={() => handleSelectKartlaggningOption(kartering.used_karteringar)}
+                                        style={{
+                                            padding: '10px',
+                                            cursor: 'pointer',
+                                            backgroundColor: selectedKartlaggningOptions.includes(kartering.used_karteringar) ? 'grey' : 'transparent',
+                                            color: selectedKartlaggningOptions.includes(kartering.used_karteringar) ? '#ffffff' : '#000000',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                        }}
+                                    >
+                                        {!selectedKartlaggningOptions.includes(kartering.used_karteringar) && (
+                                            <span style={{
+                                                marginRight: '5px',
+                                                display: 'inline-block',
+                                                width: '20px',
+                                                height: '20px',
+                                                borderRadius: '50%',
+                                                backgroundColor: 'green',
+                                                color: 'white',
+                                                textAlign: 'center',
+                                                lineHeight: '20px',
+                                                fontSize: '15px',
+                                            }}>
+                                                +
+                                            </span>
+                                        )}
+                                        {displayValue}
+                                        <span style={{ marginLeft: 'auto' }}>➡</span>
+                                    </div>
+                                );
+                            })}
 
                             {/* Separator Line */}
                             <hr style={{ margin: '10px 0' }} />
@@ -2718,11 +2734,26 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, projectKa
                         </div>
                     )}
 
+
+
+
                     <button style={{ backgroundColor: selectedKartlaggningOptions.length > 0 ? 'green' : 'red', color: 'white' }}>
                         {selectedKartlaggningOptions.length > 0 ? 'Kartering vald' : 'Ingen karteringstyp vald'}
                     </button>
-                    <button>Naturvärdesbiologi</button>
-                    <button>Värdeelement</button>
+
+                    {/* Selected karteringstyp buttons */}
+                    <div className="selected-karteringstyp-buttons">
+                        {selectedKartlaggningOptions.map((optionKey, index) => (
+                            <button
+                                key={index}
+                         
+                            >
+                                {kartlaggningstypOptions[optionKey] || optionKey}
+                            </button>
+                        ))}
+                    </div>
+
+
                     <div className="value-element-options">
                         <div className={`value-element-option ${geometryFilterPoint ? 'selected' : ''}`} onClick={() => onValueElementOptionClick('Dot')}>
                             <img src={`${process.env.PUBLIC_URL}/media/point-100.png`} alt="Dot in Box" /> {/* Replace with actual path */}
