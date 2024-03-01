@@ -1,8 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Layout from './components/Layout';
-//import Header from './components/template/Header'; // Assume you have a Header component
-//import Footer from './components/template/Footer'; // Assume you have a Footer component
 import RegistrationView from './views/RegistrationView';
 import LoginView from './views/LoginView';
 import DashboardView from './views/DashboardView';
@@ -11,10 +9,6 @@ import SettingsView from './views/SettingsView';
 import ProjectView from './views/ProjectView';
 import ReportView from './views/ReportView';
 import DataView from './views/DataView';
-// ... any other imports you might need
-//import { Buffer } from 'buffer';
-//window.Buffer = Buffer;
-//global.Buffer = global.Buffer || require('buffer').Buffer;
 
 
 const App = () => {
