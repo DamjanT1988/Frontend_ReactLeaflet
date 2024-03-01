@@ -167,7 +167,7 @@ const DraggableLine = ({ onDrag }) => {
 
 
 // Define the Map component
-const Map = ({ selectedProjectId, selectedProject, onSave, userID, shouldHideDataView }) => {
+const Map = ({ selectedProjectId, selectedProject, onSave, userID, projectKarteringar, shouldHideDataView }) => {
     const featureGroupRef = useRef(null);
     const position = [51.505, -0.09];
     const zoom = 11;
@@ -213,13 +213,99 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, shouldHideDat
     const [addStatus, setAddStatus] = useState(''); // State for the add status message
     const [addStatusObject, setAddStatusObject] = useState(''); // State for the add status message
     const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
+    const [selectedKartlaggningstyp, setSelectedKartlaggningstyp] = useState(''); //MUST BE BLANK
+    const mapObjectClickedRef = useRef(false);
+    const [showList, setShowKartlaggningList] = useState(false);
+    const [selectedKartlaggningOptions, setSelectedKartlaggningOptions] = useState([]);
+    const [selectedKartlaggningValue, setSelectedKartlaggningValue] = useState(null);
+    const [showLagerhanteringPopup, setShowLagerhanteringPopup] = useState(false);
+    const [kartlaggningstypOptions, setKartlaggningstypOptions] = useState({
+        KartlaggningBiologiskMangfald: "Kartläggning biologisk mångfald",
+        Artforekomst_punkt: "Artförekomst P",
+        Artforekomst_yta: "Artförekomst Y",
+        Bottenmiljo_punkt: "Bottenmiljö P",
+        Bottenmiljo_yta: "Bottenmiljö Y",
+        GenSkBiotopskyddsomr_punkt: "Generellt skyddat biotopskyddsomr. P",
+        GenSkBiotopskyddsomr_yta: "Generellt skyddat biotopskyddsomr. Y",
+        LivsmiljO_punkt: "Livsmiljö P",
+        LivsmiljO_yta: "Livsmiljö Y",
+        Natura2000Naturtyp: "Natura 2000-naturtyp",
+        Naturvardestrad_punkt: "Naturvärdesträd P",
+        Naturvardestrad_yta: "Naturvärdesträd Y",
+        NVILandskapsomrade: "NVI Landskapsområde",
+        NVINaturvardesbiotop: "NVI Naturvärdesbiotop",
+        OvrigBiotop: "Övrig biotop",
+        SarskSkyddsvTrad_punkt: "Särskilt skyddsvärda träd P",
+        SarskSkyddsvTrad_yta: "Särskilt skyddsvärda träd Y",
+        Smavatten_punkt: "Småvatten P",
+        Smavatten_yta: "Småvatten Y",
+        Vardeelement_punkt: "Värdeelement P",
+        Vardeelement_yta: "Värdeelement Y",
+        VattendragDelstracka: "Vattendrag delsträcka",
+    });
+    const [showValueElementOptions, setShowValueElementOptions] = useState(false);
+    const [geometryFilterPoint, setGeometryFilterPoint] = useState(false);
+    const [geometryFilterPolygon, setGeometryFilterPolygon] = useState(false);
+    const [showNewKartering, setShowNewKartering] = useState(false);
 
 
+    const MapEventsComponent = () => {
+        const map = useMapEvents({
+            click: () => {
+                if (!mapObjectClickedRef.current) {
+                    console.log("Map clicked, resetting selection and styles");
+
+                    if (highlightedId === null && selectedId === null && selectedFeatureIds.size === 0 && savedObjectIds.size === 0) {
+                        setImageList([]);
+                    } // BEFORE THE RESET - AT TOP
+
+                    // Reset selection states
+                    setSelectedId(null);
+                    setHighlightedId(null);
+                    setAttributesObject(null);
+
+
+                    // Reset styles for all layers in the feature group
+                    featureGroupRef.current.eachLayer(layer => {
+                        // Check the type of layer and reset to default styles accordingly
+                        if (layer instanceof L.Marker) {
+                            // Reset marker icon to default
+                            layer.setIcon(dotIconBlue); // Assuming dotIconBlue is your default marker icon
+                        } else if (layer instanceof L.CircleMarker) {
+                            // Reset circle or circle marker style
+                            layer.setStyle({
+                                color: '#3388ff', // Default stroke color
+                                fillColor: '#3388ff', // Default fill color
+                                fillOpacity: 0.2, // Default fill opacity
+                                weight: 2, // Default stroke weight
+                            });
+                        } else if (layer instanceof L.Polygon || layer instanceof L.Polyline) {
+                            // Reset polygon or polyline style
+                            layer.setStyle({
+                                color: '#3388ff', // Default stroke color
+                                fillColor: '#3388ff', // Default fill color
+                                fillOpacity: 0.2, // Default fill opacity
+                                weight: 2, // Default stroke weight
+                            });
+                        }
+
+                        // Add additional conditions for other layer types as needed
+                    });
+                }
+                mapObjectClickedRef.current = false;
+
+
+            },
+        });
+
+        return null; // This component does not render anything
+    };
 
     const handleDrag = (movementY) => {
         setMapHeight((prevHeight) => Math.max(prevHeight + movementY, 0), mapHeight); // Ensure map height doesn't go below a minimum (e.g., 100px)
         setAttributesContainerHeight((prevHeight) => Math.max(prevHeight - movementY, 0)); // Increase attributes container height as map height decreases
     };
+
 
     const Canvas = ({ width, height, onClose, onSave }) => {
         const canvasRef = useRef(null);
@@ -324,6 +410,7 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, shouldHideDat
         setShowDeleteConfirm(!showDeleteConfirm);
     };
 
+
     const handleDeleteImage = async () => {
         if (!imageToDelete) return; // Ensure imageToDelete is not null or undefined
 
@@ -409,7 +496,6 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, shouldHideDat
     };
 
 
-
     const fetchImages = async () => {
         try {
             const response = await fetch(`${API_URLS.PROJECT_IMAGE_GET.replace('<int:project_id>', selectedProjectId)}`, {
@@ -437,13 +523,13 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, shouldHideDat
         }
     };
 
+
     // useEffect hook to call uploadImage when imageBase64 changes and is not null
     useEffect(() => {
         if (imageBase64) {
             uploadImage(); // Call uploadImage here
         }
     }, [imageBase64]);
-
 
 
     useEffect(() => {
@@ -580,10 +666,6 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, shouldHideDat
     };
 
 
-
-
-
-
     useEffect(() => {
         window.toggleAttributeContainer = (id, attributes) => {
             setShowAttributeTable(true); // Always show the attribute table when the button is clicked
@@ -595,7 +677,6 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, shouldHideDat
             window.toggleAttributeContainer = undefined; // Clean up
         };
     }, []);
-
 
 
     useEffect(() => {
@@ -639,6 +720,7 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, shouldHideDat
                     },
 
                     onEachFeature: (feature, layer) => {
+
                         layer.on('click', (event) => {
                             handleFeatureClick(feature.properties.id, layer, event);
                             // Additional logic for displaying attributes, etc.
@@ -647,6 +729,7 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, shouldHideDat
 
                         layer.on('click', () => {
                             // Set the selected feature ID and its attributes for editing
+                            mapObjectClickedRef.current = true;
                             setSelectedId(feature.properties.id);
                             setAttributesObject(feature.properties.attributes || {});
                             setShowAttributeTable(true); // Show the attribute table
@@ -725,24 +808,28 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, shouldHideDat
                                 resetAllLayerStyles();
                                 setHighlightedIds(new Set([feature.properties.id]));
                                 //setHighlightedId(null); // Set the highlighted feature's ID
+                                mapObjectClickedRef.current = true;
                                 console.log('circle clicked: ', feature.properties.id);
                                 setHighlightedId(feature.properties.id); // Set the highlighted feature's ID
                                 circle.setStyle({
                                     color: 'red', // Change color to green upon click
-                                    fillColor: 'red', // Change fill color to green upon click
-                                    fillOpacity: 0.1,
+                                    fillColor: '#3388ff', // Change fill color to green upon click
+                                    fillOpacity: 0.2,
                                     weight: 5,
                                 });
                                 setSelectedId(feature.properties.id);
                                 setAttributesObject(feature.properties.attributes || {});
                                 setShowAttributeTable(true); // Show the attribute table
                             });
+
+
                         } else {
                             layer.addTo(featureGroupRef.current);
                         }
+
+
                     }
                 })
-
 
                 featureGroupRef.current.eachLayer(layer => {
                     if (layer.feature && layer.feature.properties.shape === "rectangleCrop") {
@@ -800,7 +887,7 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, shouldHideDat
             habitatQualities: 'Habitatkvaliteter',
             valueElements: 'Värdeelement',
             kartlaggningsTyp: 'Kartläggningstyp',
-            // Add more mappings as needed
+            kartlaggningsGeometry: 'Kartläggningsgeometri'
         };
 
         if (!shouldHideDataView) {
@@ -816,10 +903,6 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, shouldHideDat
                     }
                 });
             }
-
-            // Generate content based on properties...
-            //const id = properties.id; // Assume each feature has a unique ID
-            //const attributesJson = JSON.stringify(properties.attributes); // Convert attributes to a JSON string for passing in the onclick handler
 
             const id = properties.id;
             const attributesJson = JSON.stringify(properties.attributes);
@@ -869,6 +952,7 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, shouldHideDat
         invertedPolygon.isMask = true;
     };
 
+
     const updateInvertedMask = (rectangleLayer, invertedMask) => {
         const bounds = rectangleLayer.getBounds();
         const largeBounds = [[90, -180], [-90, 180]];
@@ -890,9 +974,8 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, shouldHideDat
         ];
 
         invertedMask.setLatLngs([newOuterCoords, newInnerCoords]);
-
-
     };
+
 
     // Function to save GeoJSON data and saved objects to the server
     const saveDataToServer = async () => {
@@ -910,6 +993,7 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, shouldHideDat
                 },
                 body: JSON.stringify(dataToSave),
             });
+            console.log('Server response: ', response);
             if (response.ok) {
                 setSaveStatus('... kartdata sparad!');
                 console.log('Data saved successfully', dataToSave);
@@ -945,10 +1029,14 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, shouldHideDat
                 const data = await response.json();
                 if (data.features) {
                     setGeoJsonData(data); // Assuming the GeoJSON data is directly at the top level
+
                 }
                 if (data.savedObjectIds) {
-                    setSavedObjectIds(new Set(data.savedObjectIds)); // Convert array back to Set
-                    console.log('Saved object IDs:', data.savedObjectIds);
+                    // Map over the array and trim whitespace from each string
+                    const trimmedObjectIds = data.savedObjectIds.map(id => id.trim());
+
+                    setSavedObjectIds(new Set(trimmedObjectIds)); // Convert array back to Set
+                    console.log('Saved object IDs:', trimmedObjectIds);
                 }
                 console.log('Loaded data:', data);
                 setSelectedImage(null); // Reset the selected image after successful upload
@@ -961,13 +1049,11 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, shouldHideDat
     };
 
 
-
     // useEffect hook to call loadDataFromServer on component mount
     useEffect(() => {
         loadDataFromServer();
 
     }, []);
-
 
 
     const updateGeoJsonEditDel = () => {
@@ -996,8 +1082,8 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, shouldHideDat
                         isCircle: layer instanceof L.Circle,
                     };
                     console.log('layerFeature ID: ', layerFeature.properties.id);
-                } 
-                
+                }
+
                 if (layer instanceof L.CircleMarker) {
                     // Preserve existing properties and add or update radius and type
                     layerFeature.properties = {
@@ -1027,7 +1113,6 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, shouldHideDat
     };
 
 
-
     const updateGeoJsonCreate = () => {
         if (featureGroupRef.current) {
             const features = [];
@@ -1054,22 +1139,23 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, shouldHideDat
                                 radius: layer.getRadius(),
                                 id: layer.options.id,
                                 attributes: {
-                                    objectNumber: ' ',
-                                    inventoryLevel: ' ',
-                                    natureValueClass: ' ',
-                                    preliminaryAssesment: ' ',
-                                    reason: ' ',
-                                    natureType: ' ',
-                                    habitat: ' ',
-                                    date: ' ',
-                                    executer: ' ',
-                                    organsation: ' ',
-                                    projectName: ' ',
-                                    area: ' ',
-                                    species: ' ',
-                                    habitatQualities: ' ',
-                                    valueElements: ' ',
-                                    kartlaggningsTyp: ' ',
+                                    objectNumber: '',
+                                    inventoryLevel: '',
+                                    natureValueClass: '',
+                                    preliminaryAssesment: '',
+                                    reason: '',
+                                    natureType: '',
+                                    habitat: '',
+                                    date: '',
+                                    executer: '',
+                                    organsation: '',
+                                    projectName: '',
+                                    area: '',
+                                    species: '',
+                                    habitatQualities: '',
+                                    valueElements: '',
+                                    kartlaggningsTyp: '',
+                                    kartlaggningsGeometry: ''
                                 }
                             }
                         };
@@ -1109,6 +1195,7 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, shouldHideDat
                                     habitatQualities: layer.options.attributes.habitatQualities,
                                     valueElements: layer.options.attributes.valueElements,
                                     kartlaggningsTyp: layer.options.attributes.kartlaggningsTyp,
+                                    kartlaggningsGeometry: layer.options.attributes.kartlaggningsGeometry
 
                                 }
                             }
@@ -1118,10 +1205,6 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, shouldHideDat
                         console.log('Circlefeature after 2: ', circleFeature);
                     }
                 }
-
-
-
-
 
                 else if (layer instanceof L.Rectangle) {
                     const bounds = layer.getBounds();
@@ -1145,22 +1228,23 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, shouldHideDat
                                 isRectangle: true,
                                 id: layer.options.id,
                                 attributes: {
-                                    objectNumber: ' ',
-                                    inventoryLevel: ' ',
-                                    natureValueClass: ' ',
-                                    preliminaryAssesment: ' ',
-                                    reason: ' ',
-                                    natureType: ' ',
-                                    habitat: ' ',
-                                    date: ' ',
-                                    executer: ' ',
-                                    organsation: ' ',
-                                    projectName: ' ',
-                                    area: ' ',
+                                    objectNumber: '',
+                                    inventoryLevel: '',
+                                    natureValueClass: '',
+                                    preliminaryAssesment: '',
+                                    reason: '',
+                                    natureType: '',
+                                    habitat: '',
+                                    date: '',
+                                    executer: '',
+                                    organsation: '',
+                                    projectName: '',
+                                    area: '',
                                     species: ' ',
-                                    habitatQualities: ' ',
-                                    valueElements: ' ',
-                                    kartlaggningsTyp: ' ',
+                                    habitatQualities: '',
+                                    valueElements: '',
+                                    kartlaggningsTyp: '',
+                                    kartlaggningsGeometry: ''
                                 }
                             },
 
@@ -1218,22 +1302,23 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, shouldHideDat
                                 isPolygon: true,
                                 id: layer.options.id,
                                 attributes: layer.options.attributes ? { ...layer.options.attributes } : {
-                                    objectNumber: ' ',
-                                    inventoryLevel: ' ',
-                                    natureValueClass: ' ',
-                                    preliminaryAssesment: ' ',
-                                    reason: ' ',
-                                    natureType: ' ',
-                                    habitat: ' ',
-                                    date: ' ',
-                                    executer: ' ',
-                                    organsation: ' ',
-                                    projectName: ' ',
-                                    area: ' ',
-                                    species: ' ',
-                                    habitatQualities: ' ',
-                                    valueElements: ' ',
-                                    kartlaggningsTyp: ' ',
+                                    objectNumber: '',
+                                    inventoryLevel: '',
+                                    natureValueClass: '',
+                                    preliminaryAssesment: '',
+                                    reason: '',
+                                    natureType: '',
+                                    habitat: '',
+                                    date: '',
+                                    executer: '',
+                                    organsation: '',
+                                    projectName: '',
+                                    area: '',
+                                    species: '',
+                                    habitatQualities: '',
+                                    valueElements: '',
+                                    kartlaggningsTyp: '',
+                                    kartlaggningsGeometry: ''
                                 }
                             },
 
@@ -1264,22 +1349,23 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, shouldHideDat
                                 isPolyline: true,
                                 id: layer.options.id,
                                 attributes: layer.options.attributes ? { ...layer.options.attributes } : {
-                                    objectNumber: ' ',
-                                    inventoryLevel: ' ',
-                                    natureValueClass: ' ',
-                                    preliminaryAssesment: ' ',
-                                    reason: ' ',
-                                    natureType: ' ',
-                                    habitat: ' ',
-                                    date: ' ',
-                                    executer: ' ',
-                                    organsation: ' ',
-                                    projectName: ' ',
-                                    area: ' ',
-                                    species: ' ',
-                                    habitatQualities: ' ',
-                                    valueElements: ' ',
-                                    kartlaggningsTyp: ' ',
+                                    objectNumber: '',
+                                    inventoryLevel: '',
+                                    natureValueClass: '',
+                                    preliminaryAssesment: '',
+                                    reason: '',
+                                    natureType: '',
+                                    habitat: '',
+                                    date: '',
+                                    executer: '',
+                                    organsation: '',
+                                    projectName: '',
+                                    area: '',
+                                    species: '',
+                                    habitatQualities: '',
+                                    valueElements: '',
+                                    kartlaggningsTyp: '',
+                                    kartlaggningsGeometry: ''
                                 }
                             },
 
@@ -1309,22 +1395,23 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, shouldHideDat
                                 id: layer.options.id,
                                 radius: layer.getRadius(), // Radius in pixels
                                 attributes: layer.options.attributes ? { ...layer.options.attributes } : {
-                                    objectNumber: ' ',
-                                    inventoryLevel: ' ',
-                                    natureValueClass: ' ',
-                                    preliminaryAssesment: ' ',
-                                    reason: ' ',
-                                    natureType: ' ',
-                                    habitat: ' ',
-                                    date: ' ',
-                                    executer: ' ',
-                                    organsation: ' ',
-                                    projectName: ' ',
-                                    area: ' ',
-                                    species: ' ',
-                                    habitatQualities: ' ',
-                                    valueElements: ' ',
-                                    kartlaggningsTyp: ' ',
+                                    objectNumber: '',
+                                    inventoryLevel: '',
+                                    natureValueClass: '',
+                                    preliminaryAssesment: '',
+                                    reason: '',
+                                    natureType: '',
+                                    habitat: '',
+                                    date: '',
+                                    executer: '',
+                                    organsation: '',
+                                    projectName: '',
+                                    area: '',
+                                    species: '',
+                                    habitatQualities: '',
+                                    valueElements: '',
+                                    kartlaggningsTyp: '',
+                                    kartlaggningsGeometry: ''
                                 }
                             },
 
@@ -1351,22 +1438,23 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, shouldHideDat
                             id: layer.options.id || uuidv4(), // Ensure each feature has a unique ID
                             attributes: layer.options.attributes || {
                                 // Default attributes, can be customized
-                                objectNumber: ' ',
-                                inventoryLevel: ' ',
-                                natureValueClass: ' ',
-                                preliminaryAssessment: ' ',
-                                reason: ' ',
-                                natureType: ' ',
-                                habitat: ' ',
-                                date: ' ',
-                                executor: ' ',
-                                organization: ' ',
-                                projectName: ' ',
-                                area: ' ',
-                                species: ' ',
-                                habitatQualities: ' ',
-                                valueElements: ' ',
-                                kartlaggningsTyp: ' ',
+                                objectNumber: '',
+                                inventoryLevel: '',
+                                natureValueClass: '',
+                                preliminaryAssesment: '',
+                                reason: '',
+                                natureType: '',
+                                habitat: '',
+                                date: '',
+                                executer: '',
+                                organsation: '',
+                                projectName: '',
+                                area: '',
+                                species: '',
+                                habitatQualities: '',
+                                valueElements: '',
+                                kartlaggningsTyp: '',
+                                kartlaggningsGeometry: ''
                             }
                         }
                     };
@@ -1381,22 +1469,23 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, shouldHideDat
                     const UUID = uuidv4();
                     layerFeature.properties.id = UUID;
                     layerFeature.properties.attributes = {
-                        objectNumber: ' ',
-                        inventoryLevel: ' ',
-                        natureValueClass: ' ',
-                        preliminaryAssesment: ' ',
-                        reason: ' ',
-                        natureType: ' ',
-                        habitat: ' ',
-                        date: ' ',
-                        executer: ' ',
-                        organsation: ' ',
-                        projectName: ' ',
-                        area: ' ',
-                        species: ' ',
-                        habitatQualities: ' ',
-                        valueElements: ' ',
-                        kartlaggningsTyp: ' ',
+                        objectNumber: '',
+                        inventoryLevel: '',
+                        natureValueClass: '',
+                        preliminaryAssesment: '',
+                        reason: '',
+                        natureType: '',
+                        habitat: '',
+                        date: '',
+                        executer: '',
+                        organsation: '',
+                        projectName: '',
+                        area: '',
+                        species: '',
+                        habitatQualities: '',
+                        valueElements: '',
+                        kartlaggningsTyp: '',
+                        kartlaggningsGeometry: ''
                     };
 
                     features.push(layerFeature);
@@ -1414,10 +1503,7 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, shouldHideDat
                 features: features
             };
 
-
             setGeoJsonData(geoJson);
-
-
             console.log('updateGeojson: ', geoJson);
 
         }
@@ -1430,22 +1516,23 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, shouldHideDat
 
         // Default attributes for all shapes
         newLayer.options.attributes = {
-            objectNumber: ' ',
-            inventoryLevel: ' ',
-            natureValueClass: ' ',
-            preliminaryAssesment: ' ',
-            reason: ' ',
-            natureType: ' ',
-            habitat: ' ',
-            date: ' ',
-            executer: ' ',
-            organsation: ' ',
-            projectName: ' ',
-            area: ' ',
-            species: ' ',
-            habitatQualities: ' ',
-            valueElements: ' ',
-            kartlaggningsTyp: ' ',
+            objectNumber: '',
+            inventoryLevel: '',
+            natureValueClass: '',
+            preliminaryAssesment: '',
+            reason: '',
+            natureType: '',
+            habitat: '',
+            date: '',
+            executer: '',
+            organsation: '',
+            projectName: '',
+            area: '',
+            species: '',
+            habitatQualities: '',
+            valueElements: '',
+            kartlaggningsTyp: '',
+            kartlaggningsGeometry: ''
         };
 
         let feature;
@@ -1484,8 +1571,6 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, shouldHideDat
                 }
             };
         }
-
-
 
 
         if (newLayer instanceof L.Polygon && !(newLayer instanceof L.Rectangle)) {
@@ -1571,9 +1656,6 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, shouldHideDat
             };
         }
 
-
-
-
         if (feature) {
             setGeoJsonData((prevData) => ({
                 // Use a fallback for prevData in case it's null or undefined
@@ -1598,6 +1680,7 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, shouldHideDat
 
         updateGeoJsonEditDel(); // Update GeoJSON when shapes are edited
     };
+
 
     const onDeleted = (e) => {
         const { layers } = e;
@@ -1667,6 +1750,7 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, shouldHideDat
         }
     };
 
+
     const saveAttributes = () => {
         const updatedFeatures = geoJsonData.features.map((feature) => {
             if (feature.properties.id === selectedId) {
@@ -1685,13 +1769,15 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, shouldHideDat
         setGeoJsonData({ ...geoJsonData, features: updatedFeatures });
         setSelectedId(null); // Deselect the current feature
         setAddStatusObject('Objektattribut uppdaterat');
+        setTimeout(() => {
+            setAddStatusObject('');
+        }, 2000);
     };
 
     // useEffect hook to synchronize layer options with geoJsonData changes
     useEffect(() => {
         syncLayerAttributes();
     }, [geoJsonData]); // Dependency array ensures this runs only when geoJsonData changes
-
 
 
     const syncLayerAttributes = () => {
@@ -1797,15 +1883,6 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, shouldHideDat
     }, [highlightedIds]);
 
 
-
-
-
-    // Call updateMapHighlights in useEffect to ensure highlights are updated when highlightedIds changes
-    useEffect(() => {
-        updateMapHighlights();
-    }, [highlightedIds]);
-
-
     // Mapping of attribute property keys to custom display names
     const attributeDisplayNameMap = {
         area: "Area",
@@ -1824,19 +1901,38 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, shouldHideDat
         species: "Arter",
         valueElements: "Värdeelement",
         kartlaggningsTyp: "Kartläggningstyp",
+        kartlaggningsKategori: "Kartläggningskategori"
         // Add more mappings as needed
     };
 
+
+
+
     const renderAttributeSectionList = () => {
+
+
         // Initialize attributesObject with default values if no object is selected
         const editableAttributesObject = attributesObject || Object.keys(attributeDisplayNameMap).reduce((acc, key) => {
             acc[key] = ''; // Initialize all attributes with empty strings or default values
             return acc;
         }, {});
 
+        // Function to handle changes to attribute values
+        const handleAttributeChange = (attributeName, newValue) => {
+            setAttributesObject({
+                ...editableAttributesObject,
+                [attributeName]: newValue,
+            });
+        };
+
+
+
+        // Check if the current attributesObject has a kartlaggningsTyp that matches one of the options
+        const headline = kartlaggningstypOptions[editableAttributesObject.kartlaggningsTyp] || "Objektattribut";
+
         return (
             <div className="attributes-container-object">
-                <h3>Objektattribut</h3>
+                <h3>{headline}</h3>
                 {Object.entries(editableAttributesObject).map(([key, value], index) => (
                     <div key={index} className="attribute-field">
                         <label htmlFor={`attribute-${key}`}>{attributeDisplayNameMap[key] || key}:</label>
@@ -1844,18 +1940,9 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, shouldHideDat
                             id={`attribute-${key}`}
                             type="text"
                             value={value}
-                            onChange={(e) => {
-                                // Update attributesObject with new values only if an object is selected
-                                if (selectedId) {
-                                    setAttributesObject({
-                                        ...editableAttributesObject,
-                                        [key]: e.target.value,
-                                    });
-                                }
-                            }}
+                            onChange={(e) => handleAttributeChange(key, e.target.value)}
                         />
                     </div>
-
                 ))}
                 <button onClick={() => saveAttributes()}>Spara</button><span className='addStatus'>{addStatusObject}</span>
                 <label htmlFor="file-upload" className="file-upload-label">Lägg till en bild</label>
@@ -1869,10 +1956,384 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, shouldHideDat
                     </>
                 )}
             </div>
-
         );
     };
 
+
+
+    const renderAttributeTable = () => {
+        // Ensure geoJsonData is not null and has features before proceeding
+        if (!geoJsonData || !geoJsonData.features) {
+            return <div>Loading data...</div>; // Or any other placeholder content
+        }
+
+        const allAttributeNames = new Set();
+        geoJsonData.features.forEach(feature => {
+            if (feature.properties && feature.properties.attributes) {
+                Object.keys(feature.properties.attributes).forEach(attrName => {
+                    allAttributeNames.add(attrName);
+                });
+            }
+        });
+
+        const attributeNames = Array.from(allAttributeNames);
+
+
+        const highlightFeature = (featureId) => {
+            if (featureGroupRef.current) {
+                setHighlightedId(featureId); // Set the highlighted feature's ID
+                featureGroupRef.current.eachLayer(layer => {
+
+                    // Check if the layer has associated feature properties
+                    const properties = layer.feature ? layer.feature.properties : null;
+
+                    // Debugging logs
+                    console.log("highlight: layer type:", properties);
+                    console.log("highlight: layer:", layer);
+                    console.log("highlight: feature id:", featureId, "Layer ID:", layer.options.id);
+
+
+                    // Reset the style for non-highlighted layers
+                    if (layer instanceof L.Path && (!properties || properties.shape !== "rectangleCrop")) {
+                        layer.setStyle({
+                            color: '#3388ff', // Default color
+                            fillColor: '#3388ff', // Default fill color
+                            fillOpacity: 0.2, // Default fill opacity
+                            weight: 3  // Default weight
+                        });
+                    }
+
+                    // Reset to default marker icon for non-highlighted markers
+
+                    if (layer instanceof L.Marker && !(highlightedIds.size > 1)) {
+                        layer.setIcon(dotIconBlue);
+                        console.log("highlightedIds", highlightedIds);
+                        console.log("selectedRowIds", selectedRowIds);
+                    }
+
+                    // Apply the highlight style to the target feature
+                    if (layer.options.id === featureId || layer.feature && layer.feature.properties.id === featureId) {
+
+
+                        if (layer instanceof L.Marker) {
+                            // Use the custom diamond icon for the highlighted marker
+                            layer.setIcon(dotIconRed);
+                        } else if (properties && properties.shape === "rectangleCrop") {
+                            // Special handling for "rectangleCrop" shapes
+                            layer.setStyle({
+                                color: 'red', // Highlight color for rectangleCrop
+                                fillColor: 'green',
+                                weight: 5 // Highlight weight for rectangleCrop
+                            });
+                        } else if (layer instanceof L.Circle) {
+                            // Apply a different style for circles
+                            layer.setStyle({
+                                color: 'red', // Highlight color
+                                fillOpacity: 0.2,
+                                weight: 5
+                            });
+                        }
+                    }
+                });
+            }
+        };
+
+
+        const handleAttributeValueChange = (featureId, attributeName, newValue) => {
+            setHighlightedIds(prev => new Set(prev).add(featureId));
+            // Create a deep copy of the geoJsonData to avoid direct state mutation
+            const updatedGeoJsonData = JSON.parse(JSON.stringify(geoJsonData));
+
+            //highlightFeature(featureId); // Highlight the feature when its attribute is being edited
+
+            // Find the feature by its ID and update the attribute value
+            const featureToUpdate = updatedGeoJsonData.features.find(feature => feature.properties.id === featureId);
+            if (featureToUpdate && featureToUpdate.properties.attributes) {
+                featureToUpdate.properties.attributes[attributeName] = newValue;
+            }
+
+            // Update the state with the modified geoJsonData
+            setGeoJsonData(updatedGeoJsonData);
+        };
+
+        const toggleSelection = (itemId) => {
+            setSelectedItems((prevSelectedItems) => {
+                const newSelectedItems = new Set(prevSelectedItems);
+                if (newSelectedItems.has(itemId)) {
+                    newSelectedItems.delete(itemId);
+                } else {
+                    newSelectedItems.add(itemId);
+                }
+                return newSelectedItems;
+            });
+        };
+
+        const showSelectedItems = () => {
+            const filteredItems = allItems.filter(item => selectedItems.has(item.id));
+            // Update your state or variable that controls the displayed items in the attribute table
+
+            setViewMode('selected');
+        };
+
+        const showAllItems = () => {
+            setViewMode('all');
+        };
+
+        const addSelectedToSavedObjects = () => {
+            if (!selectedId && selectedRowIds.size === 0) {
+                console.log('No selected objects to add');
+                setAddStatus('Selektera objekt');
+                setTimeout(() => setAddStatus(''), 2000);
+                return;
+            }
+
+            setSavedObjectIds(prevSavedObjectIds => {
+                const newSavedObjectIds = new Set(prevSavedObjectIds);
+                if (selectedId) {
+                    newSavedObjectIds.add(selectedId);
+                }
+                for (let id of selectedRowIds) {
+                    newSavedObjectIds.add(id);
+                }
+                console.log('Updated savedObjectIds:', newSavedObjectIds);
+                return newSavedObjectIds;
+            });
+
+            setAddStatus('Selekterade objekt lades till');
+            setTimeout(() => setAddStatus(''), 2000);
+        };
+
+
+        // Function to clear savedObjectIds
+        const clearSavedObjectIds = () => {
+            setSavedObjectIds(new Set()); // Clears the set
+            setAddStatus('Alla selekterade objekt rensades'); // Set the status message
+            setTimeout(() => setAddStatus(''), 2000); // Clear the message after 3 seconds
+        };
+
+
+        const deleteSelectedObjects = () => {
+            // Update savedObjectIds by removing highlightedIds or selectedRowIds
+            setSavedObjectIds(prevSavedObjectIds => {
+                // Create a new Set based on previous savedObjectIds to ensure immutability
+                const updatedSavedObjectIds = new Set(prevSavedObjectIds);
+
+                // Remove each highlightedId from the updatedSavedObjectIds
+                highlightedIds.forEach(id => updatedSavedObjectIds.delete(id));
+
+                // Alternatively, if you want to remove selectedRowIds, use:
+                // selectedRowIds.forEach(id => updatedSavedObjectIds.delete(id));
+
+                return updatedSavedObjectIds;
+            });
+
+            // Optionally, clear highlightedIds or selectedRowIds if needed
+            setHighlightedIds(new Set());
+            // setSelectedRowIds(new Set()); // Uncomment this line if you use selectedRowIds
+
+            setAddStatus('Selekterade objekt borttagna'); // Set the status message
+            setTimeout(() => setAddStatus(''), 2000); // Clear the message after 3 seconds
+        };
+
+
+        const handleSort = (key) => {
+            let direction = 'ascending';
+            if (sortConfig.key === key && sortConfig.direction === 'ascending') {
+                direction = 'descending';
+            }
+            setSortConfig({ key, direction });
+        };
+
+        // Function to compare values for sorting
+        const compare = (a, b) => {
+            if (a < b) {
+                return sortConfig.direction === 'ascending' ? -1 : 1;
+            }
+            if (a > b) {
+                return sortConfig.direction === 'ascending' ? 1 : -1;
+            }
+            return 0;
+        };
+
+        // Apply sorting to the data before rendering the table
+        const sortedData = geoJsonData.features.sort((a, b) => {
+            const aValue = a.properties.attributes[sortConfig.key];
+            const bValue = b.properties.attributes[sortConfig.key];
+            return compare(aValue, bValue);
+        });
+
+
+        // Function to determine if there are features for a given geometry type and kartlaggningstyp
+        const hasFeaturesForGeometry = (geometryType) => {
+            return geoJsonData.features.some(feature => {
+                const matchesGeometry = feature.geometry.type === geometryType;
+                const matchesKartlaggningstyp = selectedKartlaggningstyp === '' || (feature.properties.attributes && feature.properties.attributes.kartlaggningsTyp === selectedKartlaggningstyp);
+                return matchesGeometry && matchesKartlaggningstyp;
+            });
+        };
+
+        // Determine available geometries for the selected kartlaggningstyp
+        const availableGeometries = {
+            'Punkter': hasFeaturesForGeometry('Point') || hasFeaturesForGeometry('MultiPoint'),
+            'Linjer': hasFeaturesForGeometry('LineString') || hasFeaturesForGeometry('MultiLineString'),
+            'Polygoner': hasFeaturesForGeometry('Polygon') || hasFeaturesForGeometry('MultiPolygon')
+        };
+
+        // Filter features based on selected criteria
+        const filteredFeatures = geoJsonData.features.filter(feature => {
+            if (feature.properties.shape === "rectangleCrop") {
+                return false;
+            }
+
+            const matchesKartlaggningstyp = selectedKartlaggningOptions.length === 0 || selectedKartlaggningOptions.includes(feature.properties.attributes?.kartlaggningsTyp);
+
+            console.log(selectedKartlaggningOptions + ' ' + feature.properties.attributes?.kartlaggningsTyp);
+
+            // Apply geometry filters
+            if (geometryFilterPoint && feature.geometry.type !== 'Point' && feature.geometry.type !== 'MultiPoint') {
+
+                return false; // Exclude features that are not points when point filter is active
+            }
+            // Apply geometry filter for polygons, including circles
+            if (geometryFilterPolygon) {
+                const isPolygonType = feature.geometry.type === 'Polygon' || feature.geometry.type === 'MultiPolygon';
+                const isCircle = feature.properties.isCircleMarker || feature.properties.isCircle;
+                if (!isPolygonType && !isCircle) {
+                    return false; // Exclude features that are neither polygons nor circles when polygon filter is active
+                }
+            }
+
+            // When in 'selected' view mode, apply additional filtering based on the active tab
+            if (viewMode === 'selected') {
+                const isSelected = savedObjectIds.has(feature.properties.id);
+                if (!isSelected) return false; // Exclude unselected features
+
+                // Filter by geometric type according to the active tab
+                switch (activeTab) {
+                    case 'Punkter':
+                        return feature.properties.isMarker || feature.properties.isPoint;
+                    case 'Linjer':
+                        return feature.geometry.type === 'LineString' || feature.geometry.type === 'MultiLineString';
+                    case 'Polygoner':
+                        return feature.geometry.type === 'Polygon' || feature.geometry.type === 'MultiPolygon' || feature.properties.isCircleMarker || feature.properties.isCircle;
+                    default:
+                        return true; // Include all selected features for 'Alla' or unrecognized tabs
+                }
+            } else {
+                // Normal filtering logic for non-selected view mode
+                switch (activeTab) {
+                    case 'Punkter':
+                        return matchesKartlaggningstyp && (feature.properties.isMarker || feature.properties.isPoint);
+                    case 'Linjer':
+                        return matchesKartlaggningstyp && (feature.geometry.type === 'LineString' || feature.geometry.type === 'MultiLineString');
+                    case 'Polygoner':
+                        return matchesKartlaggningstyp && (feature.geometry.type === 'Polygon' || feature.geometry.type === 'MultiPolygon' || feature.properties.isCircleMarker || feature.properties.isCircle);
+                    case 'Alla':
+                        return matchesKartlaggningstyp;
+                    default:
+                        return matchesKartlaggningstyp;
+                }
+            }
+        });
+
+        const filterByGeometryType = (type) => {
+            return geoJsonData.features.filter(feature => {
+                const geometryType = feature.geometry.type;
+                const isMatchingType = geometryType === type || (type === 'Point' && (geometryType === 'Point' || geometryType === 'MultiPoint'));
+                const matchesKartlaggningstyp = selectedKartlaggningOptions.length === 0 || selectedKartlaggningOptions.includes(feature.properties.attributes?.kartlaggningsTyp);
+        
+                const isMatch = isMatchingType && matchesKartlaggningstyp;
+                console.log(`Feature ID: ${feature.properties.id}, Geometry Type: ${geometryType}, Matching Type: ${isMatchingType}, Matching Kartlaggningstyp: ${matchesKartlaggningstyp}, Is Match: ${isMatch}`);
+        
+                return isMatch;
+            });
+        };
+        
+
+        // Check if there are any objects for each category
+        const hasPunkter = filterByGeometryType('Point').length > 0;
+        const hasLinjer = filterByGeometryType('LineString').length > 0;
+        const hasPolygoner = filterByGeometryType('Polygon').length > 0;
+
+        console.log('hasPunktr: ', hasPunkter);
+
+        return (
+            <div>
+                {shouldHideDataView && <div className="elementToHide">
+                    <button className="toggle-form-button-2" onClick={saveDataToServer}>Spara projekt! {saveStatus}</button>
+                </div>}
+                <DraggableLine onDrag={handleDrag} />
+                <div className="attributes-container" style={{ maxHeight: `${attributesContainerHeight}px` }}>
+
+                    <div className="tabs">
+                        {hasPunkter && !geometryFilterPolygon && (
+                            <button className={activeTab === 'Punkter' ? 'active' : ''} onClick={() => setActiveTab('Punkter')}>Punkter</button>
+                        )}
+                        {hasLinjer && !geometryFilterPoint && !geometryFilterPolygon && (
+                            <button className={activeTab === 'Linjer' ? 'active' : ''} onClick={() => setActiveTab('Linjer')}>Linjer</button>
+                        )}
+                        {hasPolygoner && !geometryFilterPoint && (
+                            <button className={activeTab === 'Polygoner' ? 'active' : ''} onClick={() => setActiveTab('Polygoner')}>Polygoner</button>
+                        )}
+                    </div>
+
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Karta</th>
+                                {attributeNames.map((name, index) => (
+                                    <th key={index} onClick={() => handleSort(name)}>
+                                        {attributeDisplayNameMap[name] || name}
+                                    </th>
+                                ))}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {filteredFeatures.map((feature, index) => renderTableRow(feature, index))}
+                        </tbody>
+                    </table>
+                    <div className="marked-rows-info">
+                        {`${highlightedIds.size} av ${filteredFeatures.length} markerade`}
+                        <button onClick={showAllItems}>Visa alla objekt</button>
+                        <button onClick={showSelectedItems}>Visa selekterade</button>
+                        <button onClick={addSelectedToSavedObjects}>Lägg till</button>
+                        <button onClick={deleteSelectedObjects}>Ta bort</button>
+                        <button onClick={clearSavedObjectIds}>Rensa selektlistan</button>
+                        <span className='addStatus'>{addStatus}</span>
+                    </div>
+                </div>
+            </div>
+        );
+
+        // Helper function to render table row
+        function renderTableRow(feature, index) {
+            // Row rendering logic
+            return (
+                <tr key={index} className={highlightedIds.has(feature.properties.id) ? 'highlighted-row' : ''}
+                    onClick={(event) => handleRowClick(feature.properties.id, feature.properties.attributes, event)}>
+                    <td><span style={{ marginLeft: '0px' }}>{index + 1}</span></td>
+                    <td className='td-markera'>
+                        <button
+                            className={highlightedId === feature.properties.id ? 'highlighted' : ''}
+                            onClick={() => highlightFeature(feature.properties.id)}
+                        >
+                            O
+                        </button>
+                    </td>
+                    {attributeNames.map((name, attrIndex) => (
+                        <td key={`${index}-${attrIndex}`}>
+                            <input
+                                type="text"
+                                value={feature.properties.attributes[name] || ''}
+                                onChange={(e) => handleAttributeValueChange(feature.properties.id, name, e.target.value)}
+                            />
+                        </td>
+                    ))}
+                </tr>
+            );
+        }
+    };
 
 
     const renderAttributeList = () => {
@@ -2028,8 +2489,6 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, shouldHideDat
                             </div>
                         )}
 
-
-
                         <label htmlFor="file-upload" className="custom-file-upload">
                             Importera shapefil
                         </label>
@@ -2039,315 +2498,6 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, shouldHideDat
                 }
             </div>
         )
-    }
-
-    const renderAttributeTable = () => {
-
-        // Ensure geoJsonData is not null and has features before proceeding
-        if (!geoJsonData || !geoJsonData.features) {
-            return <div>Loading data...</div>; // Or any other placeholder content
-        }
-
-
-        // Collect all unique attribute names across all features
-        const allAttributeNames = new Set();
-        geoJsonData.features.forEach(feature => {
-            if (feature.properties && feature.properties.attributes) {
-                Object.keys(feature.properties.attributes).forEach(attrName => {
-                    allAttributeNames.add(attrName);
-                });
-            }
-        });
-
-        // Convert the Set to an array for mapping
-        const attributeNames = Array.from(allAttributeNames);
-
-
-        const filteredFeatures = geoJsonData.features.filter(feature => {
-            // Exclude rectangleCrop shapes
-            if (feature.properties.shape === "rectangleCrop") {
-                return false;
-            }
-            // Filter by active tab
-            switch (activeTab) {
-                case 'Punkter':
-                    return feature.properties.isMarker || feature.properties.isPoint;
-                case 'Linjer':
-                    return feature.geometry.type === 'LineString' || feature.geometry.type === 'MultiLineString';
-                case 'Polygoner':
-                    return feature.geometry.type === 'Polygon' || feature.geometry.type === 'MultiPolygon' || feature.properties.isCircleMarker || feature.properties.isCircle;
-                case 'Alla':
-                    return '';
-                case 'Selekterade':
-                    return savedObjectIds.has(feature.properties.id);
-                case 'Rensa':
-                    return '';
-                default:
-                    return true;
-            }
-        });
-
-
-
-        const highlightFeature = (featureId) => {
-            if (featureGroupRef.current) {
-                setHighlightedId(featureId); // Set the highlighted feature's ID
-                featureGroupRef.current.eachLayer(layer => {
-
-                    // Check if the layer has associated feature properties
-                    const properties = layer.feature ? layer.feature.properties : null;
-
-                    // Debugging logs
-                    console.log("highlight: layer type:", properties);
-                    console.log("highlight: layer:", layer);
-                    console.log("highlight: feature id:", featureId, "Layer ID:", layer.options.id);
-
-
-                    // Reset the style for non-highlighted layers
-                    if (layer instanceof L.Path && (!properties || properties.shape !== "rectangleCrop")) {
-                        layer.setStyle({
-                            color: '#3388ff', // Default color
-                            fillColor: '#3388ff', // Default fill color
-                            fillOpacity: 0.2, // Default fill opacity
-                            weight: 3  // Default weight
-                        });
-                    }
-
-
-
-                    // Reset to default marker icon for non-highlighted markers
-
-                    if (layer instanceof L.Marker && !(highlightedIds.size > 1)) {
-                        layer.setIcon(dotIconBlue);
-                        console.log("highlightedIds", highlightedIds);
-                        console.log("selectedRowIds", selectedRowIds);
-                    }
-
-
-
-
-                    // Apply the highlight style to the target feature
-                    if (layer.options.id === featureId || layer.feature && layer.feature.properties.id === featureId) {
-
-
-                        if (layer instanceof L.Marker) {
-                            // Use the custom diamond icon for the highlighted marker
-                            layer.setIcon(dotIconRed);
-                        } else if (properties && properties.shape === "rectangleCrop") {
-                            // Special handling for "rectangleCrop" shapes
-                            layer.setStyle({
-                                color: 'red', // Highlight color for rectangleCrop
-                                fillColor: 'green',
-                                weight: 5 // Highlight weight for rectangleCrop
-                            });
-                        } else if (layer instanceof L.Circle) {
-                            // Apply a different style for circles
-                            layer.setStyle({
-                                color: 'red', // Highlight color
-                                fillOpacity: 0.2,
-                                weight: 5
-                            });
-                        }
-                    }
-                });
-            }
-        };
-
-
-        const handleAttributeValueChange = (featureId, attributeName, newValue) => {
-            setHighlightedIds(prev => new Set(prev).add(featureId));
-            // Create a deep copy of the geoJsonData to avoid direct state mutation
-            const updatedGeoJsonData = JSON.parse(JSON.stringify(geoJsonData));
-
-            //highlightFeature(featureId); // Highlight the feature when its attribute is being edited
-
-            // Find the feature by its ID and update the attribute value
-            const featureToUpdate = updatedGeoJsonData.features.find(feature => feature.properties.id === featureId);
-            if (featureToUpdate && featureToUpdate.properties.attributes) {
-                featureToUpdate.properties.attributes[attributeName] = newValue;
-            }
-
-            // Update the state with the modified geoJsonData
-            setGeoJsonData(updatedGeoJsonData);
-        };
-
-        const toggleSelection = (itemId) => {
-            setSelectedItems((prevSelectedItems) => {
-                const newSelectedItems = new Set(prevSelectedItems);
-                if (newSelectedItems.has(itemId)) {
-                    newSelectedItems.delete(itemId);
-                } else {
-                    newSelectedItems.add(itemId);
-                }
-                return newSelectedItems;
-            });
-        };
-
-        const showSelectedItems = () => {
-            const filteredItems = allItems.filter(item => selectedItems.has(item.id));
-            // Update your state or variable that controls the displayed items in the attribute table
-            setViewMode('selected');
-        };
-
-        const showAllItems = () => {
-            setViewMode('all');
-        };
-
-
-        // New function to add selected features to savedObjectIDs
-        const addSelectedToSavedObjects = () => {
-            setSavedObjectIds(new Set([...savedObjectIds, ...selectedRowIds, ...selectedId]));
-            setAddStatus('Selekterade objekt lades till'); // Set the status message
-            setTimeout(() => setAddStatus(''), 2000); // Clear the message after 3 seconds
-        };
-
-        // Function to clear savedObjectIds
-        const clearSavedObjectIds = () => {
-            setSavedObjectIds(new Set()); // Clears the set
-            setAddStatus('Alla selekterade objekt rensades'); // Set the status message
-            setTimeout(() => setAddStatus(''), 2000); // Clear the message after 3 seconds
-        };
-
-
-        const deleteSelectedObjects = () => {
-            // Update savedObjectIds by removing highlightedIds or selectedRowIds
-            setSavedObjectIds(prevSavedObjectIds => {
-                // Create a new Set based on previous savedObjectIds to ensure immutability
-                const updatedSavedObjectIds = new Set(prevSavedObjectIds);
-
-                // Remove each highlightedId from the updatedSavedObjectIds
-                highlightedIds.forEach(id => updatedSavedObjectIds.delete(id));
-
-                // Alternatively, if you want to remove selectedRowIds, use:
-                // selectedRowIds.forEach(id => updatedSavedObjectIds.delete(id));
-
-                return updatedSavedObjectIds;
-            });
-
-            // Optionally, clear highlightedIds or selectedRowIds if needed
-            setHighlightedIds(new Set());
-            // setSelectedRowIds(new Set()); // Uncomment this line if you use selectedRowIds
-
-            setAddStatus('Selekterade objekt borttagna'); // Set the status message
-            setTimeout(() => setAddStatus(''), 2000); // Clear the message after 3 seconds
-        };
-
-
-
-        const handleSort = (key) => {
-            let direction = 'ascending';
-            if (sortConfig.key === key && sortConfig.direction === 'ascending') {
-                direction = 'descending';
-            }
-            setSortConfig({ key, direction });
-        };
-
-        // Function to compare values for sorting
-        const compare = (a, b) => {
-            if (a < b) {
-                return sortConfig.direction === 'ascending' ? -1 : 1;
-            }
-            if (a > b) {
-                return sortConfig.direction === 'ascending' ? 1 : -1;
-            }
-            return 0;
-        };
-
-        // Apply sorting to the data before rendering the table
-        const sortedData = geoJsonData.features.sort((a, b) => {
-            const aValue = a.properties.attributes[sortConfig.key];
-            const bValue = b.properties.attributes[sortConfig.key];
-            return compare(aValue, bValue);
-        });
-
-        return (
-            <div>
-                {shouldHideDataView && <div className="elementToHide">
-                    <button className="toggle-form-button-2" onClick={saveDataToServer}>Spara projekt! {saveStatus}</button>
-                </div>}
-                <DraggableLine onDrag={handleDrag} />
-                <div className="attributes-container" style={{ maxHeight: `${attributesContainerHeight}px` }}>
-
-                    <div className="tabs">
-                        <button className={activeTab === 'Punkter' ? 'active' : ''} onClick={() => setActiveTab('Punkter')}>Punkter</button>
-                        <button className={activeTab === 'Linjer' ? 'active' : ''} onClick={() => setActiveTab('Linjer')}>Linjer</button>
-                        <button className={activeTab === 'Polygoner' ? 'active' : ''} onClick={() => setActiveTab('Polygoner')}>Polygoner</button>
-                    </div>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th className='th-index'>#</th>
-                                <th className='th-karta'>Karta</th>
-                                {attributeNames.map((name, index) => (
-                                    <th key={index} onClick={() => handleSort(name)} style={{ cursor: 'pointer' }}>
-                                        {attributeDisplayNameMap[name] || name}
-                                        <span className="sort-arrows">
-                                            {sortConfig.key === name ? (
-                                                sortConfig.direction === 'ascending' ? ' ▲' : ' ▼'
-                                            ) : ' ↕'}
-                                        </span>
-                                    </th>
-                                ))}
-                            </tr>
-                        </thead>
-                        <tbody className="attributes-container-table">
-                            {viewMode === 'all' ? (
-                                filteredFeatures
-                                    .sort((a, b) => {
-                                        const aValue = a.properties.attributes[sortConfig.key];
-                                        const bValue = b.properties.attributes[sortConfig.key];
-                                        return compare(aValue, bValue);
-                                    })
-                                    .map((feature, featureIndex) => (
-                                        feature.properties.attributes ? renderTableRow(feature, featureIndex) : null
-                                    ))
-                            ) : (
-                                Array.from(savedObjectIds).map((featureId, index) => {
-                                    const feature = filteredFeatures.find(feature => feature.properties.id === featureId);
-                                    return feature ? renderTableRow(feature, index) : null;
-                                })
-                            )}
-                        </tbody>
-                    </table>
-                    <div className="marked-rows-info">
-                        {`${highlightedIds.size} av ${filteredFeatures.length} markerade`}
-                        <button onClick={showAllItems}>Visa alla objekt</button>
-                        <button onClick={showSelectedItems}>Visa selekterade</button>
-                        <button onClick={addSelectedToSavedObjects}>Lägg till</button>
-                        <button onClick={deleteSelectedObjects}>Ta bort</button>
-                        <button onClick={clearSavedObjectIds}>Rensa selektlistan</button>
-                        <span className='addStatus'>{addStatus}</span>
-                    </div>
-                </div>
-            </div>
-        );
-
-        // Helper function to render table row
-        function renderTableRow(feature, index) {
-            return (
-                <tr key={index} className={highlightedIds.has(feature.properties.id) ? 'highlighted-row' : ''}
-                    onClick={(event) => handleRowClick(feature.properties.id, feature.properties.attributes, event)}>
-                    <td><span style={{ marginLeft: '0px' }}>{index + 1}</span></td>
-                    <td className='td-markera'>
-                        <button
-                            className={highlightedId === feature.properties.id ? 'highlighted' : ''}
-                            onClick={() => highlightFeature(feature.properties.id)}
-                        >
-                            O
-                        </button>
-                    </td>
-                    {attributeNames.map((name, attrIndex) => (
-                        <td key={`${index}-${attrIndex}`}>
-                            <input
-                                type="text"
-                                value={feature.properties.attributes[name] || ''}
-                                onChange={(e) => handleAttributeValueChange(feature.properties.id, name, e.target.value)}
-                            />
-                        </td>
-                    ))}
-                </tr>
-            );
-        }
     }
 
 
@@ -2377,6 +2527,7 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, shouldHideDat
                         ))}
                     </FeatureGroup>
                     <RectangleDrawButton isRectangleDrawn={isRectangleDrawn} setIsRectangleDrawn={setIsRectangleDrawn} />
+                    <MapEventsComponent />
                 </MapContainer>
 
                 {renderAttributeTable()}
@@ -2396,21 +2547,240 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, shouldHideDat
         if (!selectedProject) {
             return <div>Laddar..</div>; // Provide a loading message or any other fallback content
         }
+
+        // Convert kartlaggningstypOptions to an array and add the "Alla" option
+        const kartlaggningstypOptionsArray = [/*{ key: '', value: 'Visa alla' },*/ ...Object.entries(kartlaggningstypOptions).map(([key, value]) => ({ key, value }))];
+
+        const toggleKartlaggningList = () => {
+            setShowKartlaggningList(!showList);
+        };
+
+        const toggleLagerhanteringPopup = () => {
+            setShowLagerhanteringPopup(!showLagerhanteringPopup);
+        };
+
+        const handleSelectKartlaggningOption = (optionKey) => {
+            console.log('Selected kartlaggning option:', optionKey);
+            console.log('Selected kartlaggning value:', kartlaggningstypOptions[optionKey]);
+            console.log('Selected kartlaggning options:', selectedKartlaggningOptions);
+            if (optionKey === '') {
+                setSelectedKartlaggningOptions([]); // Clear the selection
+                // Optionally, clear other selections related to mapping objects here
+                // For example, clear highlighted features, selected rows, etc.
+                setHighlightedIds(new Set());
+                setSelectedRowIds(new Set());
+                // Any other state resets related to the selection of mapping objects can go here
+            } else {
+                // Handle selection for other options as before
+                setSelectedKartlaggningOptions(prevOptions => {
+                    const isSelected = prevOptions.includes(optionKey);
+                    if (isSelected) {
+                        // If already selected, remove it from the selection
+                        return prevOptions.filter(key => key !== optionKey);
+                    } else {
+                        // If not selected, add it to the selection
+                        return [...prevOptions, optionKey];
+                    }
+                });
+            }
+        };
+
+        /*
+        const handleDeselectKartlaggningOption = (optionKey) => {
+            setSelectedKartlaggningOptions(prevOptions => prevOptions.filter(key => key !== optionKey));
+        };
+        */
+
+
+        const onValueElementOptionClick = (optionType) => {
+            if (optionType === 'Dot') {
+                // If already selected, reset both filters and default to 'Punkter' tab
+                if (geometryFilterPoint) {
+                    setGeometryFilterPoint(false);
+                    setGeometryFilterPolygon(false);
+                    setActiveTab('Punkter'); // Default to 'Punkter' tab
+                } else {
+                    setGeometryFilterPoint(true); // Enable point filter
+                    setGeometryFilterPolygon(false); // Disable polygon filter
+                    setActiveTab('Punkter'); // Switch to 'Punkter' tab
+                }
+            } else if (optionType === 'Triangle') {
+                // If already selected, reset both filters and default to 'Punkter' tab
+                if (geometryFilterPolygon) {
+                    setGeometryFilterPoint(false);
+                    setGeometryFilterPolygon(false);
+                    setActiveTab('Punkter'); // Default to 'Punkter' tab
+                } else {
+                    setGeometryFilterPoint(false); // Disable point filter
+                    setGeometryFilterPolygon(true); // Enable polygon filter
+                    setActiveTab('Polygoner'); // Switch to 'Polygoner' tab
+                }
+            }
+        };
+
+        // Assuming karteringar is already an array of objects with used_karteringar property
+        const karteringList = selectedProject.karteringar || [];
+
+        /*
+                // Combine karteringList with kartlaggningstypOptionsArray, ensuring karteringList is at the top
+                const combinedOptions = [...karteringList.map(kartering => ({
+                    key: kartering.used_karteringar, // Assuming 'used_karteringar' is the key you want to use
+                    value: kartering.used_karteringar, // Adjust if you have a specific value field
+                    isKartering: true // Custom property to identify karteringList items
+                })), ...kartlaggningstypOptionsArray];
+        */
+
+        const toggleNewKarteringList = () => {
+            setShowNewKartering(!showNewKartering);
+        };
+
+
         return (
             <div className="left-section">
+                <button className="addKartering" onClick={toggleKartlaggningList}>
+                    {showList ? '-' : '+'}
+                </button>
+
                 <div className="top-left">
                     <h2>{selectedProject.project_name}</h2>
-                    <button>Kartläggning biologisk mångfald</button>
-                    <button>Naturvärdesbiologi</button>
-                    <button>Landskapsområden</button>
-                    <div className="additional-section">
-                        <h3>Tillägg:</h3>
-                        <button>Example Button 1</button>
-                        <button>Example Button 2</button>
+
+                    {showList && (
+                        <div className="list-popup">
+                            <h3>Gjorda karteringar</h3>
+                            {karteringList.map((kartering, index) => {
+                                // Find the display value for each kartering's used_karteringar in kartlaggningstypOptions
+                                const displayValue = kartlaggningstypOptions[kartering.used_karteringar] || kartering.used_karteringar; // Fallback to used_karteringar if no match found
+                                return (
+                                    <div
+                                        key={index}
+                                        onClick={() => handleSelectKartlaggningOption(kartering.used_karteringar)}
+                                        style={{
+                                            padding: '10px',
+                                            cursor: 'pointer',
+                                            backgroundColor: selectedKartlaggningOptions.includes(kartering.used_karteringar) ? 'grey' : 'transparent',
+                                            color: selectedKartlaggningOptions.includes(kartering.used_karteringar) ? '#ffffff' : '#000000',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                        }}
+                                    >
+                                        {!selectedKartlaggningOptions.includes(kartering.used_karteringar) && (
+                                            <span style={{
+                                                marginRight: '5px',
+                                                display: 'inline-block',
+                                                width: '20px',
+                                                height: '20px',
+                                                borderRadius: '50%',
+                                                backgroundColor: 'green',
+                                                color: 'white',
+                                                textAlign: 'center',
+                                                lineHeight: '20px',
+                                                fontSize: '15px',
+                                            }}>
+                                                +
+                                            </span>
+                                        )}
+                                        {displayValue}
+                                        <span style={{ marginLeft: 'auto' }}>➡</span>
+                                    </div>
+                                );
+                            })}
+
+                            {/* Separator Line */}
+                            <hr style={{ margin: '10px 0' }} />
+
+                            {/* Button to toggle "Lägg till ny kartering" section */}
+                            <button className="top-bar-button" onClick={toggleNewKarteringList}>
+                                Lägg till ny kartering
+                            </button>
+
+                            {/* Conditional rendering of "Lägg till ny kartering" section */}
+                            {showNewKartering && (
+                                <>
+                                    {/* Render new kartering options */}
+                                    {kartlaggningstypOptionsArray.map(({ key, value }, index) => (
+                                        <div
+                                            key={key}
+                                            onClick={() => handleSelectKartlaggningOption(key)}
+                                            style={{
+                                                padding: '10px',
+                                                cursor: 'pointer',
+                                                backgroundColor: selectedKartlaggningOptions.includes(key) ? 'grey' : 'transparent',
+                                                color: selectedKartlaggningOptions.includes(key) ? '#ffffff' : '#000000',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                            }}
+                                        >
+                                            {!selectedKartlaggningOptions.includes(key) && (
+                                                <span style={{
+                                                    marginRight: '5px',
+                                                    display: 'inline-block',
+                                                    width: '20px',
+                                                    height: '20px',
+                                                    borderRadius: '50%',
+                                                    backgroundColor: 'green',
+                                                    color: 'white',
+                                                    textAlign: 'center',
+                                                    lineHeight: '20px',
+                                                    fontSize: '15px',
+                                                }}>
+                                                    +
+                                                </span>
+                                            )}
+                                            {value}
+                                        </div>
+                                    ))}
+                                </>
+                            )}
+                        </div>
+                    )}
+
+
+
+
+                    <button style={{ backgroundColor: selectedKartlaggningOptions.length > 0 ? 'green' : 'red', color: 'white' }}>
+                        {selectedKartlaggningOptions.length > 0 ? 'Kartering vald' : 'Ingen karteringstyp vald'}
+                    </button>
+
+                    {/* Selected karteringstyp buttons */}
+                    <div className="selected-karteringstyp-buttons">
+                        {selectedKartlaggningOptions.map((optionKey, index) => (
+                            <button
+                                key={index}
+                         
+                            >
+                                {kartlaggningstypOptions[optionKey] || optionKey}
+                            </button>
+                        ))}
                     </div>
-                </div>
-            </div>
-        )
+
+
+                    <div className="value-element-options">
+                        <div className={`value-element-option ${geometryFilterPoint ? 'selected' : ''}`} onClick={() => onValueElementOptionClick('Dot')}>
+                            <img src={`${process.env.PUBLIC_URL}/media/point-100.png`} alt="Dot in Box" /> {/* Replace with actual path */}
+                        </div>
+                        <div className={`value-element-option ${geometryFilterPolygon ? 'selected' : ''}`} onClick={() => onValueElementOptionClick('Triangle')}>
+                            <img src={`${process.env.PUBLIC_URL}/media/polygon-100.png`} alt="Triangle in Box" /> {/* Replace with actual path */}
+                        </div>
+                    </div>
+                </div >
+
+
+
+                <button className="layers-btn" onClick={toggleLagerhanteringPopup}>
+                    <img src={`${process.env.PUBLIC_URL}/media/layers-100.png`} alt="Layers" />
+                </button>
+                {
+                    showLagerhanteringPopup && (
+                        <div className="lagerhantering-popup">
+                            {/* Pop-up content goes here */}
+                            <p>Pop-up content for Lagerhantering</p>
+                            {/* Close button */}
+                            <button onClick={() => setShowLagerhanteringPopup(false)}>Stäng</button>
+                        </div>
+                    )
+                }
+            </div >
+        );
     };
 
 
@@ -2466,6 +2836,7 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, shouldHideDat
             img.onload = () => {
                 setImageSize({ width: img.width, height: img.height });
                 setFullscreenImage(image);
+                setCaptionText(image.caption); // Set the caption text
             };
             img.src = image.url;
         };
@@ -2542,9 +2913,6 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, shouldHideDat
             setShowReplacePrompt(false);
             setPendingDrawing(null);
         };
-
-
-
         const ReplacePrompt = () => (
             <div className="overlay">
                 <div className="confirmation-dialog">
@@ -2554,9 +2922,6 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, shouldHideDat
                 </div>
             </div>
         );
-
-
-
 
         const fullscreenView = fullscreenImage && (
             <div className="fullscreen-view">
@@ -2595,8 +2960,6 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, shouldHideDat
 
         );
 
-
-
         return (
             <div className="right-section">
                 <div className="top-right">
@@ -2605,36 +2968,14 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, shouldHideDat
                     <button className="top-bar-button">Export</button>
                 </div>
 
-                {/*
-                <div className="slider-container">
-                    <label htmlFor="map-height-slider">Justera karthöjd</label><br />
-                    <input
-                        id="map-height-slider"
-                        type="range"
-                        min="0"
-                        max="59"
-                        value={parseInt(mapHeight, 10)}
-                        onChange={handleSliderChange}
-                        className="height-slider"
-                    />
-                </div>
-                */}
-
                 {renderAttributeSectionList()}
-
 
                 <h3>Objektbilder</h3>
                 {fullscreenImage ? fullscreenView : miniatureView}
 
-
-
-
             </div>
         );
     };
-
-
-
 
     // Main Render Function (within MapTest component)
     return (
@@ -2647,7 +2988,7 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, shouldHideDat
             </div>
         </div>
     );
-
 };
+
 // Export the Map component
 export default Map;
