@@ -652,28 +652,33 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
         });
     };
 
-
+    //-- HOOK
     useEffect(() => {
+        // Define a global function 'toggleAttributeContainer' on the window object
         window.toggleAttributeContainer = (id, attributes) => {
-            setShowAttributeTable(true); // Always show the attribute table when the button is clicked
+            // Always show the attribute table when the button is clicked
+            setShowAttributeTable(true);
+            // Set the selected ID
             setSelectedId(id);
+            // Set the attributes object
             setAttributesObject(attributes);
         };
-
+    
+        // This function will be called when the component unmounts
         return () => {
-            window.toggleAttributeContainer = undefined; // Clean up
+            // Clean up the global function from the window object
+            window.toggleAttributeContainer = undefined;
         };
+    // The empty array [] means this effect will only run once, when the component mounts
     }, []);
 
-
+    //-- RENDER
     useEffect(() => {
         if (featureGroupRef.current) {
             featureGroupRef.current.clearLayers(); // Clear existing layers first
             let foundCropRectangle = false;
 
             if (geoJsonData) {
-
-
 
                 L.geoJSON(geoJsonData, {
                     pointToLayer: (feature, latlng) => {
@@ -745,12 +750,7 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
                             setHighlightedId(null) // Clear existing layers first
                             setHighlightedIds(new Set([feature.properties.id]));
                         });
-                        /*
-                                                layer.on('click', () => {
-                                                    setHighlightedFeatureId(feature.properties.id); // Update highlighted feature ID
-                                                    // Existing code to set the selected feature's properties
-                                                });
-                        */
+
                         if (feature.properties.shape === "rectangleCrop") {
                             foundCropRectangle = true; // Set the flag if a crop rectangle is found
                         }
@@ -764,8 +764,6 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
                         }
 
                         if (feature.properties && feature.properties.isCircle) {
-
-
                             // If the feature is a circle, recreate it
                             const center = L.latLng(feature.geometry.coordinates[1], feature.geometry.coordinates[0]);
 
@@ -813,8 +811,6 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
                         } else {
                             layer.addTo(featureGroupRef.current);
                         }
-
-
                     }
                 })
 
@@ -842,13 +838,11 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
 
                 setIsRectangleDrawn(foundCropRectangle); // Update the state based on the presence of a crop rectangle
                 setShowRectangleButton(!foundCropRectangle); // Hide or show the button based on the presence of a crop rectangle
-
-
             }
         }
     }, [geoJsonData]);
 
-
+    //-- GENERATE POPUP CONTENT
     // Function to generate popup content from feature properties
     const generatePopupContent = (properties) => {
         // Check if the feature is a rectangle and return null or empty content
@@ -900,7 +894,7 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
         }
     };
 
-
+    //-- CREATE GREY AREA AROUND THE CROP AREA
     const createInvertedMask = (rectangleLayer) => {
         const bounds = rectangleLayer.getBounds();
 
@@ -939,7 +933,7 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
         invertedPolygon.isMask = true;
     };
 
-
+/*
     const updateInvertedMask = (rectangleLayer, invertedMask) => {
         const bounds = rectangleLayer.getBounds();
         const largeBounds = [[90, -180], [-90, 180]];
@@ -962,9 +956,9 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
 
         invertedMask.setLatLngs([newOuterCoords, newInnerCoords]);
     };
+*/
 
-
-    // Function to save GeoJSON data and saved objects to the server
+    //-- SAVE PROJECT DATA FILE
     const saveDataToServer = async () => {
         try {
             setSaveStatus('Sparar...');
@@ -1003,7 +997,7 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
         }
     };
 
-
+    //-- GET PROJECT DATA FILE
     const loadDataFromServer = async () => {
         try {
             const response = await fetch(`${API_URLS.PROJECT_FILES_GET}/${userID}/${selectedProjectId}/file`, {
@@ -1035,14 +1029,12 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
         }
     };
 
-
-    // useEffect hook to call loadDataFromServer on component mount
+    //-- HOOK LOAD DATA
     useEffect(() => {
         loadDataFromServer();
-
     }, []);
 
-
+    //-- UPDATE GEOJSON AFTER EDIT AND DELETE
     const updateGeoJsonEditDel = () => {
         if (featureGroupRef.current) {
             const features = [];
@@ -1099,7 +1091,7 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
         }
     };
 
-
+    //-- UPDATE GEOJSON AFTER CREATE
     const updateGeoJsonCreate = () => {
         if (featureGroupRef.current) {
             const features = [];
@@ -1110,7 +1102,6 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
                 if (layer.isMask) {
                     return;
                 }
-
 
                 if (layer instanceof L.Circle/* && layer.options.id !== undefined*/) {
                     if (!(layer.options && layer.options.attributes)) {
@@ -1147,8 +1138,8 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
                             }
                         };
                         features.push(circleFeature);
-                        console.log('Layer after 1: ', layer);
-                        console.log('Circlefeature after 2: ', circleFeature);
+                        //console.log('Layer after 1: ', layer);
+                        //console.log('Circlefeature after 2: ', circleFeature);
                     } else {
                         console.log('full layer 2: ', layer);
                         //console.log('layer 2 options id: ', layer.options.id);
@@ -1188,8 +1179,8 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
                             }
                         };
                         features.push(circleFeature);
-                        console.log('Layer after 2: ', layer);
-                        console.log('Circlefeature after 2: ', circleFeature);
+                        //console.log('Layer after 2: ', layer);
+                        //console.log('Circlefeature after 2: ', circleFeature);
                     }
                 }
 
@@ -1237,8 +1228,8 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
 
                         }
                         features.push(rectangleFeature);
-                        console.log('layer 1 rectangle: ', layer);
-                        console.log('rectangleFeature 1: ', rectangleFeature);
+                        //console.log('layer 1 rectangle: ', layer);
+                        //console.log('rectangleFeature 1: ', rectangleFeature);
                     } else {
                         const rectangleFeature = {
                             type: 'Feature',
@@ -1259,12 +1250,11 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
                             },
                         }
                         features.push(rectangleFeature);
-                        console.log('layer 2 rectangle: ', layer);
-                        console.log('rectangleFeature 2: ', rectangleFeature);
+                        //console.log('layer 2 rectangle: ', layer);
+                        //console.log('rectangleFeature 2: ', rectangleFeature);
 
                     }
                 }
-
 
                 else if (layer instanceof L.Polygon && !(layer instanceof L.Rectangle)) {
                     // Get the first array of LatLngs for the first polygon (ignores holes)
@@ -1311,13 +1301,10 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
 
                         }
                         features.push(polygonFeature);
-                        console.log('layer 1 polygon: ', layer);
-                        console.log('polygonFeature 1: ', polygonFeature);
+                        //console.log('layer 1 polygon: ', layer);
+                        //console.log('polygonFeature 1: ', polygonFeature);
                     }
                 }
-
-
-
                 else if (layer instanceof L.Polyline) {
                     const position = layer.getLatLngs();
                     const coordinates = position.map(latlng => [latlng.lng, latlng.lat]);
@@ -1355,15 +1342,12 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
                                     kartlaggningsGeometry: ''
                                 }
                             },
-
                         }
                         features.push(polylineFeature);
-                        console.log('layer 1 polyline: ', layer);
-                        console.log('polylineFeature 1: ', polylineFeature);
-
+                        //console.log('layer 1 polyline: ', layer);
+                        //console.log('polylineFeature 1: ', polylineFeature);
                     }
                 }
-
                 else if (layer instanceof L.CircleMarker) {
                     const position = layer.getLatLng();
 
@@ -1401,16 +1385,13 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
                                     kartlaggningsGeometry: ''
                                 }
                             },
-
                         }
                         features.push(circleMarkerFeature);
-                        console.log('layer 1 marker: ', layer);
-                        console.log('circleMarker 1: ', circleMarkerFeature);
-
+                        //console.log('layer 1 marker: ', layer);
+                        //console.log('circleMarker 1: ', circleMarkerFeature);
                     }
-
-
-                } else if (layer instanceof L.Marker) {
+                } 
+                else if (layer instanceof L.Marker) {
                     let featureMarker;
                     // Handle L.Marker specifically
                     const position = layer.getLatLng();
@@ -1447,9 +1428,6 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
                     };
                     features.push(featureMarker);
                 }
-
-
-
                 else {
                     // For other shapes, use the default toGeoJSON method
                     const layerFeature = layer.toGeoJSON();
@@ -1491,12 +1469,11 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
             };
 
             setGeoJsonData(geoJson);
-            console.log('updateGeojson: ', geoJson);
-
+            //console.log('updateGeojson: ', geoJson);
         }
     };
 
-
+    //-- CREATE A MAP OBJECT
     const onCreate = (e) => {
         const newLayer = e.layer;
         newLayer.options.id = uuidv4(); // Ensure each layer has a unique ID
