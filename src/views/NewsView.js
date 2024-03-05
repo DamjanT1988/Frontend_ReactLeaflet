@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Map from '../components/map/Map';
 
 const NewsView = () => {
   const navigate = useNavigate();
@@ -17,7 +16,7 @@ const NewsView = () => {
     // Dependency array is empty, meaning it will run once on mount
   }, []); // Empty dependency array ensures effect runs once after initial render
 
-  return <div>  <Map shouldHide={true}/></div>;
+  return <div> </div>;
 };
 
 export default NewsView;
