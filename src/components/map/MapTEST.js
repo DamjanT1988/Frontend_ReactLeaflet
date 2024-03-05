@@ -10,19 +10,15 @@ import 'leaflet-draw/dist/leaflet.draw.css';
 import shp from 'shpjs';
 import { v4 as uuidv4 } from 'uuid';
 
+// Destructure BaseLayer from LayersControl
+const { BaseLayer } = LayersControl;
 
-
+//-- ICONS
 delete L.Icon.Default.prototype._getIconUrl
 L.Icon.Default.mergeOptions({
     iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
     iconUrl: require('leaflet/dist/images/marker-icon.png'),
     shadowUrl: require('leaflet/dist/images/marker-shadow.png')
-});
-const dotIconWhite = L.divIcon({
-    className: 'custom-dot-icon',
-    html: '<svg width="15" height="15" viewBox="0 0 8 8"><circle cx="4" cy="4" r="3" fill="#ffffff"/></svg>',
-    iconSize: [8, 8], // Size of the icon
-    iconAnchor: [4, 4] // Anchor point of the icon
 });
 const dotIconBlue = L.divIcon({
     className: 'custom-dot-icon',
@@ -37,10 +33,7 @@ const dotIconRed = L.divIcon({
     iconAnchor: [4, 4] // Anchor point of the icon
 });
 
-
-// Destructure BaseLayer from LayersControl
-const { BaseLayer } = LayersControl;
-
+//-- TRANSLATION OF LEAFLET TO SWEDISH
 // Direct manipulation for Swedish localization
 L.drawLocal.draw.toolbar.buttons = {
     polyline: 'Rita en polylinje',
@@ -2241,14 +2234,14 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, projectKa
                 const geometryType = feature.geometry.type;
                 const isMatchingType = geometryType === type || (type === 'Point' && (geometryType === 'Point' || geometryType === 'MultiPoint'));
                 const matchesKartlaggningstyp = selectedKartlaggningOptions.length === 0 || selectedKartlaggningOptions.includes(feature.properties.attributes?.kartlaggningsTyp);
-        
+
                 const isMatch = isMatchingType && matchesKartlaggningstyp;
                 console.log(`Feature ID: ${feature.properties.id}, Geometry Type: ${geometryType}, Matching Type: ${isMatchingType}, Matching Kartlaggningstyp: ${matchesKartlaggningstyp}, Is Match: ${isMatch}`);
-        
+
                 return isMatch;
             });
         };
-        
+
 
         // Check if there are any objects for each category
         const hasPunkter = filterByGeometryType('Point').length > 0;
@@ -2746,7 +2739,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, projectKa
                         {selectedKartlaggningOptions.map((optionKey, index) => (
                             <button
                                 key={index}
-                         
+
                             >
                                 {kartlaggningstypOptions[optionKey] || optionKey}
                             </button>
