@@ -1907,8 +1907,7 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
         );
     };
 
-
-
+    //-- RENDER ATTRIBUTE TABLE
     const renderAttributeTable = () => {
         // Ensure geoJsonData is not null and has features before proceeding
         if (!geoJsonData || !geoJsonData.features) {
@@ -1986,7 +1985,7 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
             }
         };
 
-
+        // Function to handle attribute value changes
         const handleAttributeValueChange = (featureId, attributeName, newValue) => {
             setHighlightedIds(prev => new Set(prev).add(featureId));
             // Create a deep copy of the geoJsonData to avoid direct state mutation
@@ -2004,6 +2003,7 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
             setGeoJsonData(updatedGeoJsonData);
         };
 
+        /*
         const toggleSelection = (itemId) => {
             setSelectedItems((prevSelectedItems) => {
                 const newSelectedItems = new Set(prevSelectedItems);
@@ -2015,7 +2015,9 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
                 return newSelectedItems;
             });
         };
+        */
 
+        // Function to handle row clicks and feature highlighting
         const showSelectedItems = () => {
             const filteredItems = allItems.filter(item => selectedItems.has(item.id));
             // Update your state or variable that controls the displayed items in the attribute table
@@ -2023,10 +2025,12 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
             setViewMode('selected');
         };
 
+        // Function to handle row clicks and feature highlighting
         const showAllItems = () => {
             setViewMode('all');
         };
 
+        // Function to handle row clicks and feature highlighting
         const addSelectedToSavedObjects = () => {
             if (!selectedId && selectedRowIds.size === 0) {
                 console.log('No selected objects to add');
@@ -2051,7 +2055,6 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
             setTimeout(() => setAddStatus(''), 2000);
         };
 
-
         // Function to clear savedObjectIds
         const clearSavedObjectIds = () => {
             setSavedObjectIds(new Set()); // Clears the set
@@ -2059,7 +2062,7 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
             setTimeout(() => setAddStatus(''), 2000); // Clear the message after 3 seconds
         };
 
-
+        // Function to delete selected objects
         const deleteSelectedObjects = () => {
             // Update savedObjectIds by removing highlightedIds or selectedRowIds
             setSavedObjectIds(prevSavedObjectIds => {
@@ -2083,7 +2086,7 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
             setTimeout(() => setAddStatus(''), 2000); // Clear the message after 3 seconds
         };
 
-
+        // Function to handle row clicks and feature highlighting
         const handleSort = (key) => {
             let direction = 'ascending';
             if (sortConfig.key === key && sortConfig.direction === 'ascending') {
@@ -2103,14 +2106,16 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
             return 0;
         };
 
+        /*
         // Apply sorting to the data before rendering the table
         const sortedData = geoJsonData.features.sort((a, b) => {
             const aValue = a.properties.attributes[sortConfig.key];
             const bValue = b.properties.attributes[sortConfig.key];
             return compare(aValue, bValue);
         });
+        */
 
-
+        /*
         // Function to determine if there are features for a given geometry type and kartlaggningstyp
         const hasFeaturesForGeometry = (geometryType) => {
             return geoJsonData.features.some(feature => {
@@ -2119,13 +2124,16 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
                 return matchesGeometry && matchesKartlaggningstyp;
             });
         };
+        */
 
+        /*
         // Determine available geometries for the selected kartlaggningstyp
         const availableGeometries = {
             'Punkter': hasFeaturesForGeometry('Point') || hasFeaturesForGeometry('MultiPoint'),
             'Linjer': hasFeaturesForGeometry('LineString') || hasFeaturesForGeometry('MultiLineString'),
             'Polygoner': hasFeaturesForGeometry('Polygon') || hasFeaturesForGeometry('MultiPolygon')
         };
+        */
 
         // Filter features based on selected criteria
         const filteredFeatures = geoJsonData.features.filter(feature => {
@@ -2135,7 +2143,7 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
 
             const matchesKartlaggningstyp = selectedKartlaggningOptions.length === 0 || selectedKartlaggningOptions.includes(feature.properties.attributes?.kartlaggningsTyp);
 
-            console.log(selectedKartlaggningOptions + ' ' + feature.properties.attributes?.kartlaggningsTyp);
+            //console.log(selectedKartlaggningOptions + ' ' + feature.properties.attributes?.kartlaggningsTyp);
 
             // Apply geometry filters
             if (geometryFilterPoint && feature.geometry.type !== 'Point' && feature.geometry.type !== 'MultiPoint') {
@@ -2184,6 +2192,7 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
             }
         });
 
+        // Function to filter features by geometry type
         const filterByGeometryType = (type) => {
             return geoJsonData.features.filter(feature => {
                 const geometryType = feature.geometry.type;
@@ -2197,13 +2206,12 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
             });
         };
 
-
         // Check if there are any objects for each category
         const hasPunkter = filterByGeometryType('Point').length > 0;
         const hasLinjer = filterByGeometryType('LineString').length > 0;
         const hasPolygoner = filterByGeometryType('Polygon').length > 0;
 
-        console.log('hasPunktr: ', hasPunkter);
+        //console.log('hasPunktr: ', hasPunkter);
 
         return (
             <div>
@@ -2283,9 +2291,8 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
         }
     };
 
-
+    //-- RENDER ATTRIBUTE LIST FOR PROJECT VIEW
     const renderAttributeList = () => {
-
         return (
             <div>
                 {!shouldHideDataView &&
@@ -2448,7 +2455,7 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
         )
     }
 
-
+    //-- RENDER MAP
     const renderMap = () => {
         return (
             <div ref={mapRef} style={{ height: mapHeight, width: '100%' }}>
@@ -2485,12 +2492,11 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
         )
     }
 
-    // Top Bar JSX
+    //-- RENDER TOP BAR
     const renderTopBar = () => {
-
     };
 
-    // Left Section JSX
+    //-- RENDER LEFT SECTION
     const renderLeftSection = () => {
         if (!selectedProject) {
             return <div>Laddar..</div>; // Provide a loading message or any other fallback content
@@ -2499,14 +2505,17 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
         // Convert kartlaggningstypOptions to an array and add the "Alla" option
         const kartlaggningstypOptionsArray = [/*{ key: '', value: 'Visa alla' },*/ ...Object.entries(kartlaggningstypOptions).map(([key, value]) => ({ key, value }))];
 
+        // State for showing/hiding the kartlaggning list
         const toggleKartlaggningList = () => {
             setShowKartlaggningList(!showList);
         };
 
+        // State for showing/hiding the kartlaggning list
         const toggleLagerhanteringPopup = () => {
             setShowLagerhanteringPopup(!showLagerhanteringPopup);
         };
 
+        // State for showing/hiding the kartlaggning list
         const handleSelectKartlaggningOption = (optionKey) => {
             console.log('Selected kartlaggning option:', optionKey);
             console.log('Selected kartlaggning value:', kartlaggningstypOptions[optionKey]);
@@ -2539,7 +2548,7 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
         };
         */
 
-
+        // State for showing/hiding the kartlaggning list
         const onValueElementOptionClick = (optionType) => {
             if (optionType === 'Dot') {
                 // If already selected, reset both filters and default to 'Punkter' tab
@@ -2578,10 +2587,10 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
                 })), ...kartlaggningstypOptionsArray];
         */
 
+        // State for showing/hiding the kartlaggning list
         const toggleNewKarteringList = () => {
             setShowNewKartering(!showNewKartering);
         };
-
 
         return (
             <div className="left-section">
@@ -2682,14 +2691,10 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
                         </div>
                     )}
 
-
-
-
                     <button style={{ backgroundColor: selectedKartlaggningOptions.length > 0 ? 'green' : 'red', color: 'white' }}>
                         {selectedKartlaggningOptions.length > 0 ? 'Kartering vald' : 'Ingen karteringstyp vald'}
                     </button>
 
-                    {/* Selected karteringstyp buttons */}
                     <div className="selected-karteringstyp-buttons">
                         {selectedKartlaggningOptions.map((optionKey, index) => (
                             <button
@@ -2701,7 +2706,6 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
                         ))}
                     </div>
 
-
                     <div className="value-element-options">
                         <div className={`value-element-option ${geometryFilterPoint ? 'selected' : ''}`} onClick={() => onValueElementOptionClick('Dot')}>
                             <img src={`${process.env.PUBLIC_URL}/media/point-100.png`} alt="Dot in Box" /> {/* Replace with actual path */}
@@ -2711,8 +2715,6 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
                         </div>
                     </div>
                 </div >
-
-
 
                 <button className="layers-btn" onClick={toggleLagerhanteringPopup}>
                     <img src={`${process.env.PUBLIC_URL}/media/layers-100.png`} alt="Layers" />
@@ -2731,9 +2733,7 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
         );
     };
 
-
-
-    // Right Section JSX
+    //-- RENDER RIGHT SECTION
     const renderRightSection = () => {
         const selectedMapObjectId = selectedId; // Dynamically set based on user interaction
 
@@ -2751,6 +2751,7 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
             setFullscreenImage(null);
         };
 
+        // Function to delete the selected image
         const handlePreviousImage = () => {
             const currentIndex = filteredImages.findIndex(img => img.url === fullscreenImage.url);
             if (currentIndex > 0) {
@@ -2765,7 +2766,6 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
                 setFullscreenImage(filteredImages[currentIndex + 1]);
             }
         };
-
 
         // Display filtered images in a grid, three in a row
         const miniatureView = (
@@ -2789,6 +2789,7 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
             img.src = image.url;
         };
 
+        // Function to delete the selected image
         const handleSaveDrawing = (drawingBase64) => {
             // Store the drawing data temporarily
             setPendingDrawing(drawingBase64);
@@ -2797,7 +2798,7 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
             setShowReplacePrompt(true);
         };
 
-
+        // Function to delete the selected image
         const handleReplaceDecision = async (replace) => {
             console.log('Replace decision:', replace);
             //setSelectedId(fullscreenImage.mapObjectId); // Set the selected ID for the image
@@ -2854,13 +2855,14 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
 
             }
 
-
             // Clear the drawing data and close the prompt
             fetchImages()
             setIsDrawingMode(false);
             setShowReplacePrompt(false);
             setPendingDrawing(null);
         };
+
+        // Function to delete the selected image
         const ReplacePrompt = () => (
             <div className="overlay">
                 <div className="confirmation-dialog">
@@ -2871,6 +2873,7 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
             </div>
         );
 
+        // Function to delete the selected image
         const fullscreenView = fullscreenImage && (
             <div className="fullscreen-view">
                 <button onClick={handlePreviousImage} className="nav-btn left-nav">&lt;</button>
