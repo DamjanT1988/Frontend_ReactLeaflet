@@ -77,7 +77,6 @@ L.drawLocal.draw.handlers.polyline.tooltip = {
 L.drawLocal.draw.handlers.rectangle.tooltip = {
     start: 'Klicka och dra för att rita en rektangel.',
 };
-
 L.drawLocal.edit.toolbar.actions.save = {
     title: 'Spara ändringar',
     text: 'Spara',
@@ -102,10 +101,12 @@ L.drawLocal.edit.handlers.remove.tooltip = {
     text: 'Klicka på en funktion för att ta bort',
 };
 
+//-- COMPONENT
 window.toggleAttributeContainer = (id, attributes) => {
     // Function implementation will be set in the component
 };
 
+//-- ADJUST THE MAP/TABLE HEIGHT
 const DraggableLine = ({ onDrag }) => {
     const lineRef = useRef(null);
     const lastDragTime = useRef(Date.now());
@@ -160,10 +161,13 @@ const DraggableLine = ({ onDrag }) => {
 
 
 // Define the Map component
-const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, projectKarteringar, shouldHideDataView }) => {
+const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataView }) => {
+    //-- STATES
+    // map
     const featureGroupRef = useRef(null);
     const position = [51.505, -0.09];
     const zoom = 11;
+    // functions etc.
     const [geoJsonData, setGeoJsonData] = useState(null);
     const [saveStatus, setSaveStatus] = useState('');
     const accessToken = localStorage.getItem('accessToken'); // Get the access token from local storage
@@ -175,11 +179,11 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, projectKa
     const [showAttributeTable, setShowAttributeTable] = useState(false);
     const [showRectangleButton, setShowRectangleButton] = useState(true);
     const [highlightedId, setHighlightedId] = useState(null);
-    const [highlightedFeatureId, setHighlightedFeatureId] = useState(null);
+    //const [highlightedFeatureId, setHighlightedFeatureId] = useState(null);
     const [selectedRowIds, setSelectedRowIds] = useState(new Set());
     const [highlightedIds, setHighlightedIds] = useState(new Set());
     const [activeTab, setActiveTab] = useState('Punkter');
-    const [selectedMarkerId, setSelectedMarkerId] = useState(null);
+    //const [selectedMarkerId, setSelectedMarkerId] = useState(null);
     const [lastClickedMarker, setLastClickedMarker] = useState(null);
     const [selectedImage, setSelectedImage] = useState(null);
     const [imageList, setImageList] = useState([]);
@@ -194,7 +198,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, projectKa
     const [imageBase64, setImageBase64] = useState(null); // State for the image size
     const [showReplacePrompt, setShowReplacePrompt] = useState(false);
     const [pendingDrawing, setPendingDrawing] = useState(null);
-    const [showSavePrompt, setSavePrompt] = useState(false);
+    //const [showSavePrompt, setSavePrompt] = useState(false);
     //const [mapHeight, setMapHeight] = useState("59vh"); // Default height
     const mapRef = useRef(null);
     const [mapInstance, setMapInstance] = useState(null);
@@ -210,7 +214,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, projectKa
     const mapObjectClickedRef = useRef(false);
     const [showList, setShowKartlaggningList] = useState(false);
     const [selectedKartlaggningOptions, setSelectedKartlaggningOptions] = useState([]);
-    const [selectedKartlaggningValue, setSelectedKartlaggningValue] = useState(null);
+    //const [selectedKartlaggningValue, setSelectedKartlaggningValue] = useState(null);
     const [showLagerhanteringPopup, setShowLagerhanteringPopup] = useState(false);
     const [kartlaggningstypOptions, setKartlaggningstypOptions] = useState({
         KartlaggningBiologiskMangfald: "Kartläggning biologisk mångfald",
@@ -236,12 +240,12 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, projectKa
         Vardeelement_yta: "Värdeelement Y",
         VattendragDelstracka: "Vattendrag delsträcka",
     });
-    const [showValueElementOptions, setShowValueElementOptions] = useState(false);
+    //const [showValueElementOptions, setShowValueElementOptions] = useState(false);
     const [geometryFilterPoint, setGeometryFilterPoint] = useState(false);
     const [geometryFilterPolygon, setGeometryFilterPolygon] = useState(false);
     const [showNewKartering, setShowNewKartering] = useState(false);
 
-
+    //-- MAP CLICK RESET
     const MapEventsComponent = () => {
         const map = useMapEvents({
             click: () => {
@@ -250,13 +254,12 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, projectKa
 
                     if (highlightedId === null && selectedId === null && selectedFeatureIds.size === 0 && savedObjectIds.size === 0) {
                         setImageList([]);
-                    } // BEFORE THE RESET - AT TOP
+                    } // BEFORE THE RESET - MUST BE AT TOP
 
                     // Reset selection states
                     setSelectedId(null);
                     setHighlightedId(null);
                     setAttributesObject(null);
-
 
                     // Reset styles for all layers in the feature group
                     featureGroupRef.current.eachLayer(layer => {
@@ -294,12 +297,13 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, projectKa
         return null; // This component does not render anything
     };
 
+    //-- DRAG MAP RESIZE
     const handleDrag = (movementY) => {
         setMapHeight((prevHeight) => Math.max(prevHeight + movementY, 0), mapHeight); // Ensure map height doesn't go below a minimum (e.g., 100px)
         setAttributesContainerHeight((prevHeight) => Math.max(prevHeight - movementY, 0)); // Increase attributes container height as map height decreases
     };
 
-
+    //-- DRAWING
     const Canvas = ({ width, height, onClose, onSave }) => {
         const canvasRef = useRef(null);
 
@@ -369,13 +373,12 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, projectKa
 
     };
 
-
+    //-- CTRL MULTIOBJECT SELECTION
     // Function to handle feature click with CTRL key support for multi-selection
     const handleFeatureClick = (featureId, layer, event) => {
         // If CTRL key is not pressed, clear selections and revert styles
         if (!event.originalEvent.ctrlKey) {
             // Clear the selectedFeatureIds set
-            //setSelectedFeatureIds(new Set());
             return;
 
         }
@@ -392,21 +395,19 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, projectKa
                 // Apply the selected feature style
 
             }
-            console.log('selected feature ids: ', newSelectedIds);
             return newSelectedIds;
         });
     };
 
-
+    //-- IMAGE TOGGLE
     const toggleDeleteConfirm = (image) => {
         setImageToDelete(image); // Set the image to delete with the full image object
         setShowDeleteConfirm(!showDeleteConfirm);
     };
 
-
+    //-- DELETE IMAGE
     const handleDeleteImage = async () => {
         if (!imageToDelete) return; // Ensure imageToDelete is not null or undefined
-
 
         try {
             const response = await fetch(`${API_URLS.PROJECT_IMAGE_DELETE.replace('<int:image_id>', imageToDelete.id)}`, {
@@ -430,7 +431,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, projectKa
         }
     };
 
-
+    //-- UPLOAD IMAGE
     const uploadImage = async () => {
         // Ensure there is either an image file or a base64 string, and an ID is selected
         if (!selectedId || (!selectedImage && !imageBase64)) return;
@@ -461,8 +462,6 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, projectKa
                 caption: captionText // Include the caption text
             };
 
-            console.log('upload payload: ', payload);
-
             const response = await fetch(`${API_URLS.PROJECT_IMAGE_POST}`, {
                 method: 'POST',
                 body: JSON.stringify(payload),
@@ -488,7 +487,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, projectKa
         }
     };
 
-
+    //-- FETCH IMAGES
     const fetchImages = async () => {
         try {
             const response = await fetch(`${API_URLS.PROJECT_IMAGE_GET.replace('<int:project_id>', selectedProjectId)}`, {
@@ -516,20 +515,18 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, projectKa
         }
     };
 
-
-    // useEffect hook to call uploadImage when imageBase64 changes and is not null
+    //-- HOOKS IMAGES
     useEffect(() => {
         if (imageBase64) {
             uploadImage(); // Call uploadImage here
         }
     }, [imageBase64]);
 
-
     useEffect(() => {
         fetchImages();
     }, [selectedProjectId]); // Re-fetch images when selectedProjectId changes
 
-
+    //-- RESET STYLES OF ICON AND CIRCLE
     // Function to reset styles for all layers
     const resetAllLayerStyles = () => {
         featureGroupRef.current.eachLayer(layer => {
@@ -548,7 +545,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, projectKa
         });
     };
 
-
+    //-- CREATE CROP RECTANGLE
     const RectangleDrawButton = () => {
         const map = useMap();
 
@@ -582,8 +579,6 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, projectKa
                     }
                 };
 
-
-                console.log('custom rectangle: ', newRectangle);
                 // Update GeoJSON data with the new rectangle
                 setGeoJsonData(prevData => ({
                     ...prevData,
@@ -594,7 +589,6 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, projectKa
                 removeDuplicateRectangles(); // Call function to remove duplicates
                 drawControl.disable(); // Disable the draw control after drawing  
                 setShowRectangleButton(false);
-
 
                 // Remove the event listener to prevent duplicate rectangles
                 map.off(L.Draw.Event.CREATED, onRectangleCreated);
@@ -614,7 +608,7 @@ const MapTest = ({ selectedProjectId, selectedProject, onSave, userID, projectKa
         }
     };
 
-
+    //-- REMOVE DUPLICATE RECTANGLES
     const removeDuplicateRectangles = () => {
         const layers = featureGroupRef.current.getLayers();
         const rectangles = layers.filter(layer => layer instanceof L.Rectangle);
