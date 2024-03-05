@@ -10,7 +10,7 @@ import 'leaflet-draw/dist/leaflet.draw.css';
 import shp from 'shpjs';
 import { v4 as uuidv4 } from 'uuid';
 
-// Destructure BaseLayer from LayersControl
+//-- LEAFLET COMPONENTS
 const { BaseLayer } = LayersControl;
 
 //-- ICONS
@@ -108,10 +108,12 @@ window.toggleAttributeContainer = (id, attributes) => {
 
 //-- ADJUST THE MAP/TABLE HEIGHT
 const DraggableLine = ({ onDrag }) => {
+    // Create a ref for the draggable line element
     const lineRef = useRef(null);
     const lastDragTime = useRef(Date.now());
     const dragUpdateScheduled = useRef(false);
 
+    // Function to handle the drag event
     const handleDrag = (movementY) => {
         // Use requestAnimationFrame for smoother updates
         if (!dragUpdateScheduled.current) {
@@ -131,6 +133,7 @@ const DraggableLine = ({ onDrag }) => {
     useEffect(() => {
         const line = lineRef.current;
 
+        // Event listener for mouse down on the draggable line
         const startDrag = (e) => {
             e.preventDefault(); // Prevent default to avoid text selection
             const initialY = e.clientY;
@@ -156,6 +159,7 @@ const DraggableLine = ({ onDrag }) => {
         };
     }, [onDrag]);
 
+    // Return the draggable line element
     return <div ref={lineRef} className="draggable-line"></div>;
 };
 
@@ -163,11 +167,11 @@ const DraggableLine = ({ onDrag }) => {
 // Define the Map component
 const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataView }) => {
     //-- STATES
-    // map
+    // For map
     const featureGroupRef = useRef(null);
     const position = [51.505, -0.09];
     const zoom = 11;
-    // functions etc.
+    // For functions
     const [geoJsonData, setGeoJsonData] = useState(null);
     const [saveStatus, setSaveStatus] = useState('');
     const accessToken = localStorage.getItem('accessToken'); // Get the access token from local storage
@@ -248,6 +252,7 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
     //-- MAP CLICK RESET
     const MapEventsComponent = () => {
         const map = useMapEvents({
+            // Event listener for map click
             click: () => {
                 if (!mapObjectClickedRef.current) {
                     console.log("Map clicked, resetting selection and styles");
@@ -299,12 +304,14 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
 
     //-- DRAG MAP RESIZE
     const handleDrag = (movementY) => {
+        // Function to handle the drag event and update the map height
         setMapHeight((prevHeight) => Math.max(prevHeight + movementY, 0), mapHeight); // Ensure map height doesn't go below a minimum (e.g., 100px)
         setAttributesContainerHeight((prevHeight) => Math.max(prevHeight - movementY, 0)); // Increase attributes container height as map height decreases
     };
 
     //-- DRAWING
     const Canvas = ({ width, height, onClose, onSave }) => {
+        // Create a ref for the canvas element
         const canvasRef = useRef(null);
 
         useEffect(() => {
@@ -315,7 +322,7 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
             }
         }, [width, height]);
 
-
+        // Function to capture the drawing as a base64 image
         const captureDrawing = () => {
             if (canvasRef.current) {
                 const dataURL = canvasRef.current.toDataURL('image/png');
@@ -324,6 +331,7 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
             }
         };
 
+        // Function to handle mouse down event
         const handleMouseDown = (e) => {
             const canvas = canvasRef.current;
             const ctx = canvas.getContext('2d');
@@ -333,6 +341,7 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
             document.addEventListener('mouseup', handleMouseUp);
         };
 
+        // Function to handle mouse move event
         const handleMouseMove = (e) => {
             const canvas = canvasRef.current;
             const ctx = canvas.getContext('2d');
@@ -340,6 +349,7 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
             ctx.stroke();
         };
 
+        // Function to handle mouse up event
         const handleMouseUp = () => {
             document.removeEventListener('mousemove', handleMouseMove);
             document.removeEventListener('mouseup', handleMouseUp);
@@ -383,6 +393,7 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
 
         }
 
+        // If CTRL key is pressed, add or remove the feature ID from the selectedFeatureIds set
         setSavedObjectIds(prevSelectedIds => {
             const newSelectedIds = new Set(prevSelectedIds);
 
@@ -410,6 +421,7 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
         if (!imageToDelete) return; // Ensure imageToDelete is not null or undefined
 
         try {
+            // Send the DELETE request to delete the image
             const response = await fetch(`${API_URLS.PROJECT_IMAGE_DELETE.replace('<int:image_id>', imageToDelete.id)}`, {
                 method: 'DELETE',
                 headers: {
@@ -462,6 +474,7 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
                 caption: captionText // Include the caption text
             };
 
+            // Send the POST request to upload the image
             const response = await fetch(`${API_URLS.PROJECT_IMAGE_POST}`, {
                 method: 'POST',
                 body: JSON.stringify(payload),
@@ -490,6 +503,7 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
     //-- FETCH IMAGES
     const fetchImages = async () => {
         try {
+            // Fetch images for the selected project
             const response = await fetch(`${API_URLS.PROJECT_IMAGE_GET.replace('<int:project_id>', selectedProjectId)}`, {
                 method: 'GET',
                 headers: {
@@ -498,6 +512,7 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
             });
 
             if (response.ok) {
+                // Logic after successful fetch
                 const data = await response.json();
                 console.log('image data: ', data);
                 const images = data.images; // Use the 'images' key from the response
@@ -560,6 +575,7 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
 
             // Event listener for when a rectangle is created
             const onRectangleCreated = (e) => {
+                // Extract the rectangle layer from the event
                 const { layer } = e;
                 const rectangleBounds = layer.getBounds();
                 const newRectangle = {
@@ -610,11 +626,13 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
 
     //-- REMOVE DUPLICATE RECTANGLES
     const removeDuplicateRectangles = () => {
+        // Get all layers from the feature group
         const layers = featureGroupRef.current.getLayers();
         const rectangles = layers.filter(layer => layer instanceof L.Rectangle);
         let uniqueRectangles = [];
 
         rectangles.forEach(currentRect => {
+            // Check if the current rectangle is already in the uniqueRectangles array
             const duplicateIndex = uniqueRectangles.findIndex(uniqueRect =>
                 uniqueRect.getBounds().equals(currentRect.getBounds())
             );
@@ -622,6 +640,7 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
             if (duplicateIndex === -1) {
                 uniqueRectangles.push(currentRect);
             } else {
+                // If a duplicate is found, remove the current rectangle if it has the "rectangleCrop" property
                 const duplicateRect = uniqueRectangles[duplicateIndex];
                 const hasCurrentRectCropProperty = currentRect.options && currentRect.options.shape === "rectangleCrop";
                 const hasDuplicateRectCropProperty = duplicateRect.options && duplicateRect.options.shape === "rectangleCrop";
@@ -672,7 +691,7 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
     // The empty array [] means this effect will only run once, when the component mounts
     }, []);
 
-    //-- RENDER
+    //-- HOOK RENDER
     useEffect(() => {
         if (featureGroupRef.current) {
             featureGroupRef.current.clearLayers(); // Clear existing layers first
@@ -766,7 +785,7 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
                         if (feature.properties && feature.properties.isCircle) {
                             // If the feature is a circle, recreate it
                             const center = L.latLng(feature.geometry.coordinates[1], feature.geometry.coordinates[0]);
-
+                            // Create a circle with the center and radius from the feature properties
                             const circle = L.circle(center, {
                                 radius: feature.properties.radius,
                                 id: feature.properties.id,
@@ -779,6 +798,7 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
                             });
 
                             if (!shouldHideDataView) {
+                                // Generate popup content based on feature properties
                                 const popupContent = generatePopupContent(feature.properties);
                                 circle.bindPopup(popupContent); // Bind popup to circle
                             }
@@ -806,8 +826,6 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
                                 setAttributesObject(feature.properties.attributes || {});
                                 setShowAttributeTable(true); // Show the attribute table
                             });
-
-
                         } else {
                             layer.addTo(featureGroupRef.current);
                         }
@@ -962,10 +980,12 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
     const saveDataToServer = async () => {
         try {
             setSaveStatus('Sparar...');
+            // Create a new object with the GeoJSON data and the saved object IDs
             const dataToSave = {
                 ...geoJsonData, // Your existing GeoJSON data
                 savedObjectIds: Array.from(savedObjectIds) // Convert Set to Array for serialization
             };
+            // Send the data to the server
             const response = await fetch(`${API_URLS.PROJECT_FILES_POST}/${userID}/${selectedProjectId}/file`, {
                 method: 'POST',
                 headers: {
@@ -1000,6 +1020,7 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
     //-- GET PROJECT DATA FILE
     const loadDataFromServer = async () => {
         try {
+            // Fetch the GeoJSON data from the server
             const response = await fetch(`${API_URLS.PROJECT_FILES_GET}/${userID}/${selectedProjectId}/file`, {
                 method: 'GET',
                 headers: {
@@ -1007,6 +1028,7 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
                 }
             });
             if (response.ok) {
+                // Assuming the response is a GeoJSON object
                 const data = await response.json();
                 if (data.features) {
                     setGeoJsonData(data); // Assuming the GeoJSON data is directly at the top level
@@ -1082,6 +1104,7 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
                 features.push(layerFeature);
             });
 
+            // Create a new GeoJSON object with the updated features
             const newGeoJsonData = {
                 type: 'FeatureCollection',
                 features: features
@@ -1097,8 +1120,6 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
             const features = [];
 
             featureGroupRef.current.eachLayer(layer => {
-                // Exclude the mask layer
-
                 if (layer.isMask) {
                     return;
                 }
@@ -1255,7 +1276,6 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
 
                     }
                 }
-
                 else if (layer instanceof L.Polygon && !(layer instanceof L.Rectangle)) {
                     // Get the first array of LatLngs for the first polygon (ignores holes)
                     const latlngs = layer.getLatLngs()[0];
@@ -1463,6 +1483,7 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
                 //setIsRectangleDrawn(false);
             }
 
+            // Create a GeoJSON object from the features
             const geoJson = {
                 type: 'FeatureCollection',
                 features: features
@@ -1659,9 +1680,11 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
     const handleFileUploadShape = async (e) => {
         const file = e.target.files[0];
         if (file) {
+            // Create a new FileReader
             const reader = new FileReader();
             reader.onload = async (event) => {
                 try {
+                    // Parse the shapefile
                     const arrayBuffer = event.target.result;
                     const parsedGeojson = await shp.parseZip(arrayBuffer);
                     let featuresArray;
@@ -1677,6 +1700,7 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
                         featuresArray = parsedGeojson.features;
                     }
 
+                    // Add unique IDs to each feature
                     const newGeoJsonData = {
                         type: "FeatureCollection",
                         features: featuresArray
@@ -1710,6 +1734,7 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
 
     //-- SAVE OBJECT ATTRIBUTES
     const saveAttributes = () => {
+        // Find the feature with the selected ID
         const updatedFeatures = geoJsonData.features.map((feature) => {
             if (feature.properties.id === selectedId) {
                 return {
@@ -1741,6 +1766,7 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
     const syncLayerAttributes = () => {
         if (featureGroupRef.current) {
             featureGroupRef.current.eachLayer((layer) => {
+                // Find the corresponding feature in the GeoJSON data
                 const correspondingFeature = geoJsonData.features.find(feature => feature.properties.id === layer.options.id);
                 if (correspondingFeature && correspondingFeature.properties.attributes) {
                     // Ensure layer.options.attributes exists before trying to assign to it
@@ -1760,6 +1786,7 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
     // Function to handle row clicks and feature highlighting
     const handleRowClick = (featureId, attributes, event) => {
         setHighlightedIds(prevHighlightedIds => {
+            // Create a new Set to avoid mutating state directly
             const newHighlightedIds = new Set(prevHighlightedIds);
             setSelectedId(featureId);
             setAttributesObject(attributes || {});
@@ -1914,6 +1941,7 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
             return <div>Loading data...</div>; // Or any other placeholder content
         }
 
+        // Extract all attribute names from the GeoJSON data
         const allAttributeNames = new Set();
         geoJsonData.features.forEach(feature => {
             if (feature.properties && feature.properties.attributes) {
@@ -1925,7 +1953,7 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
 
         const attributeNames = Array.from(allAttributeNames);
 
-
+        // Function to handle attribute value changes
         const highlightFeature = (featureId) => {
             if (featureGroupRef.current) {
                 setHighlightedId(featureId); // Set the highlighted feature's ID
