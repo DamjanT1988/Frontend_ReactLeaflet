@@ -1519,7 +1519,8 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
                 }
             };
 
-        } else if (newLayer instanceof L.CircleMarker) {
+        } 
+        else if (newLayer instanceof L.CircleMarker) {
             const center = newLayer.getLatLng();
             feature = {
                 type: 'Feature',
@@ -1535,7 +1536,6 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
                 }
             };
         }
-
 
         if (newLayer instanceof L.Polygon && !(newLayer instanceof L.Rectangle)) {
             // Get the first array of LatLngs for the first polygon (ignores holes)
@@ -1561,7 +1561,6 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
             };
         }
 
-
         if (newLayer instanceof L.Rectangle) {
             const bounds = newLayer.getBounds();
             feature = {
@@ -1584,7 +1583,6 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
             };
         }
 
-
         if (newLayer instanceof L.Polyline && !(newLayer instanceof L.Polygon)) {
             const latlngs = newLayer.getLatLngs();
             const coordinates = latlngs.map(latlng => [latlng.lng, latlng.lat]);
@@ -1601,7 +1599,6 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
                 }
             };
         }
-
 
         if (newLayer instanceof L.Marker) {
             const position = newLayer.getLatLng();
@@ -1635,17 +1632,15 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
             updateGeoJsonCreate();
         }
 
-        console.log('create layer: ', newLayer);
+        //console.log('create layer: ', newLayer);
     };
 
-
+    //-- EDIT A MAP OBJECT
     const onEdited = (e) => {
-
-
         updateGeoJsonEditDel(); // Update GeoJSON when shapes are edited
     };
 
-
+    //-- DELETE A MAP OBJECT
     const onDeleted = (e) => {
         const { layers } = e;
 
@@ -1660,7 +1655,7 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
         updateGeoJsonEditDel(); // Update GeoJSON data if necessary
     };
 
-
+    //-- HANDLE FILE UPLOAD
     const handleFileUploadShape = async (e) => {
         const file = e.target.files[0];
         if (file) {
@@ -1703,9 +1698,8 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
                         }
                     });
                     updateGeoJsonCreate();
-                    console.log('Parsed Features:', featuresArray);
-                    console.log('New GeoJSON Data:', newGeoJsonData);
-
+                    //console.log('Parsed Features:', featuresArray);
+                    //console.log('New GeoJSON Data:', newGeoJsonData);
                 } catch (error) {
                     console.error('Error parsing shapefile:', error);
                 }
@@ -1714,7 +1708,7 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
         }
     };
 
-
+    //-- SAVE OBJECT ATTRIBUTES
     const saveAttributes = () => {
         const updatedFeatures = geoJsonData.features.map((feature) => {
             if (feature.properties.id === selectedId) {
@@ -1738,12 +1732,12 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
         }, 2000);
     };
 
-    // useEffect hook to synchronize layer options with geoJsonData changes
+    //-- HOOK SYNC LAYER ATTRIBUTES
     useEffect(() => {
         syncLayerAttributes();
     }, [geoJsonData]); // Dependency array ensures this runs only when geoJsonData changes
 
-
+    //-- SYNC LAYER ATTRIBUTES
     const syncLayerAttributes = () => {
         if (featureGroupRef.current) {
             featureGroupRef.current.eachLayer((layer) => {
@@ -1753,7 +1747,6 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
                     if (!layer.options.attributes) {
                         layer.options.attributes = {};
                     }
-
                     // Update layer.options.attributes
                     Object.assign(layer.options.attributes, correspondingFeature.properties.attributes);
                 }
@@ -1763,8 +1756,7 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
         }
     };
 
-    // Inside MapTest component
-
+    //-- ROW FUNCTION IN TABLE
     // Function to handle row clicks and feature highlighting
     const handleRowClick = (featureId, attributes, event) => {
         setHighlightedIds(prevHighlightedIds => {
@@ -1798,15 +1790,14 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
                     // If the feature is not yet selected, add it to the selection
                     newSelectedRowIds.add(featureId);
                 }
-
                 return newSelectedRowIds;
             });
         }
-
         // Update the map to reflect the new highlighted features
         updateMapHighlights();
     };
 
+    //-- UPDATE MAP HIGHLIGHTS
     const updateMapHighlights = () => {
         if (featureGroupRef.current) {
             featureGroupRef.current.eachLayer(layer => {
@@ -1841,13 +1832,12 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
         }
     };
 
-    // Call updateMapHighlights in useEffect to ensure highlights are updated when highlightedIds changes
+    //-- HOOK UPDATE MAP HIGHLIGHTS
     useEffect(() => {
         updateMapHighlights();
     }, [highlightedIds]);
 
-
-    // Mapping of attribute property keys to custom display names
+    //-- RENDER ATTRIBUTE SECTION LIST
     const attributeDisplayNameMap = {
         area: "Area",
         date: "Datum",
@@ -1869,12 +1859,8 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
         // Add more mappings as needed
     };
 
-
-
-
+    //-- RENDER ATTRIBUTE SECTION LIST
     const renderAttributeSectionList = () => {
-
-
         // Initialize attributesObject with default values if no object is selected
         const editableAttributesObject = attributesObject || Object.keys(attributeDisplayNameMap).reduce((acc, key) => {
             acc[key] = ''; // Initialize all attributes with empty strings or default values
@@ -1888,8 +1874,6 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
                 [attributeName]: newValue,
             });
         };
-
-
 
         // Check if the current attributesObject has a kartlaggningsTyp that matches one of the options
         const headline = kartlaggningstypOptions[editableAttributesObject.kartlaggningsTyp] || "Objektattribut";
