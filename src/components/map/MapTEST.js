@@ -10,7 +10,7 @@ import 'leaflet-draw/dist/leaflet.draw.css';
 import shp from 'shpjs';
 import { v4 as uuidv4 } from 'uuid';
 
-//-- LEAFLET COMPONENTS
+//-- LEAFLET COMPONENT
 const { BaseLayer } = LayersControl;
 
 //-- ICONS
