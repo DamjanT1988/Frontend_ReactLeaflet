@@ -43,6 +43,7 @@ const ProjectView = () => {
   const [searchTerm, setSearchTerm] = useState(''); // State for search term
   const [sortOrder, setSortOrder] = useState('desc'); // State for sort order ('asc' or 'desc')
 
+  // Use effect hook to fetch projects if access token is available
   useEffect(() => {
     if (projectId) {
       viewProjectDetails(projectId);
@@ -156,6 +157,7 @@ const ProjectView = () => {
       });
   };
 
+  // Function to fetch the GeoJSON data for a project
   const updateProjectInfo = () => {
     if (!selectedProject) {
       console.error("No project selected for updating.");
@@ -201,6 +203,7 @@ const ProjectView = () => {
       .catch(error => console.error('Error updating project:', error));
   };
 
+  // Function to toggle the edit mode
   const toggleEditMode = () => {
     setIsEditMode(!isEditMode);
     if (!isEditMode) {

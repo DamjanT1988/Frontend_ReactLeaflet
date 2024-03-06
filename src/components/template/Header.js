@@ -5,6 +5,7 @@ import Logo from '../../media/vagmiljo_logotyp_grey.png'; // Adjust the path bas
 const Header = () => {
   const navigate = useNavigate();
 
+  // Function to handle the logout
   const handleLogout = () => {
     // Remove the tokens from localStorage
     localStorage.removeItem('accessToken');
@@ -14,6 +15,7 @@ const Header = () => {
     navigate('/login');
   };
 
+  // Function to get the class name for the active link
   const getNavLinkClass = (isActive) => {
     return isActive ? 'active' : undefined;
   };

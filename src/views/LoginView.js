@@ -70,9 +70,11 @@ const LoginView = () => {
     }
   };
 
+  // Function to handle the password reset request
   const handlePasswordReset = async () => {
     setStatusMessage(''); // Clear any existing messages
     try {
+      // Send a POST request to the reset password endpoint
       const response = await fetch(API_URLS.RESET, {
         method: 'POST',
         headers: {
@@ -97,6 +99,7 @@ const LoginView = () => {
     }
   };  
 
+  // Function to toggle the visibility of the password reset fields
   const togglePasswordReset = () => {
     setShowPasswordReset(!showPasswordReset); // Toggle the visibility
   };

@@ -31,6 +31,7 @@ const RegistrationView = () => {
   });
   const [statusMessage, setStatusMessage] = useState(''); // State for status message
 
+  // Use effect hook to set the background color when the component mounts
   useEffect(() => {
     // When the component mounts
     document.body.style.backgroundColor = '#d3d3d3';
@@ -41,7 +42,9 @@ const RegistrationView = () => {
     };
   }, []);
 
+  // Function to handle input changes
   const handleInputChange = (e) => {
+    // Destructure the name and value from the event target
     const { name, value } = e.target;
     const keys = name.split('.');
     if (keys.length === 2) {
@@ -61,6 +64,7 @@ const RegistrationView = () => {
     }
   };
 
+  // Function to handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     setStatusMessage(''); // Clear any existing messages

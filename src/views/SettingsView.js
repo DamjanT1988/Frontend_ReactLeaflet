@@ -229,6 +229,7 @@ const SettingsView = () => {
   // Function to handle payment update
   const handleUpdatePayment = (e) => {
     e.preventDefault();
+    // Remove any status messages
     const accessToken = localStorage.getItem('accessToken');
     const paymentApiUrl = paymentExists ? API_URLS.USER_PAYMENT_INFO : API_URLS.USER_PAYMENT_CREATE;
 

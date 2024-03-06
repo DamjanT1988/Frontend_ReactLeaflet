@@ -14,7 +14,7 @@ const Survey = () => {
     const [showUserSpecies, setShowUserSpecies] = useState(false);
     const [userSpeciesData, setUserSpeciesData] = useState([]);
 
-
+    // Use effect hook to fetch species list from the API
     useEffect(() => {
         // Fetch species list when the component mounts
         fetch(API_URLS.SPECIES_LIST, {
@@ -27,6 +27,7 @@ const Survey = () => {
             .catch(error => console.error('Error fetching species:', error));
     }, [accessToken]);
 
+    // Use effect hook to fetch user species list from the API
     useEffect(() => {
         const fetchUserSpeciesData = async () => {
             try {
@@ -49,14 +50,17 @@ const Survey = () => {
         fetchUserSpeciesData();
     }, [accessToken]);
 
+    // Function to handle survey form changes
     const handleSurveyChange = (event) => {
         setSurveyData({ ...surveyData, [event.target.name]: event.target.value });
     };
 
+    // Function to handle survey form submission
     const handleSurveySubmit = (event) => {
         event.preventDefault();
     };
 
+    // Function to update the user species list
     const updateUserSpeciesList = async () => {
         try {
             const response = await fetch(API_URLS.USER_SPECIES_LIST, {

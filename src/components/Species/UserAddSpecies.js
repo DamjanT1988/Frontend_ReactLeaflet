@@ -22,15 +22,18 @@ const UserAddSpecies = (props) => {
     const [statusMessage, setStatusMessage] = useState('');
     const [showPopup, setShowPopup] = useState(false);
 
+    // Function to display status popup
     const displayStatusPopup = (message) => {
         setStatusMessage(message);
         setShowPopup(true);
         setTimeout(() => setShowPopup(false), 3500); 
     };
 
+    // Function to fetch user species list
     const handleSearch = async () => {
         displayStatusPopup('Hämtar sökresultat..');
         try {
+            // Fetch search results
             const response = await fetch(`https://api.artdatabanken.se/information/v1/speciesdataservice/v1/speciesdata/search?searchString=${searchQuery}`, {
                 method: 'GET',
                 headers: {
@@ -50,10 +53,11 @@ const UserAddSpecies = (props) => {
         }
     };
 
-
+    // Function to select a species from the search results
     const selectSpecies = async (taxonId) => {
         setIsFetchingSpecies(true);
         try {
+            // Fetch species details
             let response = await fetch(`https://api.artdatabanken.se/information/v1/speciesdataservice/v1/speciesdata?taxa=${taxonId}`, {
                 method: 'GET',
                 headers: {
@@ -67,6 +71,7 @@ const UserAddSpecies = (props) => {
                 displayStatusPopup('Kunde inte hämta data!');
             }
 
+            // Parse the response as JSON
             const rawData = await response.json();
             const data = rawData[0]; // Access the first element of the array
 
@@ -97,6 +102,7 @@ const UserAddSpecies = (props) => {
             });
 
             if (response.ok) {
+                // Parse the response as JSON
                 const data = await response.json();
                 setUserSpeciesList(data); // Store the species list in state
             } else {
@@ -107,15 +113,17 @@ const UserAddSpecies = (props) => {
         }
     };
 
+    // Fetch user species list on component mount
     useEffect(() => {
         fetchUserSpecies();
     }, [accessToken]);  // Dependency array
 
-
+    // Function to handle form input change
     const handleChange = (e) => {
         setSpeciesData({ ...speciesData, [e.target.name]: e.target.value });
     };
 
+    // Function to handle form submission
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -152,6 +160,7 @@ const UserAddSpecies = (props) => {
         }
     };
 
+    // Function to handle file change
     const handleFileChange = (event) => {
         const file = event.target.files[0];
         if (file) {
@@ -169,6 +178,7 @@ const UserAddSpecies = (props) => {
         }
     };
     
+    // Function to process and submit data
     const processAndSubmitData = (data) => {
         // Example: Format data for your API's requirements
         const formattedData = data.map(item => ({
@@ -206,6 +216,7 @@ const UserAddSpecies = (props) => {
         // Optionally, update the UI or state after submission
     };
 
+    // Function to process file content
     const processFileContent = (content) => {
     
         if (typeof content === 'string') { // CSV content
@@ -224,7 +235,7 @@ const UserAddSpecies = (props) => {
         }
     };
     
-    
+    // Function to handle file upload click
     const handleFileUploadClick = () => {
         fileInputRef.current.click();
     };

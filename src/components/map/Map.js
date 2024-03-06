@@ -10,19 +10,15 @@ import 'leaflet-draw/dist/leaflet.draw.css';
 import shp from 'shpjs';
 import { v4 as uuidv4 } from 'uuid';
 
+//-- LEAFLET COMPONENT
+const { BaseLayer } = LayersControl;
 
-
+//-- ICONS
 delete L.Icon.Default.prototype._getIconUrl
 L.Icon.Default.mergeOptions({
     iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
     iconUrl: require('leaflet/dist/images/marker-icon.png'),
     shadowUrl: require('leaflet/dist/images/marker-shadow.png')
-});
-const dotIconWhite = L.divIcon({
-    className: 'custom-dot-icon',
-    html: '<svg width="15" height="15" viewBox="0 0 8 8"><circle cx="4" cy="4" r="3" fill="#ffffff"/></svg>',
-    iconSize: [8, 8], // Size of the icon
-    iconAnchor: [4, 4] // Anchor point of the icon
 });
 const dotIconBlue = L.divIcon({
     className: 'custom-dot-icon',
@@ -37,10 +33,7 @@ const dotIconRed = L.divIcon({
     iconAnchor: [4, 4] // Anchor point of the icon
 });
 
-
-// Destructure BaseLayer from LayersControl
-const { BaseLayer } = LayersControl;
-
+//-- TRANSLATION OF LEAFLET TO SWEDISH
 // Direct manipulation for Swedish localization
 L.drawLocal.draw.toolbar.buttons = {
     polyline: 'Rita en polylinje',
@@ -84,7 +77,6 @@ L.drawLocal.draw.handlers.polyline.tooltip = {
 L.drawLocal.draw.handlers.rectangle.tooltip = {
     start: 'Klicka och dra för att rita en rektangel.',
 };
-
 L.drawLocal.edit.toolbar.actions.save = {
     title: 'Spara ändringar',
     text: 'Spara',
@@ -109,15 +101,19 @@ L.drawLocal.edit.handlers.remove.tooltip = {
     text: 'Klicka på en funktion för att ta bort',
 };
 
+//-- COMPONENT
 window.toggleAttributeContainer = (id, attributes) => {
     // Function implementation will be set in the component
 };
 
+//-- ADJUST THE MAP/TABLE HEIGHT
 const DraggableLine = ({ onDrag }) => {
+    // Create a ref for the draggable line element
     const lineRef = useRef(null);
     const lastDragTime = useRef(Date.now());
     const dragUpdateScheduled = useRef(false);
 
+    // Function to handle the drag event
     const handleDrag = (movementY) => {
         // Use requestAnimationFrame for smoother updates
         if (!dragUpdateScheduled.current) {
@@ -137,6 +133,7 @@ const DraggableLine = ({ onDrag }) => {
     useEffect(() => {
         const line = lineRef.current;
 
+        // Event listener for mouse down on the draggable line
         const startDrag = (e) => {
             e.preventDefault(); // Prevent default to avoid text selection
             const initialY = e.clientY;
@@ -162,15 +159,19 @@ const DraggableLine = ({ onDrag }) => {
         };
     }, [onDrag]);
 
+    // Return the draggable line element
     return <div ref={lineRef} className="draggable-line"></div>;
 };
 
 
 // Define the Map component
-const Map = ({ selectedProjectId, selectedProject, onSave, userID, projectKarteringar, shouldHideDataView }) => {
+const Map = ({ selectedProjectId, selectedProject, userID, shouldHideDataView }) => {
+    //-- STATES
+    // For map
     const featureGroupRef = useRef(null);
     const position = [51.505, -0.09];
     const zoom = 11;
+    // For functions
     const [geoJsonData, setGeoJsonData] = useState(null);
     const [saveStatus, setSaveStatus] = useState('');
     const accessToken = localStorage.getItem('accessToken'); // Get the access token from local storage
@@ -182,11 +183,11 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, projectKarter
     const [showAttributeTable, setShowAttributeTable] = useState(false);
     const [showRectangleButton, setShowRectangleButton] = useState(true);
     const [highlightedId, setHighlightedId] = useState(null);
-    const [highlightedFeatureId, setHighlightedFeatureId] = useState(null);
+    //const [highlightedFeatureId, setHighlightedFeatureId] = useState(null);
     const [selectedRowIds, setSelectedRowIds] = useState(new Set());
     const [highlightedIds, setHighlightedIds] = useState(new Set());
     const [activeTab, setActiveTab] = useState('Punkter');
-    const [selectedMarkerId, setSelectedMarkerId] = useState(null);
+    //const [selectedMarkerId, setSelectedMarkerId] = useState(null);
     const [lastClickedMarker, setLastClickedMarker] = useState(null);
     const [selectedImage, setSelectedImage] = useState(null);
     const [imageList, setImageList] = useState([]);
@@ -201,7 +202,7 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, projectKarter
     const [imageBase64, setImageBase64] = useState(null); // State for the image size
     const [showReplacePrompt, setShowReplacePrompt] = useState(false);
     const [pendingDrawing, setPendingDrawing] = useState(null);
-    const [showSavePrompt, setSavePrompt] = useState(false);
+    //const [showSavePrompt, setSavePrompt] = useState(false);
     //const [mapHeight, setMapHeight] = useState("59vh"); // Default height
     const mapRef = useRef(null);
     const [mapInstance, setMapInstance] = useState(null);
@@ -217,7 +218,7 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, projectKarter
     const mapObjectClickedRef = useRef(false);
     const [showList, setShowKartlaggningList] = useState(false);
     const [selectedKartlaggningOptions, setSelectedKartlaggningOptions] = useState([]);
-    const [selectedKartlaggningValue, setSelectedKartlaggningValue] = useState(null);
+    //const [selectedKartlaggningValue, setSelectedKartlaggningValue] = useState(null);
     const [showLagerhanteringPopup, setShowLagerhanteringPopup] = useState(false);
     const [kartlaggningstypOptions, setKartlaggningstypOptions] = useState({
         KartlaggningBiologiskMangfald: "Kartläggning biologisk mångfald",
@@ -243,27 +244,27 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, projectKarter
         Vardeelement_yta: "Värdeelement Y",
         VattendragDelstracka: "Vattendrag delsträcka",
     });
-    const [showValueElementOptions, setShowValueElementOptions] = useState(false);
+    //const [showValueElementOptions, setShowValueElementOptions] = useState(false);
     const [geometryFilterPoint, setGeometryFilterPoint] = useState(false);
     const [geometryFilterPolygon, setGeometryFilterPolygon] = useState(false);
     const [showNewKartering, setShowNewKartering] = useState(false);
 
-
+    //-- MAP CLICK RESET
     const MapEventsComponent = () => {
         const map = useMapEvents({
+            // Event listener for map click
             click: () => {
                 if (!mapObjectClickedRef.current) {
                     console.log("Map clicked, resetting selection and styles");
 
                     if (highlightedId === null && selectedId === null && selectedFeatureIds.size === 0 && savedObjectIds.size === 0) {
                         setImageList([]);
-                    } // BEFORE THE RESET - AT TOP
+                    } // BEFORE THE RESET - MUST BE AT TOP
 
                     // Reset selection states
                     setSelectedId(null);
                     setHighlightedId(null);
                     setAttributesObject(null);
-
 
                     // Reset styles for all layers in the feature group
                     featureGroupRef.current.eachLayer(layer => {
@@ -301,13 +302,16 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, projectKarter
         return null; // This component does not render anything
     };
 
+    //-- DRAG MAP RESIZE
     const handleDrag = (movementY) => {
+        // Function to handle the drag event and update the map height
         setMapHeight((prevHeight) => Math.max(prevHeight + movementY, 0), mapHeight); // Ensure map height doesn't go below a minimum (e.g., 100px)
         setAttributesContainerHeight((prevHeight) => Math.max(prevHeight - movementY, 0)); // Increase attributes container height as map height decreases
     };
 
-
+    //-- DRAWING
     const Canvas = ({ width, height, onClose, onSave }) => {
+        // Create a ref for the canvas element
         const canvasRef = useRef(null);
 
         useEffect(() => {
@@ -318,7 +322,7 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, projectKarter
             }
         }, [width, height]);
 
-
+        // Function to capture the drawing as a base64 image
         const captureDrawing = () => {
             if (canvasRef.current) {
                 const dataURL = canvasRef.current.toDataURL('image/png');
@@ -327,6 +331,7 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, projectKarter
             }
         };
 
+        // Function to handle mouse down event
         const handleMouseDown = (e) => {
             const canvas = canvasRef.current;
             const ctx = canvas.getContext('2d');
@@ -336,6 +341,7 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, projectKarter
             document.addEventListener('mouseup', handleMouseUp);
         };
 
+        // Function to handle mouse move event
         const handleMouseMove = (e) => {
             const canvas = canvasRef.current;
             const ctx = canvas.getContext('2d');
@@ -343,6 +349,7 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, projectKarter
             ctx.stroke();
         };
 
+        // Function to handle mouse up event
         const handleMouseUp = () => {
             document.removeEventListener('mousemove', handleMouseMove);
             document.removeEventListener('mouseup', handleMouseUp);
@@ -376,17 +383,17 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, projectKarter
 
     };
 
-
+    //-- CTRL MULTIOBJECT SELECTION
     // Function to handle feature click with CTRL key support for multi-selection
     const handleFeatureClick = (featureId, layer, event) => {
         // If CTRL key is not pressed, clear selections and revert styles
         if (!event.originalEvent.ctrlKey) {
             // Clear the selectedFeatureIds set
-            //setSelectedFeatureIds(new Set());
             return;
 
         }
 
+        // If CTRL key is pressed, add or remove the feature ID from the selectedFeatureIds set
         setSavedObjectIds(prevSelectedIds => {
             const newSelectedIds = new Set(prevSelectedIds);
 
@@ -399,23 +406,22 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, projectKarter
                 // Apply the selected feature style
 
             }
-            console.log('selected feature ids: ', newSelectedIds);
             return newSelectedIds;
         });
     };
 
-
+    //-- IMAGE TOGGLE
     const toggleDeleteConfirm = (image) => {
         setImageToDelete(image); // Set the image to delete with the full image object
         setShowDeleteConfirm(!showDeleteConfirm);
     };
 
-
+    //-- DELETE IMAGE
     const handleDeleteImage = async () => {
         if (!imageToDelete) return; // Ensure imageToDelete is not null or undefined
 
-
         try {
+            // Send the DELETE request to delete the image
             const response = await fetch(`${API_URLS.PROJECT_IMAGE_DELETE.replace('<int:image_id>', imageToDelete.id)}`, {
                 method: 'DELETE',
                 headers: {
@@ -437,7 +443,7 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, projectKarter
         }
     };
 
-
+    //-- UPLOAD IMAGE
     const uploadImage = async () => {
         // Ensure there is either an image file or a base64 string, and an ID is selected
         if (!selectedId || (!selectedImage && !imageBase64)) return;
@@ -468,8 +474,7 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, projectKarter
                 caption: captionText // Include the caption text
             };
 
-            console.log('upload payload: ', payload);
-
+            // Send the POST request to upload the image
             const response = await fetch(`${API_URLS.PROJECT_IMAGE_POST}`, {
                 method: 'POST',
                 body: JSON.stringify(payload),
@@ -495,9 +500,10 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, projectKarter
         }
     };
 
-
+    //-- FETCH IMAGES
     const fetchImages = async () => {
         try {
+            // Fetch images for the selected project
             const response = await fetch(`${API_URLS.PROJECT_IMAGE_GET.replace('<int:project_id>', selectedProjectId)}`, {
                 method: 'GET',
                 headers: {
@@ -506,6 +512,7 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, projectKarter
             });
 
             if (response.ok) {
+                // Logic after successful fetch
                 const data = await response.json();
                 console.log('image data: ', data);
                 const images = data.images; // Use the 'images' key from the response
@@ -523,20 +530,18 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, projectKarter
         }
     };
 
-
-    // useEffect hook to call uploadImage when imageBase64 changes and is not null
+    //-- HOOKS IMAGES
     useEffect(() => {
         if (imageBase64) {
             uploadImage(); // Call uploadImage here
         }
     }, [imageBase64]);
 
-
     useEffect(() => {
         fetchImages();
     }, [selectedProjectId]); // Re-fetch images when selectedProjectId changes
 
-
+    //-- RESET STYLES OF ICON AND CIRCLE
     // Function to reset styles for all layers
     const resetAllLayerStyles = () => {
         featureGroupRef.current.eachLayer(layer => {
@@ -555,7 +560,7 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, projectKarter
         });
     };
 
-
+    //-- CREATE CROP RECTANGLE
     const RectangleDrawButton = () => {
         const map = useMap();
 
@@ -570,6 +575,7 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, projectKarter
 
             // Event listener for when a rectangle is created
             const onRectangleCreated = (e) => {
+                // Extract the rectangle layer from the event
                 const { layer } = e;
                 const rectangleBounds = layer.getBounds();
                 const newRectangle = {
@@ -589,8 +595,6 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, projectKarter
                     }
                 };
 
-
-                console.log('custom rectangle: ', newRectangle);
                 // Update GeoJSON data with the new rectangle
                 setGeoJsonData(prevData => ({
                     ...prevData,
@@ -601,7 +605,6 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, projectKarter
                 removeDuplicateRectangles(); // Call function to remove duplicates
                 drawControl.disable(); // Disable the draw control after drawing  
                 setShowRectangleButton(false);
-
 
                 // Remove the event listener to prevent duplicate rectangles
                 map.off(L.Draw.Event.CREATED, onRectangleCreated);
@@ -621,13 +624,15 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, projectKarter
         }
     };
 
-
+    //-- REMOVE DUPLICATE RECTANGLES
     const removeDuplicateRectangles = () => {
+        // Get all layers from the feature group
         const layers = featureGroupRef.current.getLayers();
         const rectangles = layers.filter(layer => layer instanceof L.Rectangle);
         let uniqueRectangles = [];
 
         rectangles.forEach(currentRect => {
+            // Check if the current rectangle is already in the uniqueRectangles array
             const duplicateIndex = uniqueRectangles.findIndex(uniqueRect =>
                 uniqueRect.getBounds().equals(currentRect.getBounds())
             );
@@ -635,6 +640,7 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, projectKarter
             if (duplicateIndex === -1) {
                 uniqueRectangles.push(currentRect);
             } else {
+                // If a duplicate is found, remove the current rectangle if it has the "rectangleCrop" property
                 const duplicateRect = uniqueRectangles[duplicateIndex];
                 const hasCurrentRectCropProperty = currentRect.options && currentRect.options.shape === "rectangleCrop";
                 const hasDuplicateRectCropProperty = duplicateRect.options && duplicateRect.options.shape === "rectangleCrop";
@@ -665,28 +671,33 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, projectKarter
         });
     };
 
-
+    //-- HOOK
     useEffect(() => {
+        // Define a global function 'toggleAttributeContainer' on the window object
         window.toggleAttributeContainer = (id, attributes) => {
-            setShowAttributeTable(true); // Always show the attribute table when the button is clicked
+            // Always show the attribute table when the button is clicked
+            setShowAttributeTable(true);
+            // Set the selected ID
             setSelectedId(id);
+            // Set the attributes object
             setAttributesObject(attributes);
         };
-
+    
+        // This function will be called when the component unmounts
         return () => {
-            window.toggleAttributeContainer = undefined; // Clean up
+            // Clean up the global function from the window object
+            window.toggleAttributeContainer = undefined;
         };
+    // The empty array [] means this effect will only run once, when the component mounts
     }, []);
 
-
+    //-- HOOK RENDER
     useEffect(() => {
         if (featureGroupRef.current) {
             featureGroupRef.current.clearLayers(); // Clear existing layers first
             let foundCropRectangle = false;
 
             if (geoJsonData) {
-
-
 
                 L.geoJSON(geoJsonData, {
                     pointToLayer: (feature, latlng) => {
@@ -758,12 +769,7 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, projectKarter
                             setHighlightedId(null) // Clear existing layers first
                             setHighlightedIds(new Set([feature.properties.id]));
                         });
-                        /*
-                                                layer.on('click', () => {
-                                                    setHighlightedFeatureId(feature.properties.id); // Update highlighted feature ID
-                                                    // Existing code to set the selected feature's properties
-                                                });
-                        */
+
                         if (feature.properties.shape === "rectangleCrop") {
                             foundCropRectangle = true; // Set the flag if a crop rectangle is found
                         }
@@ -777,11 +783,9 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, projectKarter
                         }
 
                         if (feature.properties && feature.properties.isCircle) {
-
-
                             // If the feature is a circle, recreate it
                             const center = L.latLng(feature.geometry.coordinates[1], feature.geometry.coordinates[0]);
-
+                            // Create a circle with the center and radius from the feature properties
                             const circle = L.circle(center, {
                                 radius: feature.properties.radius,
                                 id: feature.properties.id,
@@ -794,6 +798,7 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, projectKarter
                             });
 
                             if (!shouldHideDataView) {
+                                // Generate popup content based on feature properties
                                 const popupContent = generatePopupContent(feature.properties);
                                 circle.bindPopup(popupContent); // Bind popup to circle
                             }
@@ -821,13 +826,9 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, projectKarter
                                 setAttributesObject(feature.properties.attributes || {});
                                 setShowAttributeTable(true); // Show the attribute table
                             });
-
-
                         } else {
                             layer.addTo(featureGroupRef.current);
                         }
-
-
                     }
                 })
 
@@ -855,13 +856,11 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, projectKarter
 
                 setIsRectangleDrawn(foundCropRectangle); // Update the state based on the presence of a crop rectangle
                 setShowRectangleButton(!foundCropRectangle); // Hide or show the button based on the presence of a crop rectangle
-
-
             }
         }
     }, [geoJsonData]);
 
-
+    //-- GENERATE POPUP CONTENT
     // Function to generate popup content from feature properties
     const generatePopupContent = (properties) => {
         // Check if the feature is a rectangle and return null or empty content
@@ -913,7 +912,7 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, projectKarter
         }
     };
 
-
+    //-- CREATE GREY AREA AROUND THE CROP AREA
     const createInvertedMask = (rectangleLayer) => {
         const bounds = rectangleLayer.getBounds();
 
@@ -952,7 +951,7 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, projectKarter
         invertedPolygon.isMask = true;
     };
 
-
+/*
     const updateInvertedMask = (rectangleLayer, invertedMask) => {
         const bounds = rectangleLayer.getBounds();
         const largeBounds = [[90, -180], [-90, 180]];
@@ -975,16 +974,18 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, projectKarter
 
         invertedMask.setLatLngs([newOuterCoords, newInnerCoords]);
     };
+*/
 
-
-    // Function to save GeoJSON data and saved objects to the server
+    //-- SAVE PROJECT DATA FILE
     const saveDataToServer = async () => {
         try {
             setSaveStatus('Sparar...');
+            // Create a new object with the GeoJSON data and the saved object IDs
             const dataToSave = {
                 ...geoJsonData, // Your existing GeoJSON data
                 savedObjectIds: Array.from(savedObjectIds) // Convert Set to Array for serialization
             };
+            // Send the data to the server
             const response = await fetch(`${API_URLS.PROJECT_FILES_POST}/${userID}/${selectedProjectId}/file`, {
                 method: 'POST',
                 headers: {
@@ -1016,9 +1017,10 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, projectKarter
         }
     };
 
-
+    //-- GET PROJECT DATA FILE
     const loadDataFromServer = async () => {
         try {
+            // Fetch the GeoJSON data from the server
             const response = await fetch(`${API_URLS.PROJECT_FILES_GET}/${userID}/${selectedProjectId}/file`, {
                 method: 'GET',
                 headers: {
@@ -1026,6 +1028,7 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, projectKarter
                 }
             });
             if (response.ok) {
+                // Assuming the response is a GeoJSON object
                 const data = await response.json();
                 if (data.features) {
                     setGeoJsonData(data); // Assuming the GeoJSON data is directly at the top level
@@ -1048,14 +1051,12 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, projectKarter
         }
     };
 
-
-    // useEffect hook to call loadDataFromServer on component mount
+    //-- HOOK LOAD DATA
     useEffect(() => {
         loadDataFromServer();
-
     }, []);
 
-
+    //-- UPDATE GEOJSON AFTER EDIT AND DELETE
     const updateGeoJsonEditDel = () => {
         if (featureGroupRef.current) {
             const features = [];
@@ -1103,6 +1104,7 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, projectKarter
                 features.push(layerFeature);
             });
 
+            // Create a new GeoJSON object with the updated features
             const newGeoJsonData = {
                 type: 'FeatureCollection',
                 features: features
@@ -1112,18 +1114,15 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, projectKarter
         }
     };
 
-
+    //-- UPDATE GEOJSON AFTER CREATE
     const updateGeoJsonCreate = () => {
         if (featureGroupRef.current) {
             const features = [];
 
             featureGroupRef.current.eachLayer(layer => {
-                // Exclude the mask layer
-
                 if (layer.isMask) {
                     return;
                 }
-
 
                 if (layer instanceof L.Circle/* && layer.options.id !== undefined*/) {
                     if (!(layer.options && layer.options.attributes)) {
@@ -1160,8 +1159,8 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, projectKarter
                             }
                         };
                         features.push(circleFeature);
-                        console.log('Layer after 1: ', layer);
-                        console.log('Circlefeature after 2: ', circleFeature);
+                        //console.log('Layer after 1: ', layer);
+                        //console.log('Circlefeature after 2: ', circleFeature);
                     } else {
                         console.log('full layer 2: ', layer);
                         //console.log('layer 2 options id: ', layer.options.id);
@@ -1201,8 +1200,8 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, projectKarter
                             }
                         };
                         features.push(circleFeature);
-                        console.log('Layer after 2: ', layer);
-                        console.log('Circlefeature after 2: ', circleFeature);
+                        //console.log('Layer after 2: ', layer);
+                        //console.log('Circlefeature after 2: ', circleFeature);
                     }
                 }
 
@@ -1250,8 +1249,8 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, projectKarter
 
                         }
                         features.push(rectangleFeature);
-                        console.log('layer 1 rectangle: ', layer);
-                        console.log('rectangleFeature 1: ', rectangleFeature);
+                        //console.log('layer 1 rectangle: ', layer);
+                        //console.log('rectangleFeature 1: ', rectangleFeature);
                     } else {
                         const rectangleFeature = {
                             type: 'Feature',
@@ -1272,13 +1271,11 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, projectKarter
                             },
                         }
                         features.push(rectangleFeature);
-                        console.log('layer 2 rectangle: ', layer);
-                        console.log('rectangleFeature 2: ', rectangleFeature);
+                        //console.log('layer 2 rectangle: ', layer);
+                        //console.log('rectangleFeature 2: ', rectangleFeature);
 
                     }
                 }
-
-
                 else if (layer instanceof L.Polygon && !(layer instanceof L.Rectangle)) {
                     // Get the first array of LatLngs for the first polygon (ignores holes)
                     const latlngs = layer.getLatLngs()[0];
@@ -1324,13 +1321,10 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, projectKarter
 
                         }
                         features.push(polygonFeature);
-                        console.log('layer 1 polygon: ', layer);
-                        console.log('polygonFeature 1: ', polygonFeature);
+                        //console.log('layer 1 polygon: ', layer);
+                        //console.log('polygonFeature 1: ', polygonFeature);
                     }
                 }
-
-
-
                 else if (layer instanceof L.Polyline) {
                     const position = layer.getLatLngs();
                     const coordinates = position.map(latlng => [latlng.lng, latlng.lat]);
@@ -1368,15 +1362,12 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, projectKarter
                                     kartlaggningsGeometry: ''
                                 }
                             },
-
                         }
                         features.push(polylineFeature);
-                        console.log('layer 1 polyline: ', layer);
-                        console.log('polylineFeature 1: ', polylineFeature);
-
+                        //console.log('layer 1 polyline: ', layer);
+                        //console.log('polylineFeature 1: ', polylineFeature);
                     }
                 }
-
                 else if (layer instanceof L.CircleMarker) {
                     const position = layer.getLatLng();
 
@@ -1414,16 +1405,13 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, projectKarter
                                     kartlaggningsGeometry: ''
                                 }
                             },
-
                         }
                         features.push(circleMarkerFeature);
-                        console.log('layer 1 marker: ', layer);
-                        console.log('circleMarker 1: ', circleMarkerFeature);
-
+                        //console.log('layer 1 marker: ', layer);
+                        //console.log('circleMarker 1: ', circleMarkerFeature);
                     }
-
-
-                } else if (layer instanceof L.Marker) {
+                } 
+                else if (layer instanceof L.Marker) {
                     let featureMarker;
                     // Handle L.Marker specifically
                     const position = layer.getLatLng();
@@ -1460,9 +1448,6 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, projectKarter
                     };
                     features.push(featureMarker);
                 }
-
-
-
                 else {
                     // For other shapes, use the default toGeoJSON method
                     const layerFeature = layer.toGeoJSON();
@@ -1498,18 +1483,18 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, projectKarter
                 //setIsRectangleDrawn(false);
             }
 
+            // Create a GeoJSON object from the features
             const geoJson = {
                 type: 'FeatureCollection',
                 features: features
             };
 
             setGeoJsonData(geoJson);
-            console.log('updateGeojson: ', geoJson);
-
+            //console.log('updateGeojson: ', geoJson);
         }
     };
 
-
+    //-- CREATE A MAP OBJECT
     const onCreate = (e) => {
         const newLayer = e.layer;
         newLayer.options.id = uuidv4(); // Ensure each layer has a unique ID
@@ -1555,7 +1540,8 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, projectKarter
                 }
             };
 
-        } else if (newLayer instanceof L.CircleMarker) {
+        } 
+        else if (newLayer instanceof L.CircleMarker) {
             const center = newLayer.getLatLng();
             feature = {
                 type: 'Feature',
@@ -1571,7 +1557,6 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, projectKarter
                 }
             };
         }
-
 
         if (newLayer instanceof L.Polygon && !(newLayer instanceof L.Rectangle)) {
             // Get the first array of LatLngs for the first polygon (ignores holes)
@@ -1597,7 +1582,6 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, projectKarter
             };
         }
 
-
         if (newLayer instanceof L.Rectangle) {
             const bounds = newLayer.getBounds();
             feature = {
@@ -1620,7 +1604,6 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, projectKarter
             };
         }
 
-
         if (newLayer instanceof L.Polyline && !(newLayer instanceof L.Polygon)) {
             const latlngs = newLayer.getLatLngs();
             const coordinates = latlngs.map(latlng => [latlng.lng, latlng.lat]);
@@ -1637,7 +1620,6 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, projectKarter
                 }
             };
         }
-
 
         if (newLayer instanceof L.Marker) {
             const position = newLayer.getLatLng();
@@ -1671,17 +1653,15 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, projectKarter
             updateGeoJsonCreate();
         }
 
-        console.log('create layer: ', newLayer);
+        //console.log('create layer: ', newLayer);
     };
 
-
+    //-- EDIT A MAP OBJECT
     const onEdited = (e) => {
-
-
         updateGeoJsonEditDel(); // Update GeoJSON when shapes are edited
     };
 
-
+    //-- DELETE A MAP OBJECT
     const onDeleted = (e) => {
         const { layers } = e;
 
@@ -1696,13 +1676,15 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, projectKarter
         updateGeoJsonEditDel(); // Update GeoJSON data if necessary
     };
 
-
+    //-- HANDLE FILE UPLOAD
     const handleFileUploadShape = async (e) => {
         const file = e.target.files[0];
         if (file) {
+            // Create a new FileReader
             const reader = new FileReader();
             reader.onload = async (event) => {
                 try {
+                    // Parse the shapefile
                     const arrayBuffer = event.target.result;
                     const parsedGeojson = await shp.parseZip(arrayBuffer);
                     let featuresArray;
@@ -1718,6 +1700,7 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, projectKarter
                         featuresArray = parsedGeojson.features;
                     }
 
+                    // Add unique IDs to each feature
                     const newGeoJsonData = {
                         type: "FeatureCollection",
                         features: featuresArray
@@ -1739,9 +1722,8 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, projectKarter
                         }
                     });
                     updateGeoJsonCreate();
-                    console.log('Parsed Features:', featuresArray);
-                    console.log('New GeoJSON Data:', newGeoJsonData);
-
+                    //console.log('Parsed Features:', featuresArray);
+                    //console.log('New GeoJSON Data:', newGeoJsonData);
                 } catch (error) {
                     console.error('Error parsing shapefile:', error);
                 }
@@ -1750,8 +1732,9 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, projectKarter
         }
     };
 
-
+    //-- SAVE OBJECT ATTRIBUTES
     const saveAttributes = () => {
+        // Find the feature with the selected ID
         const updatedFeatures = geoJsonData.features.map((feature) => {
             if (feature.properties.id === selectedId) {
                 return {
@@ -1774,22 +1757,22 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, projectKarter
         }, 2000);
     };
 
-    // useEffect hook to synchronize layer options with geoJsonData changes
+    //-- HOOK SYNC LAYER ATTRIBUTES
     useEffect(() => {
         syncLayerAttributes();
     }, [geoJsonData]); // Dependency array ensures this runs only when geoJsonData changes
 
-
+    //-- SYNC LAYER ATTRIBUTES
     const syncLayerAttributes = () => {
         if (featureGroupRef.current) {
             featureGroupRef.current.eachLayer((layer) => {
+                // Find the corresponding feature in the GeoJSON data
                 const correspondingFeature = geoJsonData.features.find(feature => feature.properties.id === layer.options.id);
                 if (correspondingFeature && correspondingFeature.properties.attributes) {
                     // Ensure layer.options.attributes exists before trying to assign to it
                     if (!layer.options.attributes) {
                         layer.options.attributes = {};
                     }
-
                     // Update layer.options.attributes
                     Object.assign(layer.options.attributes, correspondingFeature.properties.attributes);
                 }
@@ -1799,11 +1782,11 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, projectKarter
         }
     };
 
-    // Inside MapTest component
-
+    //-- ROW FUNCTION IN TABLE
     // Function to handle row clicks and feature highlighting
     const handleRowClick = (featureId, attributes, event) => {
         setHighlightedIds(prevHighlightedIds => {
+            // Create a new Set to avoid mutating state directly
             const newHighlightedIds = new Set(prevHighlightedIds);
             setSelectedId(featureId);
             setAttributesObject(attributes || {});
@@ -1834,15 +1817,14 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, projectKarter
                     // If the feature is not yet selected, add it to the selection
                     newSelectedRowIds.add(featureId);
                 }
-
                 return newSelectedRowIds;
             });
         }
-
         // Update the map to reflect the new highlighted features
         updateMapHighlights();
     };
 
+    //-- UPDATE MAP HIGHLIGHTS
     const updateMapHighlights = () => {
         if (featureGroupRef.current) {
             featureGroupRef.current.eachLayer(layer => {
@@ -1877,13 +1859,12 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, projectKarter
         }
     };
 
-    // Call updateMapHighlights in useEffect to ensure highlights are updated when highlightedIds changes
+    //-- HOOK UPDATE MAP HIGHLIGHTS
     useEffect(() => {
         updateMapHighlights();
     }, [highlightedIds]);
 
-
-    // Mapping of attribute property keys to custom display names
+    //-- RENDER ATTRIBUTE SECTION LIST
     const attributeDisplayNameMap = {
         area: "Area",
         date: "Datum",
@@ -1905,12 +1886,8 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, projectKarter
         // Add more mappings as needed
     };
 
-
-
-
+    //-- RENDER ATTRIBUTE SECTION LIST
     const renderAttributeSectionList = () => {
-
-
         // Initialize attributesObject with default values if no object is selected
         const editableAttributesObject = attributesObject || Object.keys(attributeDisplayNameMap).reduce((acc, key) => {
             acc[key] = ''; // Initialize all attributes with empty strings or default values
@@ -1924,8 +1901,6 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, projectKarter
                 [attributeName]: newValue,
             });
         };
-
-
 
         // Check if the current attributesObject has a kartlaggningsTyp that matches one of the options
         const headline = kartlaggningstypOptions[editableAttributesObject.kartlaggningsTyp] || "Objektattribut";
@@ -1959,14 +1934,14 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, projectKarter
         );
     };
 
-
-
+    //-- RENDER ATTRIBUTE TABLE
     const renderAttributeTable = () => {
         // Ensure geoJsonData is not null and has features before proceeding
         if (!geoJsonData || !geoJsonData.features) {
             return <div>Loading data...</div>; // Or any other placeholder content
         }
 
+        // Extract all attribute names from the GeoJSON data
         const allAttributeNames = new Set();
         geoJsonData.features.forEach(feature => {
             if (feature.properties && feature.properties.attributes) {
@@ -1978,7 +1953,7 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, projectKarter
 
         const attributeNames = Array.from(allAttributeNames);
 
-
+        // Function to handle attribute value changes
         const highlightFeature = (featureId) => {
             if (featureGroupRef.current) {
                 setHighlightedId(featureId); // Set the highlighted feature's ID
@@ -2038,7 +2013,7 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, projectKarter
             }
         };
 
-
+        // Function to handle attribute value changes
         const handleAttributeValueChange = (featureId, attributeName, newValue) => {
             setHighlightedIds(prev => new Set(prev).add(featureId));
             // Create a deep copy of the geoJsonData to avoid direct state mutation
@@ -2056,6 +2031,7 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, projectKarter
             setGeoJsonData(updatedGeoJsonData);
         };
 
+        /*
         const toggleSelection = (itemId) => {
             setSelectedItems((prevSelectedItems) => {
                 const newSelectedItems = new Set(prevSelectedItems);
@@ -2067,7 +2043,9 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, projectKarter
                 return newSelectedItems;
             });
         };
+        */
 
+        // Function to handle row clicks and feature highlighting
         const showSelectedItems = () => {
             const filteredItems = allItems.filter(item => selectedItems.has(item.id));
             // Update your state or variable that controls the displayed items in the attribute table
@@ -2075,10 +2053,12 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, projectKarter
             setViewMode('selected');
         };
 
+        // Function to handle row clicks and feature highlighting
         const showAllItems = () => {
             setViewMode('all');
         };
 
+        // Function to handle row clicks and feature highlighting
         const addSelectedToSavedObjects = () => {
             if (!selectedId && selectedRowIds.size === 0) {
                 console.log('No selected objects to add');
@@ -2103,7 +2083,6 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, projectKarter
             setTimeout(() => setAddStatus(''), 2000);
         };
 
-
         // Function to clear savedObjectIds
         const clearSavedObjectIds = () => {
             setSavedObjectIds(new Set()); // Clears the set
@@ -2111,7 +2090,7 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, projectKarter
             setTimeout(() => setAddStatus(''), 2000); // Clear the message after 3 seconds
         };
 
-
+        // Function to delete selected objects
         const deleteSelectedObjects = () => {
             // Update savedObjectIds by removing highlightedIds or selectedRowIds
             setSavedObjectIds(prevSavedObjectIds => {
@@ -2135,7 +2114,7 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, projectKarter
             setTimeout(() => setAddStatus(''), 2000); // Clear the message after 3 seconds
         };
 
-
+        // Function to handle row clicks and feature highlighting
         const handleSort = (key) => {
             let direction = 'ascending';
             if (sortConfig.key === key && sortConfig.direction === 'ascending') {
@@ -2155,14 +2134,16 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, projectKarter
             return 0;
         };
 
+        /*
         // Apply sorting to the data before rendering the table
         const sortedData = geoJsonData.features.sort((a, b) => {
             const aValue = a.properties.attributes[sortConfig.key];
             const bValue = b.properties.attributes[sortConfig.key];
             return compare(aValue, bValue);
         });
+        */
 
-
+        /*
         // Function to determine if there are features for a given geometry type and kartlaggningstyp
         const hasFeaturesForGeometry = (geometryType) => {
             return geoJsonData.features.some(feature => {
@@ -2171,13 +2152,16 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, projectKarter
                 return matchesGeometry && matchesKartlaggningstyp;
             });
         };
+        */
 
+        /*
         // Determine available geometries for the selected kartlaggningstyp
         const availableGeometries = {
             'Punkter': hasFeaturesForGeometry('Point') || hasFeaturesForGeometry('MultiPoint'),
             'Linjer': hasFeaturesForGeometry('LineString') || hasFeaturesForGeometry('MultiLineString'),
             'Polygoner': hasFeaturesForGeometry('Polygon') || hasFeaturesForGeometry('MultiPolygon')
         };
+        */
 
         // Filter features based on selected criteria
         const filteredFeatures = geoJsonData.features.filter(feature => {
@@ -2187,7 +2171,7 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, projectKarter
 
             const matchesKartlaggningstyp = selectedKartlaggningOptions.length === 0 || selectedKartlaggningOptions.includes(feature.properties.attributes?.kartlaggningsTyp);
 
-            console.log(selectedKartlaggningOptions + ' ' + feature.properties.attributes?.kartlaggningsTyp);
+            //console.log(selectedKartlaggningOptions + ' ' + feature.properties.attributes?.kartlaggningsTyp);
 
             // Apply geometry filters
             if (geometryFilterPoint && feature.geometry.type !== 'Point' && feature.geometry.type !== 'MultiPoint') {
@@ -2236,26 +2220,26 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, projectKarter
             }
         });
 
+        // Function to filter features by geometry type
         const filterByGeometryType = (type) => {
             return geoJsonData.features.filter(feature => {
                 const geometryType = feature.geometry.type;
                 const isMatchingType = geometryType === type || (type === 'Point' && (geometryType === 'Point' || geometryType === 'MultiPoint'));
                 const matchesKartlaggningstyp = selectedKartlaggningOptions.length === 0 || selectedKartlaggningOptions.includes(feature.properties.attributes?.kartlaggningsTyp);
-        
+
                 const isMatch = isMatchingType && matchesKartlaggningstyp;
                 console.log(`Feature ID: ${feature.properties.id}, Geometry Type: ${geometryType}, Matching Type: ${isMatchingType}, Matching Kartlaggningstyp: ${matchesKartlaggningstyp}, Is Match: ${isMatch}`);
-        
+
                 return isMatch;
             });
         };
-        
 
         // Check if there are any objects for each category
         const hasPunkter = filterByGeometryType('Point').length > 0;
         const hasLinjer = filterByGeometryType('LineString').length > 0;
         const hasPolygoner = filterByGeometryType('Polygon').length > 0;
 
-        console.log('hasPunktr: ', hasPunkter);
+        //console.log('hasPunktr: ', hasPunkter);
 
         return (
             <div>
@@ -2335,9 +2319,8 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, projectKarter
         }
     };
 
-
+    //-- RENDER ATTRIBUTE LIST FOR PROJECT VIEW
     const renderAttributeList = () => {
-
         return (
             <div>
                 {!shouldHideDataView &&
@@ -2500,7 +2483,7 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, projectKarter
         )
     }
 
-
+    //-- RENDER MAP
     const renderMap = () => {
         return (
             <div ref={mapRef} style={{ height: mapHeight, width: '100%' }}>
@@ -2537,12 +2520,11 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, projectKarter
         )
     }
 
-    // Top Bar JSX
+    //-- RENDER TOP BAR
     const renderTopBar = () => {
-
     };
 
-    // Left Section JSX
+    //-- RENDER LEFT SECTION
     const renderLeftSection = () => {
         if (!selectedProject) {
             return <div>Laddar..</div>; // Provide a loading message or any other fallback content
@@ -2551,14 +2533,17 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, projectKarter
         // Convert kartlaggningstypOptions to an array and add the "Alla" option
         const kartlaggningstypOptionsArray = [/*{ key: '', value: 'Visa alla' },*/ ...Object.entries(kartlaggningstypOptions).map(([key, value]) => ({ key, value }))];
 
+        // State for showing/hiding the kartlaggning list
         const toggleKartlaggningList = () => {
             setShowKartlaggningList(!showList);
         };
 
+        // State for showing/hiding the kartlaggning list
         const toggleLagerhanteringPopup = () => {
             setShowLagerhanteringPopup(!showLagerhanteringPopup);
         };
 
+        // State for showing/hiding the kartlaggning list
         const handleSelectKartlaggningOption = (optionKey) => {
             console.log('Selected kartlaggning option:', optionKey);
             console.log('Selected kartlaggning value:', kartlaggningstypOptions[optionKey]);
@@ -2591,7 +2576,7 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, projectKarter
         };
         */
 
-
+        // State for showing/hiding the kartlaggning list
         const onValueElementOptionClick = (optionType) => {
             if (optionType === 'Dot') {
                 // If already selected, reset both filters and default to 'Punkter' tab
@@ -2630,10 +2615,10 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, projectKarter
                 })), ...kartlaggningstypOptionsArray];
         */
 
+        // State for showing/hiding the kartlaggning list
         const toggleNewKarteringList = () => {
             setShowNewKartering(!showNewKartering);
         };
-
 
         return (
             <div className="left-section">
@@ -2734,25 +2719,20 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, projectKarter
                         </div>
                     )}
 
-
-
-
                     <button style={{ backgroundColor: selectedKartlaggningOptions.length > 0 ? 'green' : 'red', color: 'white' }}>
                         {selectedKartlaggningOptions.length > 0 ? 'Kartering vald' : 'Ingen karteringstyp vald'}
                     </button>
 
-                    {/* Selected karteringstyp buttons */}
                     <div className="selected-karteringstyp-buttons">
                         {selectedKartlaggningOptions.map((optionKey, index) => (
                             <button
                                 key={index}
-                         
+
                             >
                                 {kartlaggningstypOptions[optionKey] || optionKey}
                             </button>
                         ))}
                     </div>
-
 
                     <div className="value-element-options">
                         <div className={`value-element-option ${geometryFilterPoint ? 'selected' : ''}`} onClick={() => onValueElementOptionClick('Dot')}>
@@ -2763,8 +2743,6 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, projectKarter
                         </div>
                     </div>
                 </div >
-
-
 
                 <button className="layers-btn" onClick={toggleLagerhanteringPopup}>
                     <img src={`${process.env.PUBLIC_URL}/media/layers-100.png`} alt="Layers" />
@@ -2783,9 +2761,7 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, projectKarter
         );
     };
 
-
-
-    // Right Section JSX
+    //-- RENDER RIGHT SECTION
     const renderRightSection = () => {
         const selectedMapObjectId = selectedId; // Dynamically set based on user interaction
 
@@ -2803,6 +2779,7 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, projectKarter
             setFullscreenImage(null);
         };
 
+        // Function to delete the selected image
         const handlePreviousImage = () => {
             const currentIndex = filteredImages.findIndex(img => img.url === fullscreenImage.url);
             if (currentIndex > 0) {
@@ -2817,7 +2794,6 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, projectKarter
                 setFullscreenImage(filteredImages[currentIndex + 1]);
             }
         };
-
 
         // Display filtered images in a grid, three in a row
         const miniatureView = (
@@ -2841,6 +2817,7 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, projectKarter
             img.src = image.url;
         };
 
+        // Function to delete the selected image
         const handleSaveDrawing = (drawingBase64) => {
             // Store the drawing data temporarily
             setPendingDrawing(drawingBase64);
@@ -2849,7 +2826,7 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, projectKarter
             setShowReplacePrompt(true);
         };
 
-
+        // Function to delete the selected image
         const handleReplaceDecision = async (replace) => {
             console.log('Replace decision:', replace);
             //setSelectedId(fullscreenImage.mapObjectId); // Set the selected ID for the image
@@ -2906,13 +2883,14 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, projectKarter
 
             }
 
-
             // Clear the drawing data and close the prompt
             fetchImages()
             setIsDrawingMode(false);
             setShowReplacePrompt(false);
             setPendingDrawing(null);
         };
+
+        // Function to delete the selected image
         const ReplacePrompt = () => (
             <div className="overlay">
                 <div className="confirmation-dialog">
@@ -2923,6 +2901,7 @@ const Map = ({ selectedProjectId, selectedProject, onSave, userID, projectKarter
             </div>
         );
 
+        // Function to delete the selected image
         const fullscreenView = fullscreenImage && (
             <div className="fullscreen-view">
                 <button onClick={handlePreviousImage} className="nav-btn left-nav">&lt;</button>
