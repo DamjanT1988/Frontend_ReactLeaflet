@@ -29,10 +29,12 @@ const LoginView = () => {
     };
   }, []); // Empty dependency array means it only runs on the first render
 
+  // Function to handle the form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     setStatusMessage(''); // Clear any existing messages
     try {
+      // Send a POST request to the login endpoint
       const response = await fetch(API_URLS.LOGIN, {
         method: 'POST',
         headers: {
@@ -45,6 +47,7 @@ const LoginView = () => {
         }),
       });
 
+      // Parse the JSON response
       const data = await response.json();
 
       if (response.ok) {

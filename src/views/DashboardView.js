@@ -18,9 +18,11 @@ const DashboardView = () => {
       return;
     }
 
+    // Check if the rememberMe value is set to true
     const savedRememberMe = localStorage.getItem('rememberMe') === 'true';
     setRememberMe(savedRememberMe);
 
+    // Fetch user info
     const fetchUserInfo = async () => {
       try {
         const response = await fetch(API_URLS.USER_INFO, {
@@ -45,8 +47,10 @@ const DashboardView = () => {
 
     fetchUserInfo();
 
+    // Fetch projects
     const fetchProjects = async () => {
       try {
+        // Fetch request to the projects API endpoint
         const response = await fetch(API_URLS.PROJECTS, {
           headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -54,6 +58,7 @@ const DashboardView = () => {
         });
   
         if (response.ok) {
+          // Parse the response as JSON
           const data = await response.json();
           setProjects(data.reverse().slice(0, 3)); // Store only the latest five projects
         } else {

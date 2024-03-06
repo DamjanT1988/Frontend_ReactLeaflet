@@ -20,16 +20,7 @@ const DataView = () => {
   const [geoJsonData, setGeoJsonData] = useState(null);
   const [searchTerm, setSearchTerm] = useState(''); // State for search term
   const [sortOrder, setSortOrder] = useState('desc'); // State for sort order ('asc' or 'desc')
-  /*
-    useEffect(() => {
-      if (!accessToken) {
-        if (projectId) {
-          viewProjectDetails(projectId);
-        }
-      }
-    }, [projectId]);
-  */
-
+  
   // Use effect hook to fetch projects if access token is available
   useEffect(() => {
     if (!accessToken) { // If there is no access token
@@ -104,6 +95,7 @@ const DataView = () => {
           selectedProjectId={selectedProject.id}
           geoJsonData={geoJsonData}
           userID={selectedProject.user}
+          projectKarteringar={selectedProject.karteringar}
           selectedProject={selectedProject}
           shouldHideDataView={true}
         />
