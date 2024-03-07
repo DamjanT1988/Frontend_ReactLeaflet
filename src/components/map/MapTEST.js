@@ -130,6 +130,7 @@ const DraggableLine = ({ onDrag }) => {
         }
     };
 
+    // Add event listeners when the component mounts
     useEffect(() => {
         const line = lineRef.current;
 
@@ -138,11 +139,13 @@ const DraggableLine = ({ onDrag }) => {
             e.preventDefault(); // Prevent default to avoid text selection
             const initialY = e.clientY;
 
+            // Event listener for mouse move and mouse up on the window
             const doDrag = (e) => {
                 const movementY = e.clientY - initialY;
                 handleDrag(movementY);
             };
 
+            // Event listener for mouse up on the window
             const stopDrag = () => {
                 window.removeEventListener('mousemove', doDrag);
                 window.removeEventListener('mouseup', stopDrag);
@@ -154,6 +157,7 @@ const DraggableLine = ({ onDrag }) => {
 
         line.addEventListener('mousedown', startDrag);
 
+        // Cleanup
         return () => {
             line.removeEventListener('mousedown', startDrag);
         };
@@ -290,7 +294,6 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
                             });
                         }
 
-                        // Add additional conditions for other layer types as needed
                     });
                 }
                 mapObjectClickedRef.current = false;
@@ -299,7 +302,7 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
             },
         });
 
-        return null; // This component does not render anything
+        return null;
     };
 
     //-- DRAG MAP RESIZE
@@ -315,6 +318,7 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
         const canvasRef = useRef(null);
 
         useEffect(() => {
+            // Set the width and height of the canvas element
             const canvas = canvasRef.current;
             if (canvas) {
                 canvas.width = width;
@@ -325,6 +329,7 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
         // Function to capture the drawing as a base64 image
         const captureDrawing = () => {
             if (canvasRef.current) {
+                // Get the base64 image data from the canvas
                 const dataURL = canvasRef.current.toDataURL('image/png');
                 onSave(dataURL); // Pass the base64 image data to the onSave callback
                 console.log('dataURL: ', dataURL);
@@ -333,6 +338,7 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
 
         // Function to handle mouse down event
         const handleMouseDown = (e) => {
+            // Set the drawing mode to true
             const canvas = canvasRef.current;
             const ctx = canvas.getContext('2d');
             ctx.beginPath();
@@ -395,6 +401,7 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
 
         // If CTRL key is pressed, add or remove the feature ID from the selectedFeatureIds set
         setSavedObjectIds(prevSelectedIds => {
+            // Create a new set from the previous selected IDs
             const newSelectedIds = new Set(prevSelectedIds);
 
             if (newSelectedIds.has(featureId)) {
@@ -453,6 +460,7 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
 
             // If there's a selected image file, convert it to base64
             if (selectedImage) {
+                // Function to convert a file to base64
                 const toBase64 = file => new Promise((resolve, reject) => {
                     const reader = new FileReader();
                     reader.readAsDataURL(file);
@@ -682,13 +690,13 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
             // Set the attributes object
             setAttributesObject(attributes);
         };
-    
+
         // This function will be called when the component unmounts
         return () => {
             // Clean up the global function from the window object
             window.toggleAttributeContainer = undefined;
         };
-    // The empty array [] means this effect will only run once, when the component mounts
+        // The empty array [] means this effect will only run once, when the component mounts
     }, []);
 
     //-- HOOK RENDER
@@ -951,30 +959,30 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
         invertedPolygon.isMask = true;
     };
 
-/*
-    const updateInvertedMask = (rectangleLayer, invertedMask) => {
-        const bounds = rectangleLayer.getBounds();
-        const largeBounds = [[90, -180], [-90, 180]];
-
-        // Update the coordinates of the inverted mask
-        const newOuterCoords = [
-            largeBounds[0], // Top-left of map
-            [90, 180], // Top-right of map
-            largeBounds[1], // Bottom-right of map
-            [-90, -180], // Bottom-left of map
-            largeBounds[0] // Close the loop
-        ];
-        const newInnerCoords = [
-            [bounds.getNorthWest().lat, bounds.getNorthWest().lng],
-            [bounds.getNorthEast().lat, bounds.getNorthEast().lng],
-            [bounds.getSouthEast().lat, bounds.getSouthEast().lng],
-            [bounds.getSouthWest().lat, bounds.getSouthWest().lng],
-            [bounds.getNorthWest().lat, bounds.getNorthWest().lng] // Closing the loop
-        ];
-
-        invertedMask.setLatLngs([newOuterCoords, newInnerCoords]);
-    };
-*/
+    /*
+        const updateInvertedMask = (rectangleLayer, invertedMask) => {
+            const bounds = rectangleLayer.getBounds();
+            const largeBounds = [[90, -180], [-90, 180]];
+    
+            // Update the coordinates of the inverted mask
+            const newOuterCoords = [
+                largeBounds[0], // Top-left of map
+                [90, 180], // Top-right of map
+                largeBounds[1], // Bottom-right of map
+                [-90, -180], // Bottom-left of map
+                largeBounds[0] // Close the loop
+            ];
+            const newInnerCoords = [
+                [bounds.getNorthWest().lat, bounds.getNorthWest().lng],
+                [bounds.getNorthEast().lat, bounds.getNorthEast().lng],
+                [bounds.getSouthEast().lat, bounds.getSouthEast().lng],
+                [bounds.getSouthWest().lat, bounds.getSouthWest().lng],
+                [bounds.getNorthWest().lat, bounds.getNorthWest().lng] // Closing the loop
+            ];
+    
+            invertedMask.setLatLngs([newOuterCoords, newInnerCoords]);
+        };
+    */
 
     //-- SAVE PROJECT DATA FILE
     const saveDataToServer = async () => {
@@ -1410,7 +1418,7 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
                         //console.log('layer 1 marker: ', layer);
                         //console.log('circleMarker 1: ', circleMarkerFeature);
                     }
-                } 
+                }
                 else if (layer instanceof L.Marker) {
                     let featureMarker;
                     // Handle L.Marker specifically
@@ -1540,7 +1548,7 @@ const MapTest = ({ selectedProjectId, selectedProject, userID, shouldHideDataVie
                 }
             };
 
-        } 
+        }
         else if (newLayer instanceof L.CircleMarker) {
             const center = newLayer.getLatLng();
             feature = {
