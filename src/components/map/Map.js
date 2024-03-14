@@ -699,6 +699,58 @@ const Map = ({ selectedProjectId, selectedProject, userID, shouldHideDataView })
         // The empty array [] means this effect will only run once, when the component mounts
     }, []);
 
+    //-- GENERATE POPUP CONTENT
+    // Function to generate popup content from feature properties
+    const generatePopupContent = (properties) => {
+        // Check if the feature is a rectangle and return null or empty content
+        if (properties.shape === "rectangleCrop") {
+            return 'Tillfällig markering'; // Return an empty string to avoid popup content for rectangles
+        }
+
+        // Define a mapping from attribute keys to Swedish names
+        const attributeNames = {
+            objectNumber: 'Objektnummer',
+            inventoryLevel: 'Inventeringsnivå',
+            natureValueClass: 'Naturvärdesklass',
+            preliminaryAssessment: 'Preliminär bedömning',
+            reason: 'Motivering',
+            natureType: 'Naturtyp',
+            habitat: 'Biotop',
+            date: 'Datum',
+            executor: 'Utförare',
+            organization: 'Organisation',
+            projectName: 'Projektnamn',
+            area: 'Area',
+            species: 'Arter',
+            habitatQualities: 'Habitatkvaliteter',
+            valueElements: 'Värdeelement',
+            kartlaggningsTyp: 'Kartläggningstyp',
+            kartlaggningsGeometry: 'Kartläggningsgeometri'
+        };
+
+        if (!shouldHideDataView) {
+            // Start the popup content with a div wrapper
+            let content = '<div class="popup-content">';
+
+            // Loop through each attribute in the properties.attributes object
+            if (properties.attributes) {
+                Object.entries(properties.attributes).forEach(([key, value]) => {
+                    // Check if the key has a Swedish name mapping and is not 'Objekt-ID'
+                    if (attributeNames[key] && key !== 'id') {
+                        content += `<p><strong>${attributeNames[key]}:</strong> ${value}</p>`;
+                    }
+                });
+            }
+
+            const id = properties.id;
+            const attributesJson = JSON.stringify(properties.attributes);
+            content += `<button className='primary-btn' onclick='window.toggleAttributeContainer("${id}", ${attributesJson})'>Redigera objektattribut</button>`;
+
+            content += '</div>';
+            return content;
+        }
+    };
+
     //-- HOOK RENDER
     useEffect(() => {
         if (featureGroupRef.current) {
@@ -800,9 +852,7 @@ const Map = ({ selectedProjectId, selectedProject, userID, shouldHideDataView })
                                 color: '#3388ff', // Default color
                                 fillColor: '#3388ff', // Default fill color
                                 fillOpacity: 0.2,
-                                weight: 3,
-                                radius: feature.properties.radius
-
+                                weight: 3
                             });
 
                             if (!shouldHideDataView) {
@@ -866,59 +916,9 @@ const Map = ({ selectedProjectId, selectedProject, userID, shouldHideDataView })
                 setShowRectangleButton(!foundCropRectangle); // Hide or show the button based on the presence of a crop rectangle
             }
         }
-    }, [geoJsonData]);
+    }, [geoJsonData, shouldHideDataView, generatePopupContent]);
 
-    //-- GENERATE POPUP CONTENT
-    // Function to generate popup content from feature properties
-    const generatePopupContent = (properties) => {
-        // Check if the feature is a rectangle and return null or empty content
-        if (properties.shape === "rectangleCrop") {
-            return 'Tillfällig markering'; // Return an empty string to avoid popup content for rectangles
-        }
 
-        // Define a mapping from attribute keys to Swedish names
-        const attributeNames = {
-            objectNumber: 'Objektnummer',
-            inventoryLevel: 'Inventeringsnivå',
-            natureValueClass: 'Naturvärdesklass',
-            preliminaryAssessment: 'Preliminär bedömning',
-            reason: 'Motivering',
-            natureType: 'Naturtyp',
-            habitat: 'Biotop',
-            date: 'Datum',
-            executor: 'Utförare',
-            organization: 'Organisation',
-            projectName: 'Projektnamn',
-            area: 'Area',
-            species: 'Arter',
-            habitatQualities: 'Habitatkvaliteter',
-            valueElements: 'Värdeelement',
-            kartlaggningsTyp: 'Kartläggningstyp',
-            kartlaggningsGeometry: 'Kartläggningsgeometri'
-        };
-
-        if (!shouldHideDataView) {
-            // Start the popup content with a div wrapper
-            let content = '<div class="popup-content">';
-
-            // Loop through each attribute in the properties.attributes object
-            if (properties.attributes) {
-                Object.entries(properties.attributes).forEach(([key, value]) => {
-                    // Check if the key has a Swedish name mapping and is not 'Objekt-ID'
-                    if (attributeNames[key] && key !== 'id') {
-                        content += `<p><strong>${attributeNames[key]}:</strong> ${value}</p>`;
-                    }
-                });
-            }
-
-            const id = properties.id;
-            const attributesJson = JSON.stringify(properties.attributes);
-            content += `<button className='primary-btn' onclick='window.toggleAttributeContainer("${id}", ${attributesJson})'>Redigera objektattribut</button>`;
-
-            content += '</div>';
-            return content;
-        }
-    };
 
     //-- CREATE GREY AREA AROUND THE CROP AREA
     const createInvertedMask = (rectangleLayer) => {
