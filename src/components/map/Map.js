@@ -1,7 +1,7 @@
 // Import necessary modules and components
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { MapContainer, TileLayer, LayersControl, FeatureGroup, GeoJSON, useMapEvents, useMap } from 'react-leaflet';
-import { EditControl, drawControl } from "react-leaflet-draw";
+import { EditControl, /*drawControl*/ } from "react-leaflet-draw";
 import { API_URLS } from '../../constants/APIURLS'; // Import the API_URLS constant
 import L from 'leaflet';
 import 'leaflet-draw';
@@ -161,7 +161,7 @@ const DraggableLine = ({ onDrag }) => {
         return () => {
             line.removeEventListener('mousedown', startDrag);
         };
-    }, [onDrag]);
+    }, /*[onDrag]*/);
 
     // Return the draggable line element
     return <div ref={lineRef} className="draggable-line"></div>;
@@ -450,8 +450,38 @@ const Map = ({ selectedProjectId, selectedProject, userID, shouldHideDataView })
         }
     };
 
+    //-- FETCH IMAGES
+    const fetchImages = useCallback(async () => {
+        try {
+            // Fetch images for the selected project
+            const response = await fetch(`${API_URLS.PROJECT_IMAGE_GET.replace('<int:project_id>', selectedProjectId)}`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`,
+                },
+            });
+
+            if (response.ok) {
+                // Logic after successful fetch
+                const data = await response.json();
+                console.log('image data: ', data);
+                const images = data.images; // Use the 'images' key from the response
+                setImageList(images.map(image => ({
+                    id: image.id, // Include the image ID
+                    url: image.url, // Include the image URL
+                    caption: image.caption, // Include the caption
+                    mapObjectId: image.mapObjectId // Include the mapObjectId
+                })));
+            } else {
+                console.error('Failed to fetch images, status:', response.status);
+            }
+        } catch (error) {
+            console.error('Error fetching images:', error);
+        }
+    }, [accessToken, selectedProjectId]);
+
     //-- UPLOAD IMAGE
-    const uploadImage = async () => {
+    const uploadImage = useCallback(async () => {
         // Ensure there is either an image file or a base64 string, and an ID is selected
         if (!selectedId || (!selectedImage && !imageBase64)) return;
 
@@ -506,48 +536,18 @@ const Map = ({ selectedProjectId, selectedProject, userID, shouldHideDataView })
         } catch (error) {
             console.error('Error uploading image:', error);
         }
-    };
-
-    //-- FETCH IMAGES
-    const fetchImages = async () => {
-        try {
-            // Fetch images for the selected project
-            const response = await fetch(`${API_URLS.PROJECT_IMAGE_GET.replace('<int:project_id>', selectedProjectId)}`, {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${accessToken}`,
-                },
-            });
-
-            if (response.ok) {
-                // Logic after successful fetch
-                const data = await response.json();
-                console.log('image data: ', data);
-                const images = data.images; // Use the 'images' key from the response
-                setImageList(images.map(image => ({
-                    id: image.id, // Include the image ID
-                    url: image.url, // Include the image URL
-                    caption: image.caption, // Include the caption
-                    mapObjectId: image.mapObjectId // Include the mapObjectId
-                })));
-            } else {
-                console.error('Failed to fetch images, status:', response.status);
-            }
-        } catch (error) {
-            console.error('Error fetching images:', error);
-        }
-    };
+    }, [accessToken, captionText, imageBase64, selectedId, selectedImage, selectedProjectId, fetchImages]);
 
     //-- HOOKS IMAGES
     useEffect(() => {
         if (imageBase64) {
             uploadImage(); // Call uploadImage here
         }
-    }, [imageBase64]);
+    }, [imageBase64, uploadImage]);
 
     useEffect(() => {
         fetchImages();
-    }, [selectedProjectId]); // Re-fetch images when selectedProjectId changes
+    }, [selectedProjectId, fetchImages]); // Re-fetch images when selectedProjectId changes
 
     //-- RESET STYLES OF ICON AND CIRCLE
     // Function to reset styles for all layers
