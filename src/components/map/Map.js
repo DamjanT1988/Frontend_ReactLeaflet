@@ -13,7 +13,7 @@ import { v4 as uuidv4 } from 'uuid';
 //-- LEAFLET COMPONENT
 const { BaseLayer } = LayersControl;
 
-//-- ICONS
+//-- ICONS  
 delete L.Icon.Default.prototype._getIconUrl
 L.Icon.Default.mergeOptions({
     iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
