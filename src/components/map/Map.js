@@ -1078,7 +1078,7 @@ const Map = ({ selectedProjectId, selectedProject, userID, shouldHideDataView })
                 }
 
                 // Use existing ID if present, otherwise assign a new unique ID
-                layerFeature.properties.id = layerFeature.properties.id;
+                //layerFeature.properties.id = layerFeature.properties.id;
 
                 //console.log('layerFeature ID: ', layerFeature.properties.id);
 
@@ -1487,7 +1487,7 @@ const Map = ({ selectedProjectId, selectedProject, userID, shouldHideDataView })
 
             });
 
-            if (features == 0 || features == null || features == undefined || features == '') {
+            if (features === 0 || features === null || features === undefined || features === '') {
                 //setIsRectangleDrawn(false);
             }
 
@@ -1722,7 +1722,7 @@ const Map = ({ selectedProjectId, selectedProject, userID, shouldHideDataView })
                         onEachFeature: (feature, layer) => {
                             layer.addTo(featureGroupRef.current);
                             layer.on('click', () => {
-                                if (feature.properties && feature.properties.id || feature.properties.attributes) {
+                                if (feature.properties && (feature.properties.id || feature.properties.attributes)) {
                                     setSelectedId(feature.properties.id);
                                     setAttributesObject(feature.properties.attributes);
                                 }
