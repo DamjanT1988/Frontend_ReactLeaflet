@@ -1995,7 +1995,7 @@ const Map = ({ selectedProjectId, selectedProject, userID, shouldHideDataView })
                     }
 
                     // Apply the highlight style to the target feature
-                    if (layer.options.id === featureId || layer.feature && layer.feature.properties.id === featureId) {
+                    if (layer.options.id === featureId || (layer.feature && layer.feature.properties.id === featureId)) {
 
 
                         if (layer instanceof L.Marker) {
