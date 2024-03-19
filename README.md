@@ -45,11 +45,5 @@ För att sätta upp och köra frontenden lokalt, följ dessa steg:
 ## Användning
 Navigera i webbläsaren till `http://localhost:3000` (eller den port som anges i din utvecklingsserver) för att se applikationen. Utforska de olika funktionerna som projektadministration, kartvisualisering och datahantering.
 
-## Bidra
-Ditt bidrag till projektet är värdefullt. Se `CONTRIBUTING.md` i repot för information om hur du kan hjälpa till med att förbättra applikationen.
-
-## Licens
-Detta projekt är öppen källkodslicenserat under MIT-licensen. Fullständiga licensvillkor finns i filen [LICENSE](LICENSE) i projektrepot.
-
 ## Dokumentation
 För ytterligare information och detaljer om applikationens funktioner och utveckling, se den fullständiga dokumentationen inkluderad i projektrepot.
