@@ -1,70 +1,43 @@
-# Getting Started with Create React App
+# GIS Fältkart Applikation
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Översikt
+Denna GIS fältkartapplikation är en innovativ lösning utformad för att effektivisera och digitalisera processen för fältkartläggning. Applikationen består av en webbapplikation för onlineanvändning och en mobilapplikation för offlineanvändning, vilket gör den idealisk för en mängd olika användningsområden inom geografiska informationssystem (GIS).
 
-## Available Scripts
+## Webbapplikation
 
-In the project directory, you can run:
+### Teknikstack
+- **Frontend**: Applikationen använder `React JS` tillsammans med `React Leaflet` för att skapa en interaktiv och användarvänlig kartupplevelse.
+- **Backend**: Backend bygger på `Django` med `GeoDjango`-tillägget, vilket tillhandahåller robusta verktyg för hantering av geospatiala data.
+- **Databas**: `PostgreSQL` används som databas, med `PostGIS`-tillägget för spatial datahantering.
 
-### `npm start`
+### Funktioner
+- Dynamisk kartvisualisering med stöd för olika lager och markörer.
+- Användarautentisering och administrationsgränssnitt för hantering av projekt och användardata.
+- Import och export av geospatiala data i format som GeoJSON, GeoPackage, shapefiler och GML.
+- Möjlighet att skapa egna GIS-projekt och samla fältdata direkt i applikationen.
+- Generering av grundläggande rapporter baserade på insamlad projektdata.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## Mobilapplikation
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+### Teknikstack
+- **Plattform**: Applikationen utvecklas med `React Native`, vilket möjliggör cross-platform kompatibilitet för både iOS och Android-enheter.
 
-### `npm test`
+### Funktioner
+- Grundläggande GIS fältkartläggningsfunktioner såsom att rita polygoner, linjer, anteckningar och fästa foton till kartobjekt.
+- Möjlighet att importera och exportera projekt mellan webbapplikationen och mobilapplikationen.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Allmänna Betraktelser
+- Säker användarautentisering och auktorisering för att skydda tillgången till känslig information.
+- Användning av Open Street Maps och samma Open Layers i både webb- och mobilapplikationer för att säkerställa konsistens.
+- Hosting av databasen i molnet medan webbapplikationen hostas på en webbtjänst, båda hos samma leverantör för smidig integration och underhåll.
 
-### `npm run build`
+## Installation och Konfiguration
+För att sätta upp projektet lokalt, följ dessa steg:
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+1. Klona repot från GitHub.
+2. Installera nödvändiga beroenden med `pipenv` för Python/Django-delen och `npm` eller `yarn` för React-delen.
+3. Konfigurera din lokala databas med PostGIS och skapa nödvändiga tabeller enligt modellspecifikationerna.
+4. Starta Django-servern och React-utvecklingsservern enligt dokumentationen.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+## Licens
+Denna projekt är licensierad under MIT-licensen. Se [LICENSE](LICENSE) filen för mer information.
